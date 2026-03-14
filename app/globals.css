@@ -1,26 +1,1825 @@
+/* ============================================================
+   BANK OF ASIA — GLOBAL DESIGN SYSTEM
+   Tailwind CSS v4 — @theme inline configuration
+   ============================================================ */
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   MARKETING SITE — BOA DESIGN SYSTEM TOKENS (v2)
+   Updated per DESIGN_BRIEF.md:
+   - navy #0A1628, teal #00C896, gold #C8972A
+   - max-width 1440px, clamp content padding
+   ============================================================ */
+:root,
+.marketing-site {
+  /* ── Core palette ──────────────────────────────────────── */
+  --boa-navy:       #0A1628;
+  --boa-navy-mid:   #0F2040;
+  --boa-navy-light: #162B52;
+  --boa-teal:       #00C896;
+  --boa-teal-dim:   #00A87E;
+  --boa-gold:       #C8972A;
+  --boa-gold-light: #E0B84A;
+  --boa-white:      #FFFFFF;
+  --boa-off-white:  #F8F9FA;
+  --boa-gray-100:   #F1F3F5;
+  --boa-gray-200:   #E5E9EE;
+  --boa-gray-400:   #9CA3AF;
+  --boa-gray-600:   #6B7280;
+  --boa-text:       #1A2332;
+  --boa-muted:      #64748B;
+  --boa-border:     #E5E9EE;
+
+  /* ── Backward compat (old purple-based pages) ────────── */
+  --boa-purple:  #4A1FA8;
+  --boa-light:   #F5F5F0;
+
+  /* ── Layout ───────────────────────────────────────────── */
+  --max-width:       1440px;
+  --content-padding: clamp(20px, 5vw, 80px);
 }
 
+/* ── Container & section utilities ──────────────────────── */
+.boa-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+}
+
+.boa-section {
+  padding: clamp(60px, 8vw, 120px) 0;
+}
+
+/* ── Glass morphism ──────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+}
+
+/* ── Gradient text ───────────────────────────────────────── */
+.text-gradient-teal {
+  background: linear-gradient(135deg, #00C896, #00A8FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #C8972A, #E8C86A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Button utilities ────────────────────────────────────── */
+.btn-primary {
+  background: var(--boa-teal);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: var(--boa-teal-dim);
+  transform: translateY(-1px);
+}
+
+.btn-outline-white {
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: transparent;
+  cursor: pointer;
+}
+.btn-outline-white:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Footer link styles (server component safe) ─────────── */
+.boa-footer-link {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  font-family: var(--font-dm-sans, sans-serif);
+  transition: color 0.15s;
+  text-decoration: none;
+}
+.boa-footer-link:hover {
+  color: #ffffff;
+}
+
+.boa-footer-bottom-link {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 11px;
+  font-family: var(--font-dm-sans, sans-serif);
+  transition: color 0.15s;
+  text-decoration: none;
+}
+.boa-footer-bottom-link:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Keyframe animations ─────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 200, 150, 0.3); }
+  50%       { box-shadow: 0 0 40px rgba(0, 200, 150, 0.6); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Marketing nav hover states ─────────────────────────── */
+.marketing-site .boa-nav-btn:hover {
+  color: var(--boa-teal) !important;
+}
+
+/* ── Product card hover ──────────────────────────────────── */
+.boa-product-card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.boa-product-card:hover {
+  box-shadow: 0 8px 36px rgba(0, 0, 0, 0.09);
+  transform: translateY(-2px);
+}
+
+/* ── Feature row hover (left accent border) ─────────────── */
+.boa-feature-row {
+  border-left: 3px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.boa-feature-row:hover {
+  border-left-color: var(--boa-teal);
+}
+
+/* ── Blinker dot (8px teal circles, on/off 2s) ───────────── */
+@keyframes blinker-dot {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px rgba(0,200,150,0.9); }
+  50%       { opacity: 0.15; transform: scale(0.6); box-shadow: 0 0 3px rgba(0,200,150,0.3); }
+}
+
+/* ── Hero visual utilities ───────────────────────────────── */
+.hero-grid-bg {
+  background-image:
+    linear-gradient(rgba(0,200,150,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,150,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Page fade-in ────────────────────────────────────────── */
+@keyframes boa-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.boa-page-fade {
+  animation: boa-fade-in 0.35s ease both;
+}
+
+/* ── Currency marquee ────────────────────────────────────── */
+@keyframes boa-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.boa-marquee-wrap {
+  overflow: hidden;
+}
+
+.boa-marquee-track {
+  display: inline-flex;
+  animation: boa-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.boa-marquee-wrap:hover .boa-marquee-track {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   THEME TOKENS
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* --- Fonts (all loaded via next/font in root layout) --- */
+  --font-display: var(--font-syne), "Syne", sans-serif;
+  --font-body:    var(--font-dm-sans), "DM Sans", sans-serif;
+  --font-sans:    var(--font-body);
+  /* --font-mono is injected by next/font as --font-mono */
+  /* --font-syne, --font-dm-sans are injected by next/font */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* --- Nexus Color Scale (deep navy-black) --- */
+  --color-nexus-950: #03050a;
+  --color-nexus-900: #060c18;
+  --color-nexus-850: #091120;
+  --color-nexus-800: #0d1a30;
+  --color-nexus-700: #122240;
+  --color-nexus-600: #1a3057;
+  --color-nexus-500: #234070;
+
+  /* --- Brand Accents --- */
+  --color-accent: #00d4ff;
+  --color-accent-dim: #00a8cc;
+  --color-accent-glow: rgba(0, 212, 255, 0.15);
+  --color-gold: #f0b429;
+  --color-gold-dim: #d4991f;
+  --color-gold-glow: rgba(240, 180, 41, 0.15);
+  --color-danger: #ff3b5c;
+  --color-danger-dim: #d42e4a;
+  --color-danger-glow: rgba(255, 59, 92, 0.15);
+  --color-success: #00e5a0;
+  --color-success-dim: #00b87f;
+  --color-success-glow: rgba(0, 229, 160, 0.15);
+
+  /* --- Glassmorphism Surface Colors --- */
+  --color-glass: rgba(13, 26, 48, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
+  --color-glass-hover: rgba(13, 26, 48, 0.8);
+
+  /* --- Text Colors --- */
+  --color-text-primary: #f0f4ff;
+  --color-text-secondary: #8899b5;
+  --color-text-muted: #4d6080;
+
+  /* --- Shadows --- */
+  --shadow-nexus: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  --shadow-nexus-lg: 0 8px 48px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  --shadow-gold: 0 0 20px rgba(240, 180, 41, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --shadow-accent: 0 0 20px rgba(0, 212, 255, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  /* --- Animations --- */
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-scanline: scanline 8s linear infinite;
+  --animate-fade-slide-up: fadeSlideUp 0.5s ease-out forwards;
+  --animate-pulse-slow: pulse 4s ease-in-out infinite;
+  --animate-spin-slow: spin 8s linear infinite;
+
+  /* --- Keyframes --- */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(0, 212, 255, 0.3); }
+    50% { box-shadow: 0 0 24px rgba(0, 212, 255, 0.6); }
   }
 }
 
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-nexus-950);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-nexus-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-nexus-600);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-dim);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-nexus-600) var(--color-nexus-900);
+}
+
+/* ============================================================
+   ANIMATED GRID BACKGROUND
+   ============================================================ */
+.nexus-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 30%, transparent 100%);
+}
+
+.nexus-grid::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    transparent,
+    rgba(0, 212, 255, 0.04),
+    transparent
+  );
+  animation: scanline 8s linear infinite;
+}
+
+/* ============================================================
+   GLASS CARDS
+   ============================================================ */
+.glass-card {
+  background: var(--color-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-nexus);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-nexus-lg);
+}
+
+.glass-card-accent {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.08) 0%,
+    rgba(13, 26, 48, 0.8) 60%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: var(--shadow-accent);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.glass-card-accent:hover {
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 0 0 32px rgba(0, 212, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.glass-card-gold {
+  background: linear-gradient(
+    135deg,
+    rgba(240, 180, 41, 0.08) 0%,
+    rgba(13, 26, 48, 0.8) 60%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(240, 180, 41, 0.2);
+  border-radius: 16px;
+  box-shadow: var(--shadow-gold);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn-nexus {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+  overflow: hidden;
+
+  /* Gradient base */
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    #0088cc 50%,
+    var(--color-accent) 100%
+  );
+  background-size: 200% auto;
+  color: #03050a;
+
+  /* Shimmer overlay */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.5s linear infinite;
+    pointer-events: none;
+  }
+
+  &:hover {
+    background-position: right center;
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.5);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--color-glass-border);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn-danger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(135deg, var(--color-danger), var(--color-danger-dim));
+  color: #fff;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 0 20px rgba(255, 59, 92, 0.5);
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn-gold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dim));
+  color: #03050a;
+  transition: all 0.2s ease;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.5s linear infinite;
+  }
+  &:hover {
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+.input-nexus {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: rgba(6, 12, 24, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+  &:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12), 0 0 16px rgba(0, 212, 255, 0.08);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge-active {
+  @extend .badge;
+  background: var(--color-success-glow);
+  color: var(--color-success);
+  border: 1px solid rgba(0, 229, 160, 0.2);
+  &::before { background: var(--color-success); box-shadow: 0 0 6px var(--color-success); }
+}
+
+.badge-pending {
+  @extend .badge;
+  background: var(--color-gold-glow);
+  color: var(--color-gold);
+  border: 1px solid rgba(240, 180, 41, 0.2);
+  &::before { background: var(--color-gold); }
+}
+
+.badge-danger {
+  @extend .badge;
+  background: var(--color-danger-glow);
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 59, 92, 0.2);
+  &::before { background: var(--color-danger); box-shadow: 0 0 6px var(--color-danger); }
+}
+
+.badge-neutral {
+  @extend .badge;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  &::before { background: var(--color-text-muted); }
+}
+
+/* ============================================================
+   GRADIENT TEXT
+   ============================================================ */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #ffffff 60%, var(--color-accent-dim) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 5s ease infinite;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-gold) 0%, #fff5d6 50%, var(--color-gold) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+}
+
+.text-gradient-danger {
+  background: linear-gradient(135deg, var(--color-danger) 0%, #ff8fa3 50%, var(--color-danger) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   PAGE ANIMATIONS
+   ============================================================ */
+.animate-fade-slide-up {
+  opacity: 0;
+  animation: fadeSlideUp 0.5s ease-out forwards;
+}
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }
+
+/* ============================================================
+   CARD CHIP (debit/credit card UI element)
+   ============================================================ */
+.card-chip {
+  width: 36px;
+  height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #d4a843, #f0c060, #b8901e);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 2px;
+  padding: 4px;
+}
+.card-chip > span {
+  background: rgba(180, 130, 20, 0.6);
+  border-radius: 1px;
+}
+
+/* ============================================================
+   VIRTUAL DEBIT/CREDIT CARD
+   ============================================================ */
+.bank-card {
+  position: relative;
+  width: 340px;
+  height: 210px;
+  border-radius: 18px;
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: default;
+}
+.bank-card:hover {
+  transform: perspective(800px) rotateX(4deg) rotateY(-3deg) translateY(-4px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 212, 255, 0.15);
+}
+.bank-card-visa {
+  background: linear-gradient(135deg, #0d1a30 0%, #122240 40%, #1a3057 100%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow: var(--shadow-accent);
+}
+.bank-card-mastercard {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1054 40%, #3d1a6e 100%);
+  border: 1px solid rgba(240, 180, 41, 0.2);
+  box-shadow: var(--shadow-gold);
+}
+
+/* ============================================================
+   DATA TABLE
+   ============================================================ */
+.nexus-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.nexus-table thead th {
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.nexus-table tbody tr {
+  transition: background 0.15s ease;
+}
+.nexus-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+.nexus-table tbody td {
+  padding: 12px 16px;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  vertical-align: middle;
+}
+
+/* ============================================================
+   GLOW EFFECTS
+   ============================================================ */
+.glow-accent {
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+}
+.glow-gold {
+  box-shadow: 0 0 24px rgba(240, 180, 41, 0.3);
+}
+.glow-danger {
+  box-shadow: 0 0 24px rgba(255, 59, 92, 0.3);
+}
+.glow-success {
+  box-shadow: 0 0 24px rgba(0, 229, 160, 0.3);
+}
+
+/* ============================================================
+   SIDEBAR NAV ITEM
+   ============================================================ */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.nav-item:hover {
+  background: rgba(0, 212, 255, 0.06);
+  color: var(--color-text-primary);
+}
+.nav-item.active {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 20%;
+  height: 60%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+/* ============================================================
+   DIVIDERS
+   ============================================================ */
+.nexus-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0.08) 80%,
+    transparent
+  );
+}
+
+/* ============================================================
+   TOOLTIPS
+   ============================================================ */
+.tooltip {
+  position: relative;
+}
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--color-nexus-800);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 50;
+}
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* ── Inter font variables ──────────────────────────────────────────────── */
+@theme inline {
+  --font-display: var(--font-inter);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/* ── Tabular numbers ───────────────────────────────────────────────────── */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "cv11";
+  letter-spacing: -0.01em;
+}
+
+.amount-display {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "cv11";
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.amount-hero {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "cv11";
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+/* ── Custom scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+/* ── Mobile bottom nav ────────────────────────────────────────────────── */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(6,12,24,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+}
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+}
+
+/* ── Responsive padding ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main-content-area {
+    padding: 16px !important;
+  }
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE — DASHBOARD
+   ============================================================ */
+
+/* ── Overview: accounts + quick-transfer 2-col → 1-col ─────────────── */
+.overview-accounts-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 340px);
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .overview-accounts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Stats grid responsive ────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+@media (max-width: 360px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 3-col stats (transactions page) → 1-col on mobile ──────────────── */
+.stats-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 640px) {
+  .stats-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* ── Data tables: hide non-essential columns on mobile ───────────────── */
+@media (max-width: 768px) {
+  /* Transactions & overview tables: hide Reference and Description columns */
+  .nexus-table th:nth-child(3),
+  .nexus-table td:nth-child(3) {
+    display: none;
+  }
+}
+@media (max-width: 560px) {
+  /* On small phones also hide the Date column */
+  .nexus-table th:nth-child(6),
+  .nexus-table td:nth-child(6) {
+    display: none;
+  }
+  /* Tighten table cells */
+  .nexus-table thead th,
+  .nexus-table tbody td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+}
+
+/* ── Hero balance card responsive ────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero-balance-card {
+    padding: 20px 18px !important;
+  }
+  .hero-balance-card .hero-sparkline {
+    display: none;
+  }
+}
+
+/* ── Notification panel: full-width on mobile ────────────────────────── */
+@media (max-width: 768px) {
+  .notification-panel {
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+/* ── Button groups: stack on small phones ────────────────────────────── */
+@media (max-width: 420px) {
+  .hero-btn-group {
+    flex-direction: column;
+  }
+  .hero-btn-group a,
+  .hero-btn-group button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── Bank card: scale down on mobile ────────────────────────────────── */
+@media (max-width: 480px) {
+  .bank-card {
+    width: 100% !important;
+    max-width: 320px;
+    height: 190px;
+  }
+}
+
+/* ── Transfer / form pages: full-width inputs ────────────────────────── */
+@media (max-width: 768px) {
+  .transfer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Filters row: stack on mobile ────────────────────────────────────── */
+@media (max-width: 640px) {
+  .filters-row {
+    flex-direction: column !important;
+  }
+  .filters-row > * {
+    width: 100% !important;
+    min-width: unset !important;
+    flex: none !important;
+  }
+}
+
+/* ── Page headings: smaller on mobile ────────────────────────────────── */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 20px !important;
+  }
+}
+
+/* ── Safe-area padding for bottom nav ────────────────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    main {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+
+/* ── Table overflow: horizontal scroll wrapper ───────────────────────── */
+@media (max-width: 768px) {
+  /* Wrap tables in a scrollable container */
+  .glass-card table.nexus-table {
+    min-width: 480px;
+  }
+  /* The parent glass-card already has overflow:hidden; allow x-scroll */
+  .glass-card:has(table.nexus-table) {
+    overflow-x: auto;
+  }
+}
+
+/* ── Cards page: responsive card visual ─────────────────────────────── */
+@media (max-width: 400px) {
+  /* Scale down the 3D card perspective wrapper on very small phones */
+  .card-visual-wrapper {
+    transform: scale(0.88);
+    transform-origin: top left;
+  }
+}
+
+/* ── Glass card padding reduce on mobile ─────────────────────────────── */
+@media (max-width: 480px) {
+  .glass-card {
+    border-radius: 12px;
+  }
+}
+
+/* ── Account card padding ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .account-card-body {
+    padding: 18px 16px !important;
+  }
+}
+
+/* ── Greeting h1 ─────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  h1 {
+    font-size: clamp(20px, 5vw, 26px);
+  }
+}
+
+/* ── Remove native number input spinner arrows (global) ──────────────── */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ── fadeSlideUp animation (for Select dropdown) ──────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE — COMPREHENSIVE DASHBOARD FIX
+   ============================================================ */
+
+/* ── Ensure all select dropdowns look sleek on mobile ──── */
+select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ── Admin users table: hide less-critical columns on mobile ─ */
+@media (max-width: 900px) {
+  .admin-users-table th:nth-child(3),
+  .admin-users-table td:nth-child(3),
+  .admin-users-table th:nth-child(7),
+  .admin-users-table td:nth-child(7) {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .admin-users-table th:nth-child(5),
+  .admin-users-table td:nth-child(5),
+  .admin-users-table th:nth-child(6),
+  .admin-users-table td:nth-child(6) {
+    display: none;
+  }
+}
+
+/* ── Overview: stat cards 3 per row on tablet ──────────── */
+@media (max-width: 900px) and (min-width: 641px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Transfer wizard: step indicators shrink ──────────── */
+@media (max-width: 480px) {
+  .transfer-step-label {
+    display: none;
+  }
+}
+
+/* ── Transaction page filters: flex wrap ──────────────── */
+@media (max-width: 768px) {
+  .tx-filters {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .tx-filters > * {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+}
+
+/* ── Security page grid: single col on mobile ─────────── */
+@media (max-width: 640px) {
+  .security-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Profile form grid: single col on mobile ─────────── */
+@media (max-width: 640px) {
+  .profile-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .profile-grid > [style*="grid-column"] {
+    grid-column: 1 !important;
+  }
+}
+
+/* ── Statement page: responsive layout ──────────────── */
+@media (max-width: 640px) {
+  .statement-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Beneficiary table: stack on mobile ──────────────── */
+@media (max-width: 640px) {
+  .beneficiary-table th:nth-child(4),
+  .beneficiary-table td:nth-child(4),
+  .beneficiary-table th:nth-child(5),
+  .beneficiary-table td:nth-child(5) {
+    display: none;
+  }
+}
+
+/* ── Cards page: center the card wrapper ──────────────── */
+@media (max-width: 640px) {
+  .cards-layout {
+    flex-direction: column !important;
+    align-items: center;
+  }
+  .bank-card {
+    width: 100% !important;
+    max-width: 340px;
+    height: auto !important;
+    aspect-ratio: 1.6 / 1;
+  }
+}
+
+/* ── Dashboard glass-card: tighter padding on mobile ──── */
+@media (max-width: 640px) {
+  .glass-card {
+    padding: 16px !important;
+  }
+  /* Override where padding is set inline */
+  .glass-card[style*="padding: 24px"] {
+    padding: 16px !important;
+  }
+}
+
+/* ── Accounts page: account number full width ──────────── */
+@media (max-width: 480px) {
+  .account-number-mono {
+    font-size: 12px !important;
+    letter-spacing: 0.5px !important;
+  }
+}
+
+/* ── Mobile: tabs overflow scroll ─────────────────────── */
+@media (max-width: 640px) {
+  .tab-row {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0;
+  }
+  .tab-row::-webkit-scrollbar { display: none; }
+  .tab-row button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+/* ── Mobile: page header flex wrap ─────────────────────── */
+@media (max-width: 640px) {
+  .page-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
+
+/* ── Step wizard: compact on mobile ──────────────────── */
+@media (max-width: 480px) {
+  .step-wizard {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px !important;
+    padding-bottom: 4px;
+  }
+  .step-wizard > * {
+    flex-shrink: 0;
+  }
+}
+
+/* ── Exchange rates table: horizontal scroll ────────── */
+@media (max-width: 640px) {
+  .exchange-rates-table {
+    overflow-x: auto;
+    display: block;
+  }
+  .exchange-rates-table table {
+    min-width: 480px;
+  }
+}
+
+/* ── Input groups side-by-side → stacked on mobile ───── */
+@media (max-width: 480px) {
+  .input-row {
+    flex-direction: column !important;
+  }
+  .input-row > * {
+    width: 100% !important;
+  }
+}
+
+/* ── Support page: message list compact ──────────────── */
+@media (max-width: 640px) {
+  .support-message-meta {
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+}
+
+/* ── Admin deposits panel: single col on mobile ─────── */
+@media (max-width: 768px) {
+  .deposits-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* ── Admin user detail: tabs overflow ─────────────────── */
+@media (max-width: 640px) {
+  .admin-user-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-user-tabs::-webkit-scrollbar { display: none; }
+}
+
+/* ── Admin overview grid: 2-col on tablet, 1-col mobile ── */
+@media (max-width: 640px) {
+  .admin-overview-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Profile edit grid: 1-col on small phones ─────────── */
+@media (max-width: 540px) {
+  .profile-edit-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .profile-edit-grid > [style*="1 / -1"],
+  .profile-edit-grid > div[style*="grid-column"] {
+    grid-column: 1 !important;
+  }
+}
+
+/* ── Touch-friendly tap targets ──────────────────────── */
+@media (max-width: 768px) {
+  .btn-nexus,
+  .btn-ghost,
+  .btn-danger,
+  .btn-gold {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .input-nexus,
+  select {
+    min-height: 44px;
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+    touch-action: manipulation;
+  }
+}
+
+/* ── Dashboard overview hero responsive ──────────────── */
+@media (max-width: 640px) {
+  .hero-balance-card {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+  .hero-sparkline {
+    display: none !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-balance-card {
+    padding: 16px 14px !important;
+  }
+}
+
+/* ── Recents transaction list: compact on mobile ─────── */
+@media (max-width: 640px) {
+  .tx-list-item {
+    padding: 10px 14px !important;
+  }
+  .tx-list-item-desc {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* ── Statements: download button full width on mobile ─── */
+@media (max-width: 480px) {
+  .statement-download-btn {
+    width: 100% !important;
+    justify-content: center;
+  }
+}
+
+/* ── Ensure modals don't overflow on mobile ──────────── */
+@media (max-width: 640px) {
+  .modal-box {
+    margin: 12px !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* ── Admin: side panel takes full width on mobile ──── */
+@media (max-width: 900px) {
+  .admin-side-panel {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-height: 80vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    z-index: 300;
+    border: none !important;
+    border-top: 1px solid rgba(240,180,41,0.2) !important;
+  }
+}
+
+/* ============================================================
+   COMPREHENSIVE ADMIN + USER PAGE MOBILE FIX
+   ============================================================ */
+
+/* ── Command Center: stats 3-col → 2-col → 1-col ────── */
+.cmd-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .cmd-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .cmd-stats-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Command Center: activity + quick-actions 2-col → 1-col */
+.cmd-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .cmd-body-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Admin Messages: list + detail panel 2-col → 1-col ── */
+.admin-messages-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  min-height: 600px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .admin-messages-grid {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+}
+
+/* ── Admin filter grid 4-col → 2-col → 1-col ─────────── */
+.admin-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 900px) {
+  .admin-filter-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .admin-filter-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Admin Deposits: 2-col → 1-col ─────────────────────── */
+.admin-deposits-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+@media (max-width: 768px) {
+  .admin-deposits-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Exchange rates: wrap table in scroll container ─────── */
+.exchange-rates-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(13,26,48,0.6);
+}
+.exchange-rates-wrapper table {
+  min-width: 420px;
+  width: 100%;
+  border-collapse: collapse;
+}
+/* Hide 7-Day Trend sparkline column on mobile */
+@media (max-width: 640px) {
+  .exchange-rates-wrapper table th:nth-child(5),
+  .exchange-rates-wrapper table td:nth-child(5) {
+    display: none;
+  }
+  .exchange-rates-wrapper table {
+    min-width: 320px;
+  }
+  .exchange-base-row {
+    width: 100%;
+  }
+  .exchange-base-selector {
+    flex: 1 !important;
+    max-width: none !important;
+  }
+  .exchange-header-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+}
+
+/* ── Exchange converter: responsive grid ────────────────── */
+.exchange-converter-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: end;
+}
+@media (max-width: 600px) {
+  .exchange-converter-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .exchange-converter-swap {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* ── Overview: hero action buttons wrap on mobile ─────── */
+@media (max-width: 480px) {
+  .hero-btn-group {
+    flex-direction: column !important;
+  }
+  .hero-btn-group > a,
+  .hero-btn-group > button {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── Table wrappers: always allow horizontal scroll ──── */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll-wrapper table {
+  min-width: 480px;
+}
+
+/* ── Admin tables: horizontal scroll on mobile ────────── */
+@media (max-width: 768px) {
+  .admin-table-card {
+    overflow-x: auto !important;
+  }
+  .admin-table-card table {
+    min-width: 540px;
+  }
+}
+
+/* ── Admin users table: hide less-critical cols ─────── */
+@media (max-width: 900px) {
+  .admin-users-table th:nth-child(3),
+  .admin-users-table td:nth-child(3),
+  .admin-users-table th:nth-child(5),
+  .admin-users-table td:nth-child(5) {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .admin-users-table th:nth-child(6),
+  .admin-users-table td:nth-child(6),
+  .admin-users-table th:nth-child(8),
+  .admin-users-table td:nth-child(8) {
+    display: none;
+  }
+}
+
+/* ── Admin messages: back button hidden on desktop ─── */
+.msg-back-btn {
+  display: none;
+}
+@media (max-width: 900px) {
+  .msg-back-btn {
+    display: inline-flex !important;
+  }
+}
+
+/* ── Exchange base selector: full width on mobile ─────── */
+@media (max-width: 600px) {
+  .exchange-base-selector {
+    width: 100% !important;
+  }
+  .exchange-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* ── Transfer wizard card: reduce padding on mobile ──── */
+@media (max-width: 480px) {
+  .transfer-wizard-card {
+    padding: 20px 16px !important;
+  }
+}
+
+/* ── Transfer type buttons: wrap time badge on very small ── */
+@media (max-width: 400px) {
+  .transfer-type-time-badge {
+    display: none;
+  }
+}
+
+/* ── Modal detail grid: single col on mobile ─────────── */
+@media (max-width: 480px) {
+  .modal-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Tab navigation row: scrollable on mobile ────────── */
+.tab-row {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tab-row::-webkit-scrollbar { display: none; }
+
+/* ── Page header row: stack on narrow ───────────────────── */
+@media (max-width: 560px) {
+  .page-header-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+}
+
+/* ── Transactions: compact table on small phones ─────── */
+@media (max-width: 480px) {
+  .nexus-table th:nth-child(2),
+  .nexus-table td:nth-child(2) {
+    display: none;
+  }
+}
+
+/* ── Stats summary cards: 2-col on mobile ───────────── */
+@media (max-width: 400px) {
+  .stats-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Transfer success card: reduce padding on mobile ─── */
+@media (max-width: 480px) {
+  .transfer-success-card {
+    padding: 32px 20px !important;
+  }
+}
+
+/* ── Security login table: hide Device col on mobile ─── */
+@media (max-width: 560px) {
+  .login-history-table th:nth-child(3),
+  .login-history-table td:nth-child(3) {
+    display: none;
+  }
+}
+
+/* ── Custom dropdown animation ─────────────────────────── */
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Admin user detail: mobile fixes ─────────────────── */
+@media (max-width: 640px) {
+  .admin-user-detail-submit {
+    width: 100% !important;
+    align-self: stretch !important;
+  }
+  .admin-user-email-row {
+    flex-direction: column !important;
+  }
+  .admin-user-email-row button {
+    width: 100% !important;
+  }
+  /* Overview grid: single col on small phones */
+  .admin-user-overview-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Admin controls profile grid: single col */
+  .admin-profile-edit-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Admin name grid: single col */
+  .admin-name-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* Hide scrollbar on admin tabs */
+  .admin-user-tabs::-webkit-scrollbar { display: none; }
+  .admin-user-tabs { scrollbar-width: none; -ms-overflow-style: none; }
+  /* Glass card padding reduction on admin detail page */
+  .glass-card {
+    padding: 16px !important;
+  }
+  /* Transfer token row: stack vertically */
+  .admin-token-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .admin-token-row > div,
+  .admin-token-row > button,
+  .admin-token-row > a {
+    width: 100% !important;
+    flex: none !important;
+  }
+  /* Status management grid: 2 cols on mobile */
+  .admin-status-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  /* Make all action buttons full width in admin detail */
+  .admin-user-action-row {
+    flex-direction: column !important;
+  }
+  .admin-user-action-row > button,
+  .admin-user-action-row > a {
+    width: 100% !important;
+  }
+}
+
+/* ── Scrollbar hide utility ── */
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ── Dashboard sidebar layout toggle on mobile ─────────
+   The sidebar uses a flex/grid that collapses below nav  */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    display: block !important;
+  }
+  .dashboard-sidebar {
+    display: none !important;
+  }
+  .dashboard-content {
+    padding: 16px !important;
+  }
 }

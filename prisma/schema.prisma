@@ -1,0 +1,298 @@
+// ============================================================
+// BANK OF ASIA — PRISMA SCHEMA
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  RESTRICTED
+  DISABLED
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+  SGD
+  CAD
+  AUD
+  CHF
+  JPY
+  CNY
+  AED
+}
+
+enum AccountStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum CardType {
+  VISA
+  MASTERCARD
+}
+
+enum CardStatus {
+  ACTIVE
+  FROZEN
+  EXPIRED
+  CANCELLED
+}
+
+enum TransactionType {
+  INTERNAL
+  LOCAL_WIRE
+  INTERNATIONAL_WIRE
+  ADMIN_DEPOSIT
+  ADMIN_DEBIT
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  AWAITING_CONFIRMATION
+}
+
+// ============================================================
+// MODELS
+// ============================================================
+
+model User {
+  id                  String     @id @default(cuid())
+  email               String     @unique
+  passwordHash        String
+  firstName           String
+  lastName            String
+  phone               String?
+  role                Role       @default(USER)
+  status              UserStatus @default(PENDING_ACTIVATION)
+  restrictionMessage  String?    // Shown to user when status is RESTRICTED
+  twoFactorSecret     String?
+  twoFactorEnabled    Boolean    @default(false)
+  transferToken       String?    // One-time token required for transfers
+  transferTokenExp    DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  dateOfBirth         DateTime?
+  gender              String?
+  nationality         String?
+  addressLine1        String?
+  addressLine2        String?
+  city                String?
+  state               String?
+  zipCode             String?
+  country             String?
+  idType              String?
+  idNumber            String?
+  idExpiry            DateTime?
+  idDocument          String?   // base64 encoded ID document
+  profilePhoto        String?
+  kycStatus           String?   @default("PENDING")
+  displayId           String?   @unique
+  relationshipManager String?
+  adminNotes          String?
+  passwordResetToken  String?
+  passwordResetExpiry DateTime?
+
+  accounts              Account[]
+  auditLogs             AuditLog[]
+  beneficiaries         Beneficiary[]
+  loginHistory          LoginHistory[]
+  supportMessages       SupportMessage[]
+  userNotifications     UserNotification[]
+  passwordResetTokens   PasswordResetToken[]
+
+  @@map("users")
+}
+
+model Account {
+  id            String        @id @default(cuid())
+  userId        String
+  accountNumber String        @unique // 12-digit
+  currency      Currency      @default(USD)
+  balance       Decimal       @default(0) @db.Decimal(20, 2)
+  status        AccountStatus @default(ACTIVE)
+  createdAt     DateTime      @default(now())
+
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  virtualCards     VirtualCard[]
+  sentTransactions     Transaction[] @relation("SenderAccount")
+  receivedTransactions Transaction[] @relation("ReceiverAccount")
+
+  @@map("accounts")
+}
+
+model VirtualCard {
+  id             String     @id @default(cuid())
+  accountId      String
+  cardNumber     String     // 16-digit (stored encrypted in production)
+  expiry         String     // MM/YY format
+  cvv            String     // 3-digit (stored encrypted in production)
+  cardholderName String
+  type           CardType   @default(VISA)
+  status         CardStatus @default(ACTIVE)
+  createdAt      DateTime   @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("virtual_cards")
+}
+
+model Transaction {
+  id                   String            @id @default(cuid())
+  reference            String            @unique // NXB-XXXXXXXXXXXXXXXX format
+  type                 TransactionType
+  senderAccountId      String?
+  receiverAccountId    String?
+  externalDetails      Json?             // Wire beneficiary info: name, bank, SWIFT, IBAN, address
+  amount               Decimal           @db.Decimal(20, 2)
+  currency             Currency
+  status               TransactionStatus @default(PENDING)
+  description          String?
+  requiresEmailConfirm Boolean           @default(false)
+  emailConfirmToken    String?
+  emailConfirmedAt     DateTime?
+  requiresTransferToken Boolean          @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  senderAccount   Account? @relation("SenderAccount", fields: [senderAccountId], references: [id])
+  receiverAccount Account? @relation("ReceiverAccount", fields: [receiverAccountId], references: [id])
+
+  @@map("transactions")
+}
+
+model SystemSettings {
+  id                           String   @id @default("singleton")
+  requireEmailConfirmForTransfers Boolean @default(false)
+  requireTokenForTransfers     Boolean  @default(false)
+  globalNotice                 String?  // Banner shown to all users
+  maintenanceMode              Boolean  @default(false)
+  maxDailyTransferUSD          Decimal  @default(10000) @db.Decimal(20, 2)
+  updatedAt                    DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // e.g. "USER_LOGIN", "TRANSFER_INITIATED", "ADMIN_FREEZE_ACCOUNT"
+  target    String?  // e.g. account ID, user ID being acted upon
+  details   Json     @default("{}")
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+model Beneficiary {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  bankName      String
+  accountNumber String?
+  iban          String?
+  swiftCode     String?
+  routingNumber String?
+  country       String   @default("US")
+  currency      String   @default("USD")
+  bankAddress   String?
+  isInternal    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("beneficiaries")
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  ipAddress String?
+  userAgent String?
+  status    String   @default("SUCCESS")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("login_history")
+}
+
+model SupportMessage {
+  id          String   @id @default(cuid())
+  userId      String
+  subject     String
+  category    String
+  priority    String   @default("NORMAL")
+  message     String
+  reference   String?
+  status      String   @default("SENT")
+  adminReply  String?
+  repliedAt   DateTime?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("support_messages")
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "SUPPORT_REPLY", "ACCOUNT_UPDATE", etc.
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_notifications")
+}
+
+model AdminNotification {
+  id        String   @id @default(cuid())
+  type      String   // "NEW_TRANSFER", "NEW_USER", etc.
+  title     String
+  message   String
+  data      Json     @default("{}")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("admin_notifications")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expires   DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
