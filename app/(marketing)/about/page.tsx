@@ -3,6 +3,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
+import EditorialBanner from "@/components/marketing/EditorialBanner";
 
 /* ─────────────────────────────────────────────
    ANIMATED COUNTER
@@ -95,205 +97,482 @@ function AnimatedCounter({
 }
 
 /* ─────────────────────────────────────────────
-   BUILDING VISUAL
+   HERO COMPOSITE VISUAL
 ───────────────────────────────────────────── */
-function BuildingVisual() {
-  const windows = Array.from({ length: 20 });
+function HeroVisual() {
+  const BAR_HEIGHTS = [55, 40, 75, 50, 90, 65, 88];
+  const TRANSACTIONS = [
+    { icon: "↗", label: "Transfer to HK", amount: "-S$800", positive: false },
+    { icon: "↙", label: "Salary Credit", amount: "+S$4,200", positive: true },
+    { icon: "↗", label: "Rent Payment", amount: "-S$1,500", positive: false },
+  ];
 
   return (
-    <div style={{ position: "relative", width: 420, height: 460 }}>
+    <div style={{ position: "relative", width: 460, height: 520 }}>
       {/* Ambient glow */}
       <div
         style={{
           position: "absolute",
-          width: 300,
-          height: 300,
-          bottom: -60,
-          left: "50%",
-          transform: "translateX(-50%)",
+          inset: 0,
           background:
-            "radial-gradient(circle, rgba(0,200,150,0.06), transparent 70%)",
-          filter: "blur(80px)",
-          borderRadius: "50%",
+            "radial-gradient(circle at 50% 50%, rgba(0,200,150,0.07) 0%, transparent 65%)",
           pointerEvents: "none",
         }}
       />
 
-      {/* Left wing */}
+      {/* Outer rotating ring */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
         style={{
           position: "absolute",
-          width: 80,
-          height: 160,
-          bottom: 40,
-          left: "calc(50% - 130px)",
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: "4px 4px 0 0",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
         }}
-      />
+        animate={{ rotate: 360 }}
+        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+      >
+        <svg width="420" height="420" viewBox="0 0 420 420">
+          <circle
+            cx="210"
+            cy="210"
+            r="195"
+            fill="none"
+            stroke="rgba(0,200,150,0.10)"
+            strokeWidth="1"
+            strokeDasharray="6 18"
+          />
+        </svg>
+      </motion.div>
 
-      {/* Right wing */}
+      {/* Inner counter-rotating ring */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
         style={{
           position: "absolute",
-          width: 80,
-          height: 160,
-          bottom: 40,
-          right: "calc(50% - 130px)",
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: "4px 4px 0 0",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          pointerEvents: "none",
         }}
-      />
+        animate={{ rotate: -360 }}
+        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+      >
+        <svg width="290" height="290" viewBox="0 0 290 290">
+          <circle
+            cx="145"
+            cy="145"
+            r="130"
+            fill="none"
+            stroke="rgba(200,151,42,0.09)"
+            strokeWidth="1"
+            strokeDasharray="3 10"
+          />
+        </svg>
+      </motion.div>
 
-      {/* Roof triangle */}
-      <div
+      {/* ── Profile card (centre) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.3 }}
         style={{
           position: "absolute",
-          bottom: "calc(40px + 240px)",
+          top: "50%",
           left: "50%",
-          transform: "translateX(-50%)",
-          width: 0,
-          height: 0,
-          borderLeft: "80px solid transparent",
-          borderRight: "80px solid transparent",
-          borderBottom: "40px solid rgba(255,255,255,0.08)",
-          zIndex: 2,
-        }}
-      />
-
-      {/* Main building body */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-        style={{
-          position: "absolute",
-          bottom: 40,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 160,
-          height: 240,
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: "4px 4px 0 0",
-          zIndex: 1,
+          transform: "translate(-50%, -54%)",
+          background: "rgba(255,255,255,0.055)",
+          border: "1px solid rgba(255,255,255,0.13)",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          borderRadius: 20,
+          padding: "24px 26px",
+          width: 248,
+          zIndex: 4,
         }}
       >
-        {/* Windows grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.9 }}
+        {/* Avatar + name row */}
+        <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 8,
-            padding: 16,
-            marginTop: 16,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            marginBottom: 18,
           }}
         >
-          {windows.map((_, i) => (
+          <div
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #00C896, #00A87E)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+              fontWeight: 700,
+              fontSize: 16,
+              color: "white",
+              flexShrink: 0,
+            }}
+          >
+            SC
+          </div>
+          <div>
             <div
-              key={i}
               style={{
-                width: 10,
-                height: 8,
-                background:
-                  i % 2 === 0
-                    ? "rgba(0,200,150,0.25)"
-                    : "rgba(200,151,42,0.2)",
+                color: "white",
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+                lineHeight: 1.2,
               }}
-            />
-          ))}
+            >
+              Sarah Chen
+            </div>
+            <div
+              style={{
+                color: "rgba(255,255,255,0.48)",
+                fontSize: 12,
+                fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+              }}
+            >
+              Premium Savings
+            </div>
+          </div>
+        </div>
+
+        {/* Balance */}
+        <div
+          style={{
+            color: "rgba(255,255,255,0.42)",
+            fontSize: 10,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase" as const,
+            fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+            marginBottom: 5,
+          }}
+        >
+          TOTAL BALANCE
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+            fontSize: 28,
+            fontWeight: 700,
+            color: "white",
+            letterSpacing: "-0.02em",
+            lineHeight: 1,
+          }}
+        >
+          S$24,850
+          <span style={{ fontSize: 16, color: "rgba(255,255,255,0.42)" }}>
+            .00
+          </span>
+        </div>
+
+        <div
+          style={{
+            height: 1,
+            background: "rgba(255,255,255,0.08)",
+            margin: "14px 0",
+          }}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span
+            style={{
+              color: "#00C896",
+              fontSize: 12,
+              fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+              fontWeight: 500,
+            }}
+          >
+            ▲ +2.4% this month
+          </span>
+          <span
+            style={{
+              background: "rgba(0,200,150,0.14)",
+              color: "#00C896",
+              fontSize: 10,
+              fontWeight: 700,
+              borderRadius: 6,
+              padding: "3px 8px",
+              fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+              letterSpacing: "0.04em",
+            }}
+          >
+            ACTIVE
+          </span>
+        </div>
+      </motion.div>
+
+      {/* ── Stats card (bottom-left, floating) ── */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.7, delay: 0.6 }}
+        style={{
+          position: "absolute",
+          bottom: "10%",
+          left: "0%",
+          background: "rgba(10,22,40,0.88)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 16,
+          padding: "16px 18px",
+          width: 184,
+          zIndex: 5,
+        }}
+      >
+        <motion.div
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div
+            style={{
+              color: "rgba(255,255,255,0.45)",
+              fontSize: 10,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase" as const,
+              fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+              marginBottom: 10,
+            }}
+          >
+            THIS MONTH
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  color: "rgba(255,255,255,0.4)",
+                  fontSize: 10,
+                  fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+                  marginBottom: 2,
+                }}
+              >
+                Sent
+              </div>
+              <div
+                style={{
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                }}
+              >
+                S$2,400
+              </div>
+            </div>
+            <div style={{ textAlign: "right" as const }}>
+              <div
+                style={{
+                  color: "rgba(255,255,255,0.4)",
+                  fontSize: 10,
+                  fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+                  marginBottom: 2,
+                }}
+              >
+                Received
+              </div>
+              <div
+                style={{
+                  color: "#00C896",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                }}
+              >
+                S$5,200
+              </div>
+            </div>
+          </div>
+          {/* Mini bar chart */}
+          <div
+            style={{
+              display: "flex",
+              gap: 3,
+              alignItems: "flex-end",
+              height: 28,
+            }}
+          >
+            {BAR_HEIGHTS.map((h, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1,
+                  height: `${h}%`,
+                  background:
+                    i === BAR_HEIGHTS.length - 1
+                      ? "#00C896"
+                      : "rgba(255,255,255,0.14)",
+                  borderRadius: 2,
+                }}
+              />
+            ))}
+          </div>
         </motion.div>
       </motion.div>
 
-      {/* Floating badge — Est. 2020 */}
+      {/* ── Achievement badge (top-right, pulse) ── */}
       <motion.div
-        animate={{ y: [0, -7, 0] }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut" as const,
-        }}
+        initial={{ opacity: 0, scale: 0.75 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.9, type: "spring" }}
         style={{
           position: "absolute",
-          top: "5%",
-          right: "5%",
-          background: "rgba(255,255,255,0.07)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: 10,
-          padding: "8px 12px",
-          fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
-          fontSize: 12,
-          fontWeight: 600,
-          color: "white",
-          zIndex: 3,
-        }}
-      >
-        Est. 2020
-      </motion.div>
-
-      {/* Floating badge — MAS Licensed */}
-      <motion.div
-        animate={{ y: [0, -5, 0] }}
-        transition={{
-          duration: 3.8,
-          repeat: Infinity,
-          ease: "easeInOut" as const,
-          delay: 0.4,
-        }}
-        style={{
-          position: "absolute",
-          top: "35%",
-          left: "2%",
-          background: "rgba(255,255,255,0.07)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: 10,
-          padding: "8px 12px",
-          fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
-          fontSize: 12,
-          fontWeight: 600,
-          color: "var(--boa-teal, #00C896)",
-          zIndex: 3,
-        }}
-      >
-        MAS Licensed
-      </motion.div>
-
-      {/* Floating badge — 50K+ Customers */}
-      <motion.div
-        animate={{ y: [0, -6, 0] }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut" as const,
-          delay: 0.8,
-        }}
-        style={{
-          position: "absolute",
-          bottom: "20%",
+          top: "7%",
           right: "3%",
-          background: "rgba(255,255,255,0.07)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: 10,
-          padding: "8px 12px",
-          fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
-          fontSize: 12,
-          fontWeight: 600,
-          color: "var(--boa-gold, #C8972A)",
-          zIndex: 3,
+          background: "rgba(0,200,150,0.11)",
+          border: "1px solid rgba(0,200,150,0.28)",
+          borderRadius: 12,
+          padding: "10px 14px",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          zIndex: 5,
         }}
       >
-        50K+ Customers
+        {/* Pulse dot */}
+        <div style={{ position: "relative", width: 10, height: 10, flexShrink: 0 }}>
+          <motion.div
+            animate={{ scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "50%",
+              background: "#00C896",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              inset: 2,
+              borderRadius: "50%",
+              background: "#00C896",
+            }}
+          />
+        </div>
+        <span
+          style={{
+            color: "#00C896",
+            fontSize: 12,
+            fontWeight: 600,
+            fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+            whiteSpace: "nowrap" as const,
+          }}
+        >
+          MAS Verified
+        </span>
+      </motion.div>
+
+      {/* ── Activity feed (bottom-right, slide up) ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1.1 }}
+        style={{
+          position: "absolute",
+          bottom: "2%",
+          right: "0%",
+          background: "rgba(255,255,255,0.045)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 16,
+          padding: "14px 16px",
+          width: 210,
+          zIndex: 5,
+        }}
+      >
+        <motion.div
+          animate={{ y: [0, -4, 0] }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5,
+          }}
+        >
+          <div
+            style={{
+              color: "rgba(255,255,255,0.45)",
+              fontSize: 10,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase" as const,
+              fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+              marginBottom: 10,
+            }}
+          >
+            RECENT ACTIVITY
+          </div>
+          {TRANSACTIONS.map((tx, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: i < TRANSACTIONS.length - 1 ? 8 : 0,
+              }}
+            >
+              <div
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: tx.positive
+                    ? "rgba(0,200,150,0.15)"
+                    : "rgba(255,107,107,0.13)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 11,
+                  color: tx.positive ? "#00C896" : "#FF6B6B",
+                  flexShrink: 0,
+                }}
+              >
+                {tx.icon}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    color: "rgba(255,255,255,0.65)",
+                    fontSize: 11,
+                    fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap" as const,
+                  }}
+                >
+                  {tx.label}
+                </div>
+              </div>
+              <div
+                style={{
+                  color: tx.positive ? "#00C896" : "#FF6B6B",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                  flexShrink: 0,
+                }}
+              >
+                {tx.amount}
+              </div>
+            </div>
+          ))}
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -494,7 +773,7 @@ export default function AboutPage() {
                 }}
               >
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "inline-block",
                     background: "var(--boa-teal, #00C896)",
@@ -531,15 +810,27 @@ export default function AboutPage() {
               </motion.div>
             </motion.div>
 
-            {/* RIGHT — Building Visual (hidden on mobile) */}
+            {/* RIGHT — Animated composite visual (hidden on mobile) */}
             <div
               style={{ display: "none" }}
               className="lg:flex lg:justify-center lg:items-center"
             >
-              <BuildingVisual />
+              <HeroVisual />
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Banner image */}
+      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <Image
+          src="/banner-image5.png"
+          alt="Bank of Asia team"
+          width={1920}
+          height={600}
+          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
+          priority={false}
+        />
       </section>
 
       {/* ───────────────────────────────────────
@@ -1100,81 +1391,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ───────────────────────────────────────
-          SECTION 7 — CTA STRIP
-      ─────────────────────────────────────── */}
-      <section
-        style={{
-          background: "#0A1628",
-          paddingTop: 64,
-          paddingBottom: 64,
-          textAlign: "center" as const,
-        }}
-      >
-        <div
-          className="boa-container"
-          style={{ maxWidth: 600, margin: "0 auto" }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2
-              style={{
-                fontFamily: "var(--font-syne, 'Syne', sans-serif)",
-                fontSize: "clamp(28px, 4vw, 44px)",
-                color: "white",
-                fontWeight: 700,
-                marginBottom: 16,
-              }}
-            >
-              Ready to bank with us?
-            </h2>
-            <p
-              style={{
-                fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
-                fontSize: 16,
-                color: "rgba(255,255,255,0.55)",
-                marginBottom: 32,
-              }}
-            >
-              Join 50,000+ customers who trust Bank of Asia with their
-              finances.
-            </p>
-            <Link
-              href="/register"
-              style={{
-                display: "inline-block",
-                background: "var(--boa-teal, #00C896)",
-                color: "white",
-                fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
-                fontSize: 16,
-                fontWeight: 600,
-                padding: "16px 32px",
-                borderRadius: 8,
-                textDecoration: "none",
-              }}
-            >
-              Open an Account
-            </Link>
-            <a
-              href="#team"
-              style={{
-                display: "block",
-                fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
-                fontSize: 14,
-                color: "var(--boa-teal, #00C896)",
-                textDecoration: "underline",
-                marginTop: 16,
-              }}
-            >
-              Learn more →
-            </a>
-          </motion.div>
-        </div>
-      </section>
+      <EditorialBanner
+        headline="Ready to bank with us?"
+        subtext="Join 50,000+ customers who trust Bank of Asia with their finances."
+        ctaText="Open an Account"
+        ctaHref="/register"
+        ctaText2="Meet the team →"
+        ctaHref2="#team"
+      />
     </main>
   );
 }

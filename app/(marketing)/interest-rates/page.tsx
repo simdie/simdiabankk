@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 
 // ─── Inline RateAlertForm ──────────────────────────────────────────────────
 
@@ -757,6 +758,18 @@ export default function InterestRatesPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Banner image */}
+      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <Image
+          src="/banner-image4.png"
+          alt="Bank of Asia interest rates"
+          width={1920}
+          height={600}
+          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
+          priority={false}
+        />
       </section>
 
       {/* ══════════════════════════════════════════════════════════════

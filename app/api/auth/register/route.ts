@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations";
 import { generateAccountNumber } from "@/lib/utils";
-import { sendEmail, welcomeEmailHtml } from "@/lib/email";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send welcome email (non-blocking)
-    sendEmail(email, "Welcome to Bank of Asia Online — Account Under Review", welcomeEmailHtml(firstName)).catch(console.error);
+    sendWelcomeEmail(email, firstName, accountNumber).catch(console.error);
 
     return NextResponse.json(
       {

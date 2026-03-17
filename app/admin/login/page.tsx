@@ -47,16 +47,8 @@ function AdminLoginInner() {
       <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 420, padding: "0 24px" }}>
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ width: 64, height: 64, borderRadius: 16, background: "rgba(0,212,255,0.08)", border: "1.5px solid rgba(0,212,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto" }}>
-            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-              <path d="M24 3 L42 10 L42 26 C42 35 34 43 24 46 C14 43 6 35 6 26 L6 10 Z"
-                fill="rgba(6,12,24,0.9)" stroke="#00D4FF" strokeWidth="1.5" strokeOpacity="0.8"/>
-              <text x="24" y="30" fontFamily="Arial" fontWeight="700" fontSize="11"
-                fill="#00D4FF" textAnchor="middle" letterSpacing="1">BOA</text>
-            </svg>
-          </div>
-          <div style={{ fontFamily: "var(--font-syne)", fontSize: 16, fontWeight: 800, color: "var(--color-accent)", letterSpacing: "0.1em", marginTop: 12 }}>BANK OF ASIA ONLINE</div>
-          <div style={{ fontFamily: "var(--font-syne)", fontSize: 13, fontWeight: 700, letterSpacing: "0.15em", color: "var(--color-text-muted)", textTransform: "uppercase", marginTop: 4 }}>Admin Portal</div>
+          <img src="/logo-dark-bg.png" alt="Bank of Asia Online" style={{ width: 200, height: "auto", margin: "0 auto", display: "block" }} />
+          <div style={{ fontFamily: "var(--font-syne)", fontSize: 13, fontWeight: 700, letterSpacing: "0.15em", color: "var(--color-text-muted)", textTransform: "uppercase", marginTop: 12 }}>Admin Portal</div>
         </div>
 
         <div className="glass-card" style={{ padding: "36px 32px" }}>
@@ -71,7 +63,7 @@ function AdminLoginInner() {
               <input
                 type="text"
                 className="input-nexus"
-                placeholder="admin@bankofasia.com"
+                placeholder="admin@boasiaonline.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required

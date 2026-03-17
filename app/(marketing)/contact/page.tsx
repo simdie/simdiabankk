@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
@@ -168,6 +168,135 @@ const inputBase: React.CSSProperties = {
   boxSizing: "border-box" as const,
 };
 
+// ─── CUSTOM SELECT ─────────────────────────────────────────────────────────────
+
+function CustomSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  error,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder: string;
+  error?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ position: "relative" }}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        style={{
+          ...inputBase,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          cursor: "pointer",
+          borderColor: error
+            ? "#dc2626"
+            : open
+            ? "var(--boa-teal, #00C896)"
+            : "var(--boa-border, #E5E9EE)",
+          color: value
+            ? "var(--boa-navy, #0A1628)"
+            : "var(--boa-muted, #64748B)",
+          userSelect: "none" as const,
+        }}
+      >
+        <span style={{ flex: 1, textAlign: "left" as const, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
+          {value || placeholder}
+        </span>
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          style={{ display: "flex", alignItems: "center", flexShrink: 0, marginLeft: 8 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 4.5l5 5 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </motion.span>
+      </button>
+
+      {/* Dropdown panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scaleY: 0.95 }}
+            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+            exit={{ opacity: 0, y: -6, scaleY: 0.95 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 4px)",
+              left: 0,
+              right: 0,
+              background: "white",
+              border: "1px solid var(--boa-border, #E5E9EE)",
+              borderRadius: 10,
+              boxShadow: "0 10px 32px rgba(0,0,0,0.10)",
+              zIndex: 100,
+              overflow: "hidden",
+              transformOrigin: "top center",
+            }}
+          >
+            {options.map((opt) => {
+              const selected = value === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => { onChange(opt); setOpen(false); }}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    textAlign: "left" as const,
+                    padding: "10px 14px",
+                    fontSize: 14,
+                    fontFamily: "var(--font-dm-sans, 'DM Sans', sans-serif)",
+                    color: selected ? "var(--boa-teal, #00C896)" : "var(--boa-navy, #0A1628)",
+                    background: selected ? "rgba(0,200,150,0.07)" : "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "background 0.1s",
+                    fontWeight: selected ? 600 : 400,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!selected) e.currentTarget.style.background = "rgba(0,0,0,0.03)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!selected) e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  {selected && (
+                    <span style={{ marginRight: 8, color: "var(--boa-teal, #00C896)" }}>✓</span>
+                  )}
+                  {opt}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ─── CONTACT FORM ──────────────────────────────────────────────────────────────
 
 function ContactForm() {
@@ -177,11 +306,17 @@ function ContactForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function set(k: keyof typeof form) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setForm((prev) => ({ ...prev, [k]: e.target.value }));
       if (errors[k]) setErrors((prev) => ({ ...prev, [k]: "" }));
       if (state === "error") setState("idle");
     };
+  }
+
+  function setSubject(v: string) {
+    setForm((prev) => ({ ...prev, subject: v }));
+    if (errors.subject) setErrors((prev) => ({ ...prev, subject: "" }));
+    if (state === "error") setState("idle");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -294,7 +429,7 @@ function ContactForm() {
           }}
         >
           Thank you for reaching out. We&apos;ll reply within 24 hours. For urgent matters, call us or email{" "}
-          <a href="mailto:security@bankofasia.com" style={{ color: "var(--boa-teal)" }}>security@bankofasia.com</a>.
+          <a href="mailto:security@boasiaonline.com" style={{ color: "var(--boa-teal)" }}>security@boasiaonline.com</a>.
         </p>
       </motion.div>
     );
@@ -392,27 +527,13 @@ function ContactForm() {
       {/* Subject */}
       <div style={{ marginTop: 16 }}>
         <Label error={errors.subject}>Subject *</Label>
-        <select
-          required
+        <CustomSelect
           value={form.subject}
-          onChange={set("subject")}
-          style={{
-            ...inputBase,
-            appearance: "none" as const,
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "right 14px center",
-            paddingRight: 36,
-            color: form.subject ? "var(--boa-navy)" : "var(--boa-muted)",
-            borderColor: errors.subject ? "#dc2626" : "var(--boa-border, #E5E9EE)",
-          }}
-          onFocus={(e) => { if (!errors.subject) e.currentTarget.style.borderColor = "var(--boa-teal, #00C896)"; }}
-          onBlur={(e) => { if (!errors.subject) e.currentTarget.style.borderColor = "var(--boa-border, #E5E9EE)"; }}
-        >
-          <option value="" disabled>Select a topic…</option>
-          {SUBJECTS.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
+          onChange={setSubject}
+          options={SUBJECTS}
+          placeholder="Select a topic…"
+          error={errors.subject}
+        />
       </div>
 
       {/* Message */}
@@ -501,10 +622,10 @@ function ContactForm() {
       >
         We aim to respond within 24 hours. For urgent security matters, email{" "}
         <a
-          href="mailto:security@bankofasia.com"
+          href="mailto:security@boasiaonline.com"
           style={{ color: "var(--boa-teal)", textDecoration: "underline" }}
         >
-          security@bankofasia.com
+          security@boasiaonline.com
         </a>
         .
       </p>
@@ -961,7 +1082,7 @@ export default function ContactPage() {
 
               {/* Email */}
               <a
-                href="mailto:support@bankofasia.com"
+                href="mailto:support@boasiaonline.com"
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
@@ -995,14 +1116,14 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--boa-muted)", marginBottom: 2 }}>Email Support</p>
-                  <p style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 600, fontSize: 14, color: "var(--boa-navy)", marginBottom: 2 }}>support@bankofasia.com</p>
+                  <p style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 600, fontSize: 14, color: "var(--boa-navy)", marginBottom: 2 }}>support@boasiaonline.com</p>
                   <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 12, color: "var(--boa-muted)" }}>Response within 1–2 business days</p>
                 </div>
               </a>
 
               {/* Emergency security line — GOLD highlight */}
               <a
-                href="mailto:security@bankofasia.com"
+                href="mailto:security@boasiaonline.com"
                 style={{
                   display: "flex",
                   alignItems: "flex-start",
@@ -1036,7 +1157,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: "var(--boa-gold, #C8972A)", marginBottom: 2 }}>Emergency Security Line</p>
-                  <p style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 600, fontSize: 14, color: "var(--boa-navy)", marginBottom: 2 }}>security@bankofasia.com</p>
+                  <p style={{ fontFamily: "var(--font-dm-sans)", fontWeight: 600, fontSize: 14, color: "var(--boa-navy)", marginBottom: 2 }}>security@boasiaonline.com</p>
                   <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: 12, color: "var(--boa-muted)" }}>24/7 — urgent matters only</p>
                 </div>
               </a>
@@ -1189,7 +1310,7 @@ export default function ContactPage() {
               Join 50,000+ customers who bank smarter with Bank of Asia.
             </p>
             <Link
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
               style={{
                 display: "inline-block",
                 background: "var(--boa-teal, #00C896)",

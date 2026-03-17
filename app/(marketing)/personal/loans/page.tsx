@@ -128,7 +128,7 @@ export default function LoansPage() {
 
           <div className="flex flex-wrap gap-4">
             <Link
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-[15px] transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: "var(--boa-teal)",
@@ -505,7 +505,7 @@ export default function LoansPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-[15px] transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: "var(--boa-teal)",

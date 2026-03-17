@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { NEWS_POSTS } from "@/lib/news-posts";
 
-const BASE_URL = "https://www.bankofasia.com";
+const BASE_URL = "https://www.boasiaonline.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [

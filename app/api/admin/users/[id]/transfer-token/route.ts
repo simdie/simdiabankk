@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { generateToken } from "@/lib/utils";
 import { z } from "zod";
+import { sendTransferTokenEmail } from "@/lib/email";
 
 const EXPIRY_HOURS: Record<string, number> = { "1h": 1, "6h": 6, "24h": 24, "72h": 72 };
 
@@ -40,6 +41,18 @@ export async function POST(
       ipAddress: req.headers.get("x-forwarded-for") || null,
     },
   });
+
+  // Send token email (non-blocking)
+  const expiresDisplay = exp.toLocaleString("en-US", {
+    year: "numeric", month: "long", day: "numeric",
+    hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore",
+  }) + " SGT";
+  sendTransferTokenEmail(user.email, {
+    firstName: user.firstName,
+    token,
+    expiresAt: expiresDisplay,
+    issuedBy: (session.user as any).email ?? undefined,
+  }).catch(console.error);
 
   return NextResponse.json({ token, expiresAt: exp.toISOString() });
 }

@@ -131,7 +131,7 @@ export default function BusinessPaymentsPage() {
 
           <div className="flex flex-wrap gap-4">
             <Link
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-[15px] transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: "var(--boa-teal)",
@@ -239,7 +239,7 @@ export default function BusinessPaymentsPage() {
                   </ul>
 
                   <Link
-                    href="/register"
+                    href="/register" target="_blank" rel="noopener noreferrer"
                     className="block text-center py-3 rounded-xl text-[14px] font-medium transition-opacity hover:opacity-90"
                     style={{
                       backgroundColor: solution.color === "var(--boa-teal)" ? "var(--boa-teal)" : solution.color === "var(--boa-purple)" ? "var(--boa-purple)" : "var(--boa-gold)",
@@ -409,7 +409,7 @@ export default function BusinessPaymentsPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-[15px] transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: "var(--boa-teal)",

@@ -2,9 +2,11 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import FaqAccordion from "@/components/marketing/FaqAccordion";
 import type { FaqItem } from "@/components/marketing/FaqAccordion";
+import EditorialBanner from "@/components/marketing/EditorialBanner";
 
 // ── FAQ data ──────────────────────────────────────────────
 
@@ -520,7 +522,7 @@ function CurrencyConverter() {
 
       <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
         <Link
-          href="/register"
+          href="/register" target="_blank" rel="noopener noreferrer"
           style={{
             background: "var(--boa-teal)",
             color: "white",
@@ -722,13 +724,8 @@ export default function InternationalPage() {
 
         <div className="boa-container" style={{ width: "100%", position: "relative", zIndex: 1 }}>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: 48,
-              alignItems: "center",
-            }}
-            className="lg:grid-cols-[52%_48%]"
+            style={{ display: "grid", gap: 48, alignItems: "center" }}
+            className="grid-cols-1 lg:grid-cols-[55fr_45fr]"
           >
             {/* LEFT */}
             <motion.div
@@ -790,7 +787,7 @@ export default function InternationalPage() {
               {/* CTAs */}
               <motion.div variants={heroChild} style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   style={{
                     background: "var(--boa-teal)",
                     color: "white",
@@ -847,6 +844,19 @@ export default function InternationalPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Banner image */}
+      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <Image
+          key="banner-image3-v2"
+          src="/banner-image3.png"
+          alt="International wire transfers"
+          width={1920}
+          height={600}
+          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
+          priority={false}
+        />
       </section>
 
       {/* ════════════════════════════════════════════════════
@@ -1315,6 +1325,15 @@ export default function InternationalPage() {
           </div>
         </div>
       </section>
+
+      <EditorialBanner
+        headline="Send money anywhere. Today."
+        subtext="Open a Bank of Asia account in minutes and start sending international transfers with transparent fees and real exchange rates."
+        ctaText="Open an Account"
+        ctaHref="/register"
+        ctaText2="View Fee Schedule"
+        ctaHref2="/international#fees"
+      />
     </>
   );
 }

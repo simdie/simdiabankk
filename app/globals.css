@@ -1823,3 +1823,10 @@ select {
     padding: 16px !important;
   }
 }
+
+/* ── Financial figures — consistent DM Sans for all balance/amount displays ── */
+.financial-figure {
+  font-family: 'DM Sans', -apple-system, sans-serif !important;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}

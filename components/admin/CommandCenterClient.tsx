@@ -129,11 +129,11 @@ export default function CommandCenterClient({ stats, auditLogs }: { stats: Stats
                 }}>
                   {s.icon}
                 </div>
-                <span style={{ fontSize: 11, color: "var(--color-text-muted)", fontWeight: 600, letterSpacing: "0.04em" }}>
+                <span style={{ fontSize: 11, color: "var(--color-text-muted)", fontWeight: 600, letterSpacing: "0.04em", fontFamily: "var(--font-dm-sans)" }}>
                   {s.label}
                 </span>
               </div>
-              <div style={{ fontFamily: "var(--font-syne)", fontSize: typeof s.value === "string" ? 18 : 28, fontWeight: 800, color: s.color }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: typeof s.value === "string" ? 18 : 28, fontWeight: 600, color: s.color }}>
                 {s.value}
               </div>
             </div>

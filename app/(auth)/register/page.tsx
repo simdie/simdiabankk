@@ -401,7 +401,7 @@ export default function RegisterPage() {
       {/* Left — Card Preview */}
       <div className="hidden lg:flex flex-col items-center justify-center relative z-10" style={{ width: "45%", padding: "60px 48px", gap: 40 }}>
         <div style={{ textAlign: "center" }}>
-          <div className="text-gradient" style={{ fontFamily: "var(--font-syne)", fontSize: 24, fontWeight: 800 }}>BANK OF ASIA ONLINE</div>
+          <img src="/logo-dark-bg.png" alt="Bank of Asia Online" style={{ width: 200, height: "auto", display: "block", margin: "0 auto" }} />
           <div style={{ fontSize: 12, color: "var(--color-text-muted)", letterSpacing: "0.12em", textTransform: "uppercase", marginTop: 8 }}>Open Your Account</div>
         </div>
         <div style={{ animation: "float 6s ease-in-out infinite" }}>

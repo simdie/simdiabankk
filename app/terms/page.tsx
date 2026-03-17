@@ -83,7 +83,7 @@ export default function TermsPage() {
           </Section>
 
           <Section title="11. Contact">
-            If you have questions about these Terms, please contact us at <a href="mailto:legal@bankofasia.com" style={{ color: "var(--color-accent)" }}>legal@bankofasia.com</a>.
+            If you have questions about these Terms, please contact us at <a href="mailto:legal@boasiaonline.com" style={{ color: "var(--color-accent)" }}>legal@boasiaonline.com</a>.
           </Section>
 
         </div>

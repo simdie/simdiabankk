@@ -622,7 +622,7 @@ export default function PersonalPage() {
                 style={{ display: "flex", gap: 12, flexWrap: "wrap" }}
               >
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",

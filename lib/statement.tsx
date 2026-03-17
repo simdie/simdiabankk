@@ -1,5 +1,5 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, pdf, Svg, Path, Line, Rect, Circle } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, pdf } from "@react-pdf/renderer";
 
 export interface StatementTransaction {
   id: string;
@@ -257,26 +257,6 @@ const S = StyleSheet.create({
   tdBalance: { width: 78,  fontSize: 8,   fontFamily: "Helvetica-Bold", color: C.navy, textAlign: "right" },
   tdEmpty:   { width: 74,  fontSize: 7.5, color: C.light, textAlign: "right" },
 
-  // Signature section
-  signatureSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    paddingHorizontal: 44,
-    paddingTop: 24,
-    paddingBottom: 20,
-    marginTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: C.border,
-  },
-  sigBlock: { width: 190 },
-  sigLine: {
-    height: 1, backgroundColor: C.borderD, marginBottom: 6,
-  },
-  sigName: { fontSize: 10, fontFamily: "Helvetica-Bold", color: C.text, marginBottom: 2 },
-  sigTitle: { fontSize: 8, color: C.muted },
-  sigLicence: { fontSize: 7, color: C.light, marginTop: 2 },
-  stampBlock: { width: 120, alignItems: "center" },
   legalNotice: {
     paddingHorizontal: 44,
     paddingBottom: 10,
@@ -315,102 +295,7 @@ function typeShort(type: string): string {
   return type.replace(/_/g, " ").slice(0, 14);
 }
 
-// Professional professor-style signature for Dr. James Wei
-function SigDrWei() {
-  return (
-    <Svg width="190" height="58" viewBox="0 0 190 58">
-      {/* Capital J with serif top and looped descender */}
-      <Path
-        d="M 22 11 L 36 11"
-        stroke="#1B3A6B" strokeWidth="2" fill="none" strokeLinecap="round"
-      />
-      <Path
-        d="M 30 11 C 30 11 32 9 34 11 C 36 14 34 24 32 34 C 30 44 27 52 20 53 C 13 54 9 49 11 44 C 13 39 18 43 17 48"
-        stroke="#1B3A6B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* Dot — period separator */}
-      <Circle cx="40" cy="36" r="2.5" fill="#1B3A6B" />
-      {/* Flowing middle strokes suggesting 'ames' */}
-      <Path
-        d="M 46 28 C 52 18 60 20 62 30 C 64 38 60 42 66 36 C 71 30 78 26 82 34 C 86 40 84 46 90 40 C 95 34 102 28 106 36 C 109 42 106 48 112 40"
-        stroke="#1B3A6B" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* W — distinctive double-peak strokes of 'Wei' */}
-      <Path
-        d="M 116 22 C 120 34 124 44 128 34 C 132 24 136 22 140 34 C 144 46 148 44 153 30"
-        stroke="#1B3A6B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* Long elegant underline with terminal uptick flourish */}
-      <Path
-        d="M 9 54 C 45 57 95 57 148 52 C 163 50 172 43 165 36"
-        stroke="#1B3A6B" strokeWidth="1.3" fill="none" strokeLinecap="round"
-      />
-    </Svg>
-  );
-}
 
-// Professional professor-style signature for Ms. Sarah Chen
-function SigMsChen() {
-  return (
-    <Svg width="190" height="58" viewBox="0 0 190 58">
-      {/* Capital S — elegant S-curve opening */}
-      <Path
-        d="M 26 16 C 20 12 10 14 10 24 C 10 32 22 30 24 38 C 26 46 16 50 9 44"
-        stroke="#1B3A6B" strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* Period separator */}
-      <Circle cx="32" cy="38" r="2.5" fill="#1B3A6B" />
-      {/* Flowing 'arah' middle cursive section */}
-      <Path
-        d="M 38 28 C 44 18 54 18 56 28 C 58 36 54 40 60 34 C 65 28 73 24 77 32 C 81 40 78 46 84 38 C 89 30 97 26 101 36"
-        stroke="#1B3A6B" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* C — open bowl of 'Chen' */}
-      <Path
-        d="M 120 18 C 110 12 98 16 96 28 C 94 40 102 50 114 48 C 122 46 126 38 124 30"
-        stroke="#1B3A6B" strokeWidth="2.2" fill="none" strokeLinecap="round"
-      />
-      {/* h — ascender with arch */}
-      <Path
-        d="M 128 14 L 128 46 M 128 32 C 132 24 140 22 144 30 C 146 35 144 40 142 46"
-        stroke="#1B3A6B" strokeWidth="2" fill="none" strokeLinecap="round"
-      />
-      {/* en — flowing into end */}
-      <Path
-        d="M 148 30 C 152 22 160 22 162 30 C 164 37 158 42 152 40 M 162 30 L 148 30"
-        stroke="#1B3A6B" strokeWidth="1.8" fill="none" strokeLinecap="round"
-      />
-      {/* Elegant underline flourish */}
-      <Path
-        d="M 8 54 C 45 58 100 58 152 52 C 168 50 176 42 168 34"
-        stroke="#1B3A6B" strokeWidth="1.3" fill="none" strokeLinecap="round"
-      />
-    </Svg>
-  );
-}
-
-function OfficialStamp({ date }: { date: string }) {
-  return (
-    <Svg width="108" height="108" viewBox="0 0 108 108">
-      <Circle cx="54" cy="54" r="50" stroke={C.navy} strokeWidth="2.5" fill="none" />
-      <Circle cx="54" cy="54" r="42" stroke={C.gold} strokeWidth="1" fill="none" />
-      <Circle cx="54" cy="54" r="38" stroke={C.navy} strokeWidth="0.5" fill="rgba(0,43,107,0.03)" />
-      {/* Stars at top */}
-      <Path d="M 54 8 L 55.5 12.5 L 60 12.5 L 56.5 15.5 L 58 20 L 54 17.5 L 50 20 L 51.5 15.5 L 48 12.5 L 52.5 12.5 Z"
-        fill={C.gold} />
-      <Text style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold", fill: C.navy, textAnchor: "middle" }} x="54" y="33">BANK OF ASIA</Text>
-      <Text style={{ fontSize: 5.5, fill: C.gold, textAnchor: "middle", letterSpacing: 1.5 }} x="54" y="43">SINGAPORE • EST. 2014</Text>
-      <Line x1="24" y1="50" x2="84" y2="50" stroke={C.borderD} strokeWidth="0.7" />
-      <Text style={{ fontSize: 8.5, fontFamily: "Helvetica-Bold", fill: C.navy, textAnchor: "middle" }} x="54" y="63">{date}</Text>
-      <Line x1="24" y1="68" x2="84" y2="68" stroke={C.borderD} strokeWidth="0.7" />
-      <Text style={{ fontSize: 6, fill: C.muted, textAnchor: "middle" }} x="54" y="79">AUTHENTICATED</Text>
-      <Text style={{ fontSize: 5.5, fill: C.light, textAnchor: "middle" }} x="54" y="89">bankofasia.com</Text>
-      {/* Bottom star */}
-      <Path d="M 54 94 L 55.2 97.5 L 58.9 97.5 L 56 99.8 L 57 103 L 54 101 L 51 103 L 52 99.8 L 49.1 97.5 L 52.8 97.5 Z"
-        fill={C.gold} />
-    </Svg>
-  );
-}
 
 function StatementDocument({ data }: { data: StatementData }) {
   const fromStr = new Date(data.fromDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -450,10 +335,8 @@ function StatementDocument({ data }: { data: StatementData }) {
           <View style={S.logoBlock}>
             <Text style={S.bankName}>BANK OF ASIA</Text>
             <Text style={S.bankTagline}>Premium Digital Banking • Asia Pacific</Text>
-            <Text style={S.bankAddress}>
-              {"One Financial Plaza, Asia Pacific Tower  •  Level 42\n"}
-              {"Singapore 048583  •  Republic of Singapore\n"}
-              {"SWIFT/BIC: BKASSGSG  •  T: +65 6800 0000  •  bankofasia.com"}
+            <Text style={{ fontSize: 8, color: "#374151", lineHeight: 1.4, marginTop: 7 }}>
+              {"Bank of Asia Online  ·  123 Financial District, Singapore 048946  ·  Tel: +65 6532 1234  ·  www.boasiaonline.com"}
             </Text>
           </View>
           <View style={S.headerRight}>
@@ -476,7 +359,13 @@ function StatementDocument({ data }: { data: StatementData }) {
             <Text style={S.infoValue}>{data.ownerName}</Text>
             <Text style={S.infoSub}>{data.email}</Text>
             {data.phone && <Text style={S.infoSub}>{data.phone}</Text>}
-            {data.address && <Text style={S.infoSub}>{data.address}</Text>}
+            {data.address && (
+              <View style={{ minHeight: 36, justifyContent: "flex-start" }}>
+                <Text style={{ fontSize: 9, color: "#374151", lineHeight: 1.8, flex: 1 }}>
+                  {data.address}
+                </Text>
+              </View>
+            )}
           </View>
           <View style={S.infoCol}>
             <Text style={S.infoLabel}>Account Details</Text>
@@ -572,39 +461,54 @@ function StatementDocument({ data }: { data: StatementData }) {
           )}
         </View>
 
-        {/* Signature + stamp section */}
-        <View style={S.signatureSection}>
-          {/* Sig 1 */}
-          <View style={S.sigBlock}>
-            <SigDrWei />
-            <View style={S.sigLine} />
-            <Text style={S.sigName}>Dr. James Wei</Text>
-            <Text style={S.sigTitle}>Chief Operations Officer</Text>
-            <Text style={S.sigLicence}>Bank of Asia Online Operations Division  •  Lic: MAS-BOA-001</Text>
-          </View>
-
-          {/* Sig 2 */}
-          <View style={S.sigBlock}>
-            <SigMsChen />
-            <View style={S.sigLine} />
-            <Text style={S.sigName}>Ms. Sarah Chen, LLB</Text>
-            <Text style={S.sigTitle}>Head of Compliance & Regulatory Affairs</Text>
-            <Text style={S.sigLicence}>Bank of Asia Online Legal Division  •  Lic: MAS-BOA-002</Text>
-          </View>
-
-          {/* Stamp */}
-          <View style={S.stampBlock}>
-            <OfficialStamp date={generated} />
+        {/* Authorised Signatory — text only, no SVG, no stamp */}
+        <View style={{ paddingHorizontal: 44, paddingBottom: 20 }}>
+          <View style={{
+            marginTop: 36,
+            paddingTop: 20,
+            borderTopWidth: 1,
+            borderTopColor: "#E5E7EB",
+            borderTopStyle: "solid",
+          }}>
+            <Text style={{ fontSize: 8, color: "#9CA3AF", letterSpacing: 1.5, textTransform: "uppercase", textAlign: "center", marginBottom: 28 }}>
+              Authorised Signatory
+            </Text>
+            <View style={{ width: "45%" }}>
+              <View style={{ width: 180, height: 1, backgroundColor: "#CBD5E1", marginBottom: 10 }} />
+              <Text style={{ fontSize: 10.5, fontFamily: "Helvetica-Bold", color: "#0A1628", marginBottom: 4 }}>
+                Dr. James Wei
+              </Text>
+              <Text style={{ fontSize: 9, color: "#374151", marginBottom: 3 }}>
+                Chief Operations Officer
+              </Text>
+              <Text style={{ fontSize: 9, color: "#374151", marginBottom: 3 }}>
+                Bank of Asia Online Operations Division
+              </Text>
+              <Text style={{ fontSize: 9, color: "#6B7280" }}>
+                MAS License: BOA-OPS-2024-001
+              </Text>
+            </View>
           </View>
         </View>
 
-        {/* Legal notice */}
+        {/* Important Notices */}
         <View style={S.legalNotice}>
-          <Text style={S.legalText}>
-            {"This statement is issued by Bank of Asia Online, regulated by the Monetary Authority of Singapore (MAS) under the Banking Act (Cap. 19).\n"}
-            {"The information contained herein is accurate as of the statement date. Discrepancies must be reported within 30 days of this statement date.\n"}
-            {"CONFIDENTIAL — This document is intended solely for the named account holder. Unauthorised disclosure, copying or distribution is strictly prohibited."}
-          </Text>
+          {[
+            "Please verify all transactions and report discrepancies within 14 days to support@boasiaonline.com",
+            "This statement covers the period stated above only.",
+            "Unauthorized use of account information is prohibited.",
+            "For disputes or queries: +65 6532 1234 (Singapore) or +1 (212) 555-0147 (USA)",
+            "Computer generated — valid without wet signature.",
+          ].map((notice, i) => (
+            <View key={i} style={{ flexDirection: "row", marginBottom: 9, alignItems: "flex-start" }}>
+              <Text style={{ fontSize: 8.5, color: "#374151", marginRight: 5, lineHeight: 1.6, width: 12, flexShrink: 0 }}>
+                {i + 1}.
+              </Text>
+              <Text style={{ fontSize: 8.5, color: "#374151", flex: 1, lineHeight: 1.6 }}>
+                {notice}
+              </Text>
+            </View>
+          ))}
         </View>
 
         {/* Footer */}
@@ -618,11 +522,14 @@ function StatementDocument({ data }: { data: StatementData }) {
             </View>
             <Text style={S.pageNum} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} fixed />
           </View>
-          <View style={S.footerBot}>
-            <Text style={S.footerBotText}>
-              © {new Date().getFullYear()} Bank of Asia Online  •  One Financial Plaza, Singapore 048583  •  SWIFT: BKASSGSG  •  Regulated by MAS
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+            <Text style={{ fontSize: 8, color: "#6B7280" }}>
+              Bank of Asia Online  |  Regulated by MAS  |  STRICTLY CONFIDENTIAL
             </Text>
-            <Text style={S.footerBotText}>bankofasia.com  •  +65 6800 0000</Text>
+            <Text style={{ fontSize: 8, color: "#6B7280" }}>Page 1 of 1</Text>
+          </View>
+          <View style={{ marginTop: 3 }}>
+            <Text style={{ fontSize: 8, color: "#9CA3AF" }}>www.boasiaonline.com</Text>
           </View>
         </View>
       </Page>

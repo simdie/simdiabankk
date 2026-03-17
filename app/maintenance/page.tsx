@@ -34,8 +34,8 @@ export default function MaintenancePage() {
 
         <p style={{ fontSize: 13, color: "#4d6080" }}>
           Questions? Contact us at{" "}
-          <a href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@bankofasia.com"}`} style={{ color: "#00d4ff" }}>
-            {process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@bankofasia.com"}
+          <a href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@boasiaonline.com"}`} style={{ color: "#00d4ff" }}>
+            {process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@boasiaonline.com"}
           </a>
         </p>
       </div>

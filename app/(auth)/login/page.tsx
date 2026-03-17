@@ -170,10 +170,10 @@ function LoginInner() {
         {/* Left panel */}
         <div style={{ width: "58%", padding: "48px 56px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
-            <div className="text-gradient" style={{ fontFamily: "var(--font-syne)", fontSize: 28, fontWeight: 800, letterSpacing: "-0.5px" }}>BANK OF ASIA ONLINE</div>
+            <div className="text-gradient" style={{ fontFamily: "var(--font-dm-sans)", fontSize: 28, fontWeight: 700, letterSpacing: "0.04em" }}>BANK OF ASIA ONLINE</div>
           </div>
           <div style={{ maxWidth: 520 }}>
-            <h1 style={{ fontFamily: "var(--font-syne)", fontSize: 58, fontWeight: 800, lineHeight: 1.05, letterSpacing: "-2px", color: "var(--color-text-primary)", marginBottom: 20 }}>
+            <h1 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 48, fontWeight: 700, lineHeight: 1.08, letterSpacing: "-0.02em", color: "var(--color-text-primary)", marginBottom: 20 }}>
               The Future of <span className="text-gradient">Banking</span><br/>Starts Here.
             </h1>
             <p style={{ fontSize: 17, color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
@@ -276,10 +276,10 @@ function DesktopFormContent(props: FormProps) {
         <div className="animate-fade-slide-up">
           {/* Bank Logo — desktop only */}
           <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <img src="/logo.svg" alt="Bank of Asia Online" style={{ width: 72, height: 72, margin: "0 auto", display: "block" }} />
+            <img src="/logo-dark-bg.png" alt="Bank of Asia Online" style={{ width: 180, height: "auto", margin: "0 auto", display: "block" }} />
           </div>
           <div style={{ marginBottom: 28, textAlign: "center" }}>
-            <h2 style={{ fontFamily: "var(--font-syne)", fontSize: 26, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 6 }}>Welcome back</h2>
+            <h2 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 26, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 6 }}>Welcome back</h2>
             <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>Sign in to access your account</p>
           </div>
           <CredentialsForm email={email} setEmail={setEmail} password={password} setPassword={setPassword} showPassword={showPassword} setShowPassword={setShowPassword} loading={loading} error={error} handleCredentials={handleCredentials} />
@@ -300,7 +300,7 @@ function MobileFormContent(props: FormProps) {
       {step === "credentials" && (
         <>
           <div style={{ marginBottom: 28 }}>
-            <h2 style={{ fontFamily: "var(--font-syne)", fontSize: 24, fontWeight: 700, color: "#f0f4ff", marginBottom: 6 }}>Welcome back</h2>
+            <h2 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 24, fontWeight: 700, color: "#f0f4ff", marginBottom: 6 }}>Welcome back</h2>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Sign in to your account</p>
           </div>
           <CredentialsForm email={email} setEmail={setEmail} password={password} setPassword={setPassword} showPassword={showPassword} setShowPassword={setShowPassword} loading={loading} error={error} handleCredentials={handleCredentials} />
@@ -373,7 +373,7 @@ function TwoFAStep({ error, loading, handle2FA, setStep, setError }: {
   return (
     <div className="animate-fade-slide-up" style={{ textAlign: "center" }}>
       <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(0,212,255,0.1)", border: "2px solid rgba(0,212,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 24px", boxShadow: "0 0 24px rgba(0,212,255,0.2)" }}>🔐</div>
-      <h2 style={{ fontFamily: "var(--font-syne)", fontSize: 24, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 8 }}>Two-Factor Verification</h2>
+      <h2 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 24, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 8 }}>Two-Factor Verification</h2>
       <p style={{ color: "var(--color-text-muted)", fontSize: 14, marginBottom: 24 }}>Enter the 6-digit code from your authenticator app to continue</p>
 
       {/* 6-box OTP */}
@@ -397,11 +397,11 @@ function BlockedStep({ blockedMessage, setStep, setError, setBlockedMessage }: {
       <div style={{ borderRadius: 16, padding: "32px 28px", background: "linear-gradient(135deg, rgba(255,59,92,0.08), rgba(13,26,48,0.9))", border: "1px solid rgba(255,59,92,0.3)", boxShadow: "0 0 40px rgba(255,59,92,0.1)", textAlign: "center" }}>
         <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(255,59,92,0.1)", border: "2px solid rgba(255,59,92,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, margin: "0 auto 20px", boxShadow: "0 0 30px rgba(255,59,92,0.2)" }}>🔒</div>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-danger)", marginBottom: 8 }}>Access Restricted</div>
-        <h2 style={{ fontFamily: "var(--font-syne)", fontSize: 22, fontWeight: 800, color: "var(--color-text-primary)", marginBottom: 20 }}>Account Access Denied</h2>
+        <h2 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 20 }}>Account Access Denied</h2>
         <div style={{ padding: "16px", borderRadius: 10, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,59,92,0.15)", fontFamily: "var(--font-jetbrains-mono)", fontSize: 12.5, lineHeight: 1.7, color: "rgba(255,150,160,0.9)", textAlign: "left", marginBottom: 24 }}>
           {blockedMessage}
         </div>
-        <a href="mailto:support@bankofasia.com?subject=Account Access Issue" className="btn-danger" style={{ width: "100%", display: "flex", justifyContent: "center", textDecoration: "none", marginBottom: 14 }}>
+        <a href="mailto:support@boasiaonline.com?subject=Account Access Issue" className="btn-danger" style={{ width: "100%", display: "flex", justifyContent: "center", textDecoration: "none", marginBottom: 14 }}>
           Contact Support
         </a>
         <button onClick={() => { setStep("credentials"); setError(""); setBlockedMessage(""); }} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>

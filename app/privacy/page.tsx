@@ -86,7 +86,7 @@ export default function PrivacyPage() {
               <li>Data portability</li>
               <li>Lodge a complaint with a supervisory authority</li>
             </ul>
-            <p>To exercise these rights, contact us at <a href="mailto:privacy@bankofasia.com" style={{ color: "var(--color-accent)" }}>privacy@bankofasia.com</a>.</p>
+            <p>To exercise these rights, contact us at <a href="mailto:privacy@boasiaonline.com" style={{ color: "var(--color-accent)" }}>privacy@boasiaonline.com</a>.</p>
           </Section>
 
           <Section title="8. Cookies">
@@ -102,7 +102,7 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="11. Contact Us">
-            For privacy-related questions or requests, contact our Data Protection Officer at <a href="mailto:privacy@bankofasia.com" style={{ color: "var(--color-accent)" }}>privacy@bankofasia.com</a> or write to: Bank of Asia Online, Data Protection, 1 Raffles Place, Singapore 048616.
+            For privacy-related questions or requests, contact our Data Protection Officer at <a href="mailto:privacy@boasiaonline.com" style={{ color: "var(--color-accent)" }}>privacy@boasiaonline.com</a> or write to: Bank of Asia Online, Data Protection, 1 Raffles Place, Singapore 048616.
           </Section>
 
         </div>

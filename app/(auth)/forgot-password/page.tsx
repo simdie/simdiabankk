@@ -42,13 +42,8 @@ export default function ForgotPasswordPage() {
       <div className="glass-card animate-fade-slide-up" style={{ maxWidth: 420, width: "100%", padding: "44px 40px", position: "relative", zIndex: 1 }}>
 
         {/* Logo */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
-          <svg width="56" height="56" viewBox="0 0 80 80" fill="none" style={{ marginBottom: 12 }}>
-            <circle cx="40" cy="40" r="38" fill="rgba(0,212,255,0.06)" stroke="rgba(0,212,255,0.15)" strokeWidth="1"/>
-            <path d="M40 8L10 20V38C10 53.6 23.6 67.8 40 72C56.4 67.8 70 53.6 70 38V20L40 8Z" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.5)" strokeWidth="1.5"/>
-            <path d="M27 40L35 48L53 30" stroke="#00D4FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <div style={{ fontFamily: "var(--font-syne)", fontSize: 16, fontWeight: 800, color: "var(--color-accent)", letterSpacing: "0.1em" }}>BANK OF ASIA ONLINE</div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+          <img src="/logo-dark-bg.png" alt="Bank of Asia Online" style={{ width: 180, height: "auto" }} />
         </div>
 
         {sent ? (

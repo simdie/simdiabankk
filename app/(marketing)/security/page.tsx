@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import EditorialBanner from "@/components/marketing/EditorialBanner";
 
 // ─── SHIELD VISUAL ───────────────────────────────────────────────────────────
 
@@ -856,6 +857,15 @@ export default function SecurityPage() {
           <ReportSection />
         </div>
       </section>
+
+      <EditorialBanner
+        headline="Bank with confidence."
+        subtext="Bank-grade security, MAS-regulated, and monitored 24/7. Your money and data are protected by multiple layers of defence."
+        ctaText="Open an Account"
+        ctaHref="/register"
+        ctaText2="Report a concern"
+        ctaHref2="/security#report"
+      />
     </>
   );
 }
@@ -1026,7 +1036,7 @@ function ReportSection() {
       </p>
 
       <a
-        href="mailto:security@bankofasia.com"
+        href="mailto:security@boasiaonline.com"
         style={{
           display: "inline-flex",
           alignItems: "center",
@@ -1047,7 +1057,7 @@ function ReportSection() {
           (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "var(--boa-teal)";
         }}
       >
-        📧 security@bankofasia.com
+        📧 security@boasiaonline.com
       </a>
 
       <p

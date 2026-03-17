@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import FaqAccordion from "@/components/marketing/FaqAccordion";
 import type { FaqItem } from "@/components/marketing/FaqAccordion";
+import EditorialBanner from "@/components/marketing/EditorialBanner";
 
 // ── FAQ data ───────────────────────────────────────────────────────────────
 
@@ -31,7 +33,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: "How do I get a dedicated account manager?",
-    a: "Business accounts with an average monthly balance of $100,000 AUD equivalent or higher are eligible for a dedicated relationship manager. Contact our business team at business@bankofasia.com to request assignment.",
+    a: "Business accounts with an average monthly balance of $100,000 AUD equivalent or higher are eligible for a dedicated relationship manager. Contact our business team at business@boasiaonline.com to request assignment.",
   },
 ];
 
@@ -710,156 +712,17 @@ export default function BusinessPage() {
 
         <div className="boa-container" style={{ position: "relative", zIndex: 1, width: "100%" }}>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(1, 1fr)",
-              gap: 48,
-              alignItems: "center",
-            }}
-            className="lg:grid-cols-business-hero"
+            style={{ display: "grid", gap: 48, alignItems: "center" }}
+            className="grid-cols-1 lg:grid-cols-[54fr_46fr]"
           >
-            {/* Override with responsive classes via Tailwind */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "54% 46%",
-                gap: 48,
-                alignItems: "center",
-              }}
-              className="hidden lg:grid"
-            >
-              {/* LEFT */}
-              <motion.div
-                variants={heroStagger}
-                initial="hidden"
-                animate="show"
-                style={{ display: "flex", flexDirection: "column", gap: 0 }}
-              >
-                {/* Eyebrow pill */}
-                <motion.div variants={heroChild} style={{ marginBottom: 24 }}>
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      backgroundColor: "rgba(0,200,150,0.1)",
-                      border: "1px solid rgba(0,200,150,0.28)",
-                      color: "#00C896",
-                      fontFamily: "var(--font-dm-sans, sans-serif)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      borderRadius: 9999,
-                      padding: "8px 16px",
-                    }}
-                  >
-                    BUSINESS BANKING
-                  </span>
-                </motion.div>
-
-                {/* H1 */}
-                <motion.h1
-                  variants={heroChild}
-                  style={{
-                    fontFamily: "var(--font-syne, sans-serif)",
-                    fontSize: "clamp(36px, 5vw, 60px)",
-                    color: "#fff",
-                    lineHeight: 1.1,
-                    letterSpacing: "-0.03em",
-                    marginBottom: 24,
-                    fontWeight: 700,
-                  }}
-                >
-                  Banking for businesses that move fast.
-                </motion.h1>
-
-                {/* Body */}
-                <motion.p
-                  variants={heroChild}
-                  style={{
-                    fontFamily: "var(--font-dm-sans, sans-serif)",
-                    fontSize: 17,
-                    color: "rgba(255,255,255,0.6)",
-                    lineHeight: 1.75,
-                    marginBottom: 36,
-                  }}
-                >
-                  Business accounts with multi-currency wallets, batch payments, FX solutions, and dedicated support — built for companies that operate globally.
-                </motion.p>
-
-                {/* CTAs */}
-                <motion.div variants={heroChild} style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 32 }}>
-                  <Link
-                    href="/register"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      backgroundColor: "#00C896",
-                      color: "#fff",
-                      borderRadius: 8,
-                      padding: "14px 28px",
-                      fontFamily: "var(--font-dm-sans, sans-serif)",
-                      fontWeight: 600,
-                      fontSize: 16,
-                      textDecoration: "none",
-                      transition: "background-color 0.2s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#00A87E")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#00C896")}
-                  >
-                    Open Business Account
-                  </Link>
-                  <Link
-                    href="/contact"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      border: "1.5px solid rgba(255,255,255,0.35)",
-                      color: "#fff",
-                      borderRadius: 8,
-                      padding: "14px 28px",
-                      fontFamily: "var(--font-dm-sans, sans-serif)",
-                      fontWeight: 600,
-                      fontSize: 16,
-                      textDecoration: "none",
-                      transition: "background-color 0.2s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.07)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                  >
-                    Talk to Sales
-                  </Link>
-                </motion.div>
-
-                {/* Trust badges */}
-                <motion.div variants={heroChild} style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-                  {["✓ No monthly fees", "✓ Multi-currency", "✓ API access"].map((badge) => (
-                    <span
-                      key={badge}
-                      style={{
-                        fontFamily: "var(--font-dm-sans, sans-serif)",
-                        fontSize: 13,
-                        color: "rgba(255,255,255,0.5)",
-                      }}
-                    >
-                      {badge}
-                    </span>
-                  ))}
-                </motion.div>
-              </motion.div>
-
-              {/* RIGHT — Dashboard card */}
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", paddingTop: 32 }}>
-                <BusinessDashboardCard />
-              </div>
-            </div>
-
-            {/* Mobile layout (single column) */}
+            {/* LEFT — text */}
             <motion.div
               variants={heroStagger}
               initial="hidden"
               animate="show"
               style={{ display: "flex", flexDirection: "column", gap: 0 }}
-              className="lg:hidden"
             >
+              {/* Eyebrow pill */}
               <motion.div variants={heroChild} style={{ marginBottom: 24 }}>
                 <span
                   style={{
@@ -879,6 +742,7 @@ export default function BusinessPage() {
                 </span>
               </motion.div>
 
+              {/* H1 */}
               <motion.h1
                 variants={heroChild}
                 style={{
@@ -894,6 +758,7 @@ export default function BusinessPage() {
                 Banking for businesses that move fast.
               </motion.h1>
 
+              {/* Body */}
               <motion.p
                 variants={heroChild}
                 style={{
@@ -907,9 +772,10 @@ export default function BusinessPage() {
                 Business accounts with multi-currency wallets, batch payments, FX solutions, and dedicated support — built for companies that operate globally.
               </motion.p>
 
+              {/* CTAs */}
               <motion.div variants={heroChild} style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 32 }}>
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -921,7 +787,10 @@ export default function BusinessPage() {
                     fontWeight: 600,
                     fontSize: 16,
                     textDecoration: "none",
+                    transition: "background-color 0.2s",
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#00A87E")}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#00C896")}
                 >
                   Open Business Account
                 </Link>
@@ -938,12 +807,16 @@ export default function BusinessPage() {
                     fontWeight: 600,
                     fontSize: 16,
                     textDecoration: "none",
+                    transition: "background-color 0.2s",
                   }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.07)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                 >
                   Talk to Sales
                 </Link>
               </motion.div>
 
+              {/* Trust badges */}
               <motion.div variants={heroChild} style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
                 {["✓ No monthly fees", "✓ Multi-currency", "✓ API access"].map((badge) => (
                   <span
@@ -959,8 +832,25 @@ export default function BusinessPage() {
                 ))}
               </motion.div>
             </motion.div>
+
+            {/* RIGHT — Dashboard card (hidden on mobile) */}
+            <div className="hidden lg:flex" style={{ justifyContent: "center", alignItems: "flex-start", paddingTop: 32 }}>
+              <BusinessDashboardCard />
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Banner image */}
+      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <Image
+          src="/banner-image2.png"
+          alt="Bank of Asia business banking"
+          width={1920}
+          height={600}
+          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
+          priority={false}
+        />
       </section>
 
       {/* ═══════════════════════════════════════════════════════
@@ -1345,106 +1235,14 @@ export default function BusinessPage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════
-          SECTION 7 — CTA BANNER
-      ═══════════════════════════════════════════════════════ */}
-      <section
-        style={{
-          background: "linear-gradient(135deg, #0F2040, #162B52)",
-          paddingTop: 80,
-          paddingBottom: 80,
-          textAlign: "center",
-        }}
-      >
-        <div className="boa-container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            style={{ maxWidth: 640, margin: "0 auto" }}
-          >
-            <h2
-              style={{
-                fontFamily: "var(--font-syne, sans-serif)",
-                fontSize: "clamp(28px, 4vw, 48px)",
-                fontWeight: 700,
-                color: "#fff",
-                letterSpacing: "-0.025em",
-                marginBottom: 16,
-              }}
-            >
-              Open a business account today.
-            </h2>
-
-            <p
-              style={{
-                fontFamily: "var(--font-dm-sans, sans-serif)",
-                fontSize: 17,
-                color: "rgba(255,255,255,0.55)",
-                marginBottom: 40,
-                lineHeight: 1.65,
-              }}
-            >
-              Join hundreds of businesses banking smarter with Bank of Asia. No setup fees. No lock-in.
-            </p>
-
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center", marginBottom: 28 }}>
-              <Link
-                href="/register"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  backgroundColor: "#00C896",
-                  color: "#fff",
-                  borderRadius: 8,
-                  padding: "16px 36px",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                  fontWeight: 600,
-                  fontSize: 17,
-                  textDecoration: "none",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#00A87E")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#00C896")}
-              >
-                Open Business Account
-              </Link>
-              <Link
-                href="/contact"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  border: "1.5px solid rgba(255,255,255,0.3)",
-                  color: "#fff",
-                  borderRadius: 8,
-                  padding: "16px 36px",
-                  fontFamily: "var(--font-dm-sans, sans-serif)",
-                  fontWeight: 600,
-                  fontSize: 17,
-                  textDecoration: "none",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.07)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-              >
-                Talk to Sales
-              </Link>
-            </div>
-
-            <p
-              style={{
-                fontFamily: "var(--font-dm-sans, sans-serif)",
-                fontSize: 13,
-                color: "rgba(255,255,255,0.35)",
-                letterSpacing: "0.04em",
-              }}
-            >
-              No monthly fees · No lock-in · Open in minutes
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <EditorialBanner
+        headline="Open a business account today."
+        subtext="Join hundreds of businesses banking smarter with Bank of Asia. No setup fees. No lock-in."
+        ctaText="Open Business Account"
+        ctaHref="/register"
+        ctaText2="Talk to Sales"
+        ctaHref2="/contact"
+      />
     </>
   );
 }

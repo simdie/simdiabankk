@@ -98,15 +98,20 @@ export default function AdminShell({
       }}>
         {(inMobile || !collapsed) && (
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-              <span style={{ fontSize: 18, filter: "drop-shadow(0 0 6px rgba(240,180,41,0.6))" }}>🛡</span>
-              <span style={{ fontWeight: 800, fontSize: 13, color: G, letterSpacing: 0.5 }}>BANK OF ASIA ONLINE</span>
-            </div>
-            <div style={{ fontSize: 9, letterSpacing: "0.2em", color: "rgba(240,180,41,0.35)", marginTop: 2, marginLeft: 26, textTransform: "uppercase" as const }}>ADMIN PANEL</div>
+            <img
+              src="/logo-dark-bg.png"
+              alt="Bank of Asia Online"
+              style={{ width: 130, height: "auto", borderRadius: 6, display: "block" }}
+            />
+            <div style={{ fontSize: 9, letterSpacing: "0.2em", color: "rgba(240,180,41,0.35)", marginTop: 4, textTransform: "uppercase" as const }}>ADMIN PANEL</div>
           </div>
         )}
         {!inMobile && collapsed && (
-          <span style={{ fontSize: 18 }}>🛡</span>
+          <img
+            src="/logo-dark-bg.png"
+            alt="Bank of Asia Online"
+            style={{ width: 40, height: 40, borderRadius: 6, objectFit: "cover", objectPosition: "left center", display: "block" }}
+          />
         )}
         {!inMobile ? (
           <button onClick={() => setCollapsed(!collapsed)} style={{

@@ -184,6 +184,10 @@ export default function CardsClient({ accounts }: { accounts: Account[] }) {
   const [cards, setCards] = useState<VirtualCard[]>(accounts.flatMap((a) => a.cards));
   const [error, setError] = useState<Record<string, string>>({});
   const [successMsg, setSuccessMsg] = useState("");
+  const [limitToast, setLimitToast] = useState(false);
+
+  const totalCardCount = cards.filter((c) => c.status !== "CANCELLED").length;
+  const atLimit = totalCardCount >= 2;
 
   async function handleCardAction(cardId: string, action: "freeze" | "unfreeze" | "cancel") {
     setActionLoading((p) => ({ ...p, [cardId]: true }));
@@ -230,14 +234,43 @@ export default function CardsClient({ accounts }: { accounts: Account[] }) {
           <h1 style={{ fontFamily: "var(--font-syne)", fontSize: 24, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 4 }}>Virtual Cards</h1>
           <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>{allCards.length} card{allCards.length !== 1 ? "s" : ""}</p>
         </div>
-        <button onClick={() => setNewCard({ accountId: accounts[0]?.id ?? "", type: "VISA" })} className="btn-nexus" style={{ padding: "9px 20px" }}>
-          + Generate Card
-        </button>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+          <button
+            onClick={() => {
+              if (atLimit) {
+                setLimitToast(true);
+                setTimeout(() => setLimitToast(false), 3000);
+                return;
+              }
+              setNewCard({ accountId: accounts[0]?.id ?? "", type: "VISA" });
+            }}
+            className="btn-nexus"
+            style={{
+              padding: "9px 20px",
+              opacity: atLimit ? 0.4 : 1,
+              cursor: atLimit ? "not-allowed" : "pointer",
+              background: atLimit ? "#374151" : undefined,
+              pointerEvents: atLimit ? ("none" as const) : undefined,
+            }}
+          >
+            + Generate Card
+          </button>
+          {atLimit && (
+            <p style={{ color: "#6B7280", fontSize: 13, margin: 0, textAlign: "right" }}>
+              Maximum of 2 virtual cards reached. Cancel an existing card to generate a new one.
+            </p>
+          )}
+        </div>
       </div>
 
       {successMsg && (
         <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(0,229,160,0.08)", border: "1px solid rgba(0,229,160,0.2)", color: "var(--color-success)", fontSize: 13 }}>
           ✓ {successMsg}
+        </div>
+      )}
+      {limitToast && (
+        <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(255,59,92,0.08)", border: "1px solid rgba(255,59,92,0.2)", color: "var(--color-danger)", fontSize: 13 }}>
+          You have reached the maximum of 2 virtual cards.
         </div>
       )}
 

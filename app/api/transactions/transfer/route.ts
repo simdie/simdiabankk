@@ -6,7 +6,7 @@ import {
   executeInternalTransfer,
   executeWireTransfer,
 } from "@/lib/transactions";
-import { sendTransferConfirmEmail } from "@/lib/email";
+import { sendTransferConfirmEmail, sendReceiptEmail } from "@/lib/email";
 import { notifyTransfer } from "@/lib/notifications";
 
 const internalSchema = z.object({
@@ -88,6 +88,21 @@ export async function POST(req: NextRequest) {
         reference: result.transaction.reference,
         senderUserId: session.user.id,
       }).catch(() => {});
+      // Send receipt if transaction is immediately completed (no email confirm pending)
+      if (!result.requiresEmailConfirm && result.transaction.status === "COMPLETED") {
+        sendReceiptEmail(user.email, {
+          reference: result.transaction.reference,
+          type: result.transaction.type,
+          status: result.transaction.status,
+          amount: Number(result.transaction.amount),
+          currency: result.transaction.currency,
+          description: result.transaction.description ?? null,
+          createdAt: result.transaction.createdAt,
+          sender: { name: `${user.firstName} ${user.lastName}`, accountNumber: parsed.data.senderAccountId, currency: result.transaction.currency },
+          receiver: null,
+          externalDetails: null,
+        }).catch(() => {});
+      }
       return NextResponse.json({ success: true, transaction: result.transaction, requiresEmailConfirm: result.requiresEmailConfirm });
     }
 

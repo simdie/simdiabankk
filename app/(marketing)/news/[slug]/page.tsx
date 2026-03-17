@@ -247,7 +247,7 @@ export default async function ArticlePage({ params }: Props) {
                   Open a free account in under 3 minutes. No fees, no minimums.
                 </p>
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   className="block text-center py-3 rounded-lg text-[14px] font-medium"
                   style={{
                     backgroundColor: "var(--boa-purple)",

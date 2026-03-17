@@ -199,8 +199,8 @@ export default function ContactForm() {
         style={{ color: "var(--boa-muted)", fontFamily: "var(--font-dm-sans, var(--font-inter))" }}
       >
         We aim to respond within 1–2 business days. For urgent security matters, email{" "}
-        <a href="mailto:security@bankofasia.com" className="underline underline-offset-2" style={{ color: "var(--boa-purple)" }}>
-          security@bankofasia.com
+        <a href="mailto:security@boasiaonline.com" className="underline underline-offset-2" style={{ color: "var(--boa-purple)" }}>
+          security@boasiaonline.com
         </a>
         .
       </p>

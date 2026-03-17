@@ -299,7 +299,7 @@ export default function CurrencyConverter() {
 
         {/* CTA */}
         <Link
-          href="/register"
+          href="/register" target="_blank" rel="noopener noreferrer"
           className="block w-full text-center py-3.5 rounded-xl text-[15px] font-medium text-white transition-opacity hover:opacity-90"
           style={{
             backgroundColor: "var(--boa-purple)",

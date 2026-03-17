@@ -134,7 +134,7 @@ export default function TransactionsClient({ transactions, userId }: { transacti
         ].map((s) => (
           <div key={s.label} className="glass-card" style={{ padding: "16px 20px" }}>
             <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</div>
-            <div style={{ fontFamily: "var(--font-syne)", fontSize: 20, fontWeight: 700, color: s.color }}>{s.val}</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 20, fontWeight: 600, color: s.color }}>{s.val}</div>
           </div>
         ))}
       </div>

@@ -38,11 +38,14 @@ export async function POST(req: NextRequest) {
   if (!account) return NextResponse.json({ error: "Account not found" }, { status: 404 });
   if (account.status !== "ACTIVE") return NextResponse.json({ error: "Account is not active" }, { status: 400 });
 
-  const activeCards = await prisma.virtualCard.count({
-    where: { accountId, status: { in: ["ACTIVE", "FROZEN"] } },
+  const cardCount = await prisma.virtualCard.count({
+    where: {
+      account: { userId: session.user.id },
+      status: { not: "CANCELLED" },
+    },
   });
-  if (activeCards >= 3) {
-    return NextResponse.json({ error: "Maximum 3 active cards per account" }, { status: 400 });
+  if (cardCount >= 2) {
+    return NextResponse.json({ error: "Maximum of 2 cards allowed per account." }, { status: 400 });
   }
 
   const card = await prisma.virtualCard.create({

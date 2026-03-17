@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import Logo from "./Logo";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ── Column data ───────────────────────────────────────────────
 const ABOUT_US = [
@@ -23,11 +24,11 @@ const PERSONAL_BANKING = [
 ];
 
 const BUSINESS_BANKING = [
-  { label: "Business Accounts",    href: "/business" },
-  { label: "Merchant Services",    href: "/business" },
-  { label: "Business Loans",       href: "/business" },
-  { label: "API & Integrations",   href: "/business" },
-  { label: "Corporate Solutions",  href: "/business" },
+  { label: "Business Accounts",    href: "/business"      },
+  { label: "Merchant Services",    href: "/business"      },
+  { label: "Business Loans",       href: "/business"      },
+  { label: "API & Integrations",   href: "/business"      },
+  { label: "Corporate Solutions",  href: "/business"      },
   { label: "FX Solutions",         href: "/international" },
 ];
 
@@ -58,36 +59,176 @@ const COMPLIANCE_LINKS = [
 ];
 
 const TRUST_BADGES = [
-  { icon: "🛡", label: "Bank Licensed"      },
-  { icon: "🔒", label: "256-bit Encryption" },
-  { icon: "✓",  label: "Deposit Insured"    },
-  { icon: "🏆", label: "ISO 27001"          },
+  { icon: "shield", label: "Bank Licensed"      },
+  { icon: "lock",   label: "256-bit Encryption" },
+  { icon: "check",  label: "Deposit Insured"    },
+  { icon: "shield", label: "ISO 27001"          },
 ];
 
-const REG_BADGES = [
-  "🛡 Bank Licensed",
-  "🔐 256-bit Encryption",
-  "✓ Deposit Insured",
-  "ISO 27001",
+const NAV_COLUMNS = [
+  { heading: "About Us",         links: ABOUT_US         },
+  { heading: "Personal Banking", links: PERSONAL_BANKING },
+  { heading: "Business Banking", links: BUSINESS_BANKING },
+  { heading: "Help & Support",   links: HELP_SUPPORT     },
+  { heading: "Legal",            links: LEGAL            },
 ];
 
-// ── Tiny sub-components ───────────────────────────────────────
+// ── Shield SVG icon (consistent style across all trust badges) ─
+function ShieldIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M7 1L13 3.5V7C13 10.2 10.2 12.8 7 13C3.8 12.8 1 10.2 1 7V3.5L7 1Z"
+        fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M4.5 7L6.2 8.7L9.5 5.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function LockIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <rect x="3" y="6" width="8" height="7" rx="1.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" />
+      <path d="M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CheckIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="5.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" />
+      <path d="M4.5 7L6.2 8.7L9.5 5.5" stroke="rgba(255,255,255,0.6)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TrustIcon({ type }: { type: string }) {
+  if (type === "lock") return <LockIcon />;
+  if (type === "check") return <CheckIcon />;
+  return <ShieldIcon />;
+}
+
+// ── VISA / PCI ─────────────────────────────────────────────────
+function VisaSVG() {
+  return (
+    <svg width="42" height="14" viewBox="0 0 42 14" fill="none" aria-label="VISA">
+      <rect width="42" height="14" rx="2" fill="#1A1F71" />
+      <text x="50%" y="10" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontStyle="italic" fontFamily="Arial, sans-serif">VISA</text>
+    </svg>
+  );
+}
+
+function PciSVG() {
+  return (
+    <div
+      className="flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold tracking-wide"
+      style={{ border: "1px solid rgba(200,151,42,0.5)", color: "var(--boa-gold)", fontSize: 9, letterSpacing: "0.06em" }}
+    >
+      PCI&nbsp;DSS
+    </div>
+  );
+}
+
+// ── Mobile accordion column ────────────────────────────────────
+function AccordionCol({ heading, links }: { heading: string; links: { label: string; href: string }[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 0",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-dm-sans, DM Sans, sans-serif)",
+            fontSize: 11,
+            fontWeight: 600,
+            textTransform: "uppercase" as const,
+            letterSpacing: "0.12em",
+            color: "rgba(255,255,255,0.45)",
+          }}
+        >
+          {heading}
+        </span>
+        <motion.span
+          animate={{ rotate: open ? 45 : 0 }}
+          transition={{ duration: 0.2 }}
+          style={{ color: "rgba(255,255,255,0.35)", fontSize: 20, lineHeight: 1, fontWeight: 300 }}
+        >
+          +
+        </motion.span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            style={{ overflow: "hidden", paddingBottom: open ? 12 : 0 }}
+          >
+            {links.map((l) => (
+              <li key={l.label} style={{ paddingBottom: 10 }}>
+                <Link
+                  href={l.href}
+                  style={{
+                    fontFamily: "var(--font-dm-sans, DM Sans, sans-serif)",
+                    fontSize: 14,
+                    color: "rgba(255,255,255,0.6)",
+                    textDecoration: "none",
+                  }}
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Desktop column ─────────────────────────────────────────────
 function FooterCol({ heading, links }: { heading: string; links: { label: string; href: string }[] }) {
   return (
     <div>
       <h4
-        className="text-[11px] uppercase tracking-widest font-semibold mb-4"
-        style={{ color: "rgba(255,255,255,0.45)" }}
+        style={{
+          fontFamily: "var(--font-dm-sans, DM Sans, sans-serif)",
+          fontSize: 11,
+          fontWeight: 600,
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.12em",
+          color: "rgba(255,255,255,0.45)",
+          marginBottom: 16,
+        }}
       >
         {heading}
       </h4>
-      <ul className="space-y-2.5">
+      <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column" as const, gap: 10 }}>
         {links.map((l) => (
           <li key={l.label}>
             <Link
               href={l.href}
-              className="text-[13.5px] transition-colors duration-150"
-              style={{ color: "rgba(255,255,255,0.65)" }}
+              style={{
+                fontFamily: "var(--font-dm-sans, DM Sans, sans-serif)",
+                fontSize: 13.5,
+                color: "rgba(255,255,255,0.65)",
+                textDecoration: "none",
+                transition: "color 0.15s",
+              }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.65)")}
             >
@@ -100,36 +241,7 @@ function FooterCol({ heading, links }: { heading: string; links: { label: string
   );
 }
 
-// VISA SVG wordmark (simplified)
-function VisaSVG() {
-  return (
-    <svg width="42" height="14" viewBox="0 0 42 14" fill="none" aria-label="VISA">
-      <rect width="42" height="14" rx="2" fill="#1A1F71" />
-      <text x="50%" y="10" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontStyle="italic" fontFamily="Arial, sans-serif">
-        VISA
-      </text>
-    </svg>
-  );
-}
-
-// PCI DSS badge (simplified)
-function PciSVG() {
-  return (
-    <div
-      className="flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold tracking-wide"
-      style={{
-        border: "1px solid rgba(200,151,42,0.5)",
-        color: "var(--boa-gold)",
-        fontSize: 9,
-        letterSpacing: "0.06em",
-      }}
-    >
-      PCI&nbsp;DSS
-    </div>
-  );
-}
-
-// ── Main Footer ───────────────────────────────────────────────
+// ── Main Footer ────────────────────────────────────────────────
 export default function Footer() {
   return (
     <footer
@@ -137,66 +249,52 @@ export default function Footer() {
       style={{ fontFamily: "var(--font-dm-sans, DM Sans, sans-serif)" }}
     >
       {/* ══════════════════════════════════════════════════════════
-          SECTION 1 — MAIN FOOTER
+          SECTION 1 — MAIN FOOTER GRID
       ══════════════════════════════════════════════════════════ */}
       <div style={{ backgroundColor: "#0A1628" }} className="py-16">
         <div className="boa-container">
+
+          {/* ── DESKTOP & TABLET GRID (hidden on mobile) ── */}
           <div
-            className="grid gap-10"
+            className="hidden md:grid gap-10"
             style={{
-              gridTemplateColumns:
-                "clamp(200px,22%,280px) repeat(5,1fr)",
+              gridTemplateColumns: "clamp(180px,20%,260px) repeat(5,1fr)",
             }}
           >
             {/* COL 1 — Brand */}
-            <div className="space-y-6" style={{ gridColumn: 1 }}>
-              {/* Logo */}
-              <Logo size="default" />
-
-              {/* Tagline */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <img src="/logo-dark-bg.png" alt="Bank of Asia Online" style={{ width: 170, height: "auto", display: "block" }} />
               <div>
-                <p
-                  className="font-semibold mb-1"
-                  style={{ color: "rgba(255,255,255,0.9)", fontSize: 14 }}
-                >
+                <p style={{ fontWeight: 600, fontSize: 14, color: "rgba(255,255,255,0.9)", marginBottom: 4 }}>
                   Modern digital banking for Asia-Pacific.
                 </p>
-                <p
-                  className="text-[13px] leading-relaxed"
-                  style={{ color: "rgba(255,255,255,0.5)" }}
-                >
-                  Open your account in minutes, send money across borders
-                  instantly, and earn competitive rates.
+                <p style={{ fontSize: 13, lineHeight: 1.65, color: "rgba(255,255,255,0.5)" }}>
+                  Open your account in minutes, send money across borders instantly, and earn competitive rates.
                 </p>
               </div>
-
-              {/* Contact block */}
-              <div className="space-y-2">
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {[
                   { icon: "📞", text: "+65 6123 4567" },
-                  { icon: "✉",  text: "support@bankofasia.com" },
-                  { icon: "📍", text: "Singapore · Hong Kong · Tokyo · New York" },
+                  { icon: "✉",  text: "support@boasiaonline.com" },
+                  { icon: "📍", text: "Singapore · Hong Kong · New York" },
                 ].map(({ icon, text }) => (
-                  <p
-                    key={text}
-                    className="flex items-start gap-2 text-[12.5px]"
-                    style={{ color: "rgba(255,255,255,0.55)" }}
-                  >
-                    <span className="shrink-0 mt-px">{icon}</span>
+                  <p key={text} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12.5, color: "rgba(255,255,255,0.55)", margin: 0 }}>
+                    <span style={{ flexShrink: 0 }}>{icon}</span>
                     <span>{text}</span>
                   </p>
                 ))}
               </div>
-
-              {/* Regulatory badges */}
-              <div className="flex flex-wrap gap-2">
-                {REG_BADGES.map((badge) => (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {["🛡 Bank Licensed", "🔐 Encrypted", "✓ Deposit Insured", "ISO 27001"].map((badge) => (
                   <span
                     key={badge}
-                    className="px-2.5 py-1 rounded text-[10.5px] font-medium"
                     style={{
+                      padding: "4px 10px",
+                      borderRadius: 4,
                       border: "1px solid rgba(255,255,255,0.2)",
                       color: "rgba(255,255,255,0.6)",
+                      fontSize: 10.5,
+                      fontWeight: 500,
                     }}
                   >
                     {badge}
@@ -205,86 +303,148 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* COL 2-6 — Nav columns */}
-            <FooterCol heading="About Us"          links={ABOUT_US}         />
-            <FooterCol heading="Personal Banking"  links={PERSONAL_BANKING} />
-            <FooterCol heading="Business Banking"  links={BUSINESS_BANKING} />
-            <FooterCol heading="Help & Support"    links={HELP_SUPPORT}     />
-            <FooterCol heading="Legal"             links={LEGAL}            />
+            {/* COL 2-6 — Nav */}
+            {NAV_COLUMNS.map((col) => (
+              <FooterCol key={col.heading} heading={col.heading} links={col.links} />
+            ))}
+          </div>
+
+          {/* ── MOBILE LAYOUT (visible only <md) ── */}
+          <div className="md:hidden">
+            {/* Brand — always visible, centered */}
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <img
+                src="/logo-dark-bg.png"
+                alt="Bank of Asia Online"
+                style={{ width: 180, height: "auto", display: "block", margin: "0 auto 16px" }}
+              />
+              <p style={{ fontWeight: 600, fontSize: 14, color: "rgba(255,255,255,0.9)", marginBottom: 6 }}>
+                Modern digital banking for Asia-Pacific.
+              </p>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>
+                Open your account in minutes, send money across borders instantly.
+              </p>
+              {/* Contact */}
+              <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6, alignItems: "center" }}>
+                {[
+                  { icon: "📞", text: "+65 6123 4567" },
+                  { icon: "✉",  text: "support@boasiaonline.com" },
+                  { icon: "📍", text: "Singapore · Hong Kong · New York" },
+                ].map(({ icon, text }) => (
+                  <p key={text} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, color: "rgba(255,255,255,0.55)", margin: 0 }}>
+                    <span>{icon}</span><span>{text}</span>
+                  </p>
+                ))}
+              </div>
+              {/* Reg badges 2×2 */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 16 }}>
+                {["🛡 Bank Licensed", "🔐 Encrypted", "✓ Deposit Insured", "ISO 27001"].map((badge) => (
+                  <span
+                    key={badge}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 6,
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      color: "rgba(255,255,255,0.6)",
+                      fontSize: 11,
+                      fontWeight: 500,
+                      textAlign: "center",
+                    }}
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Accordion columns */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+              {NAV_COLUMNS.map((col) => (
+                <AccordionCol key={col.heading} heading={col.heading} links={col.links} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* ══════════════════════════════════════════════════════════
-          SECTION 2 — APP DOWNLOAD BANNER
+          SECTION 2 — LICENSED & REGULATED TRUST STRIP
       ══════════════════════════════════════════════════════════ */}
       <div style={{ backgroundColor: "#0A1628" }} className="pb-10">
-        <div className="boa-container">
+        <div className="boa-container px-3 sm:px-0">
+          {/* A) Regulated Banking card — responsive 2-col / stacked */}
           <div
-            className="flex flex-col md:flex-row items-center justify-between gap-6 px-8 py-6 rounded-xl"
             style={{
               backgroundColor: "#0F2040",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12,
+              padding: "clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px)",
             }}
           >
-            {/* Left */}
-            <div className="flex items-center gap-4">
-              <div
-                className="flex items-center justify-center w-12 h-12 rounded-xl shrink-0"
-                style={{ backgroundColor: "rgba(0,200,150,0.15)" }}
-              >
-                <span style={{ fontSize: 24 }}>📱</span>
-              </div>
+            <div
+              style={{
+                display: "grid",
+                gap: 24,
+                gridTemplateColumns: "1fr",
+                alignItems: "center",
+              }}
+              className="md:grid-cols-[1fr_auto]"
+            >
+              {/* LEFT */}
               <div>
                 <p
-                  className="font-bold text-white mb-0.5"
                   style={{
-                    fontSize: 16,
                     fontFamily: "var(--font-syne, Syne, sans-serif)",
+                    fontWeight: 600,
+                    fontSize: "clamp(18px, 4vw, 24px)",
+                    color: "#fff",
+                    marginBottom: 8,
+                    lineHeight: 1.3,
                   }}
                 >
-                  Bank on the go
+                  Regulated Banking. Guaranteed Security.
                 </p>
-                <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  Download our mobile app for iOS and Android
+                <p style={{ fontSize: 14, color: "rgba(209,213,219,1)", lineHeight: 1.65, maxWidth: 480, margin: 0 }}>
+                  Bank of Asia Online operates under the supervision of MAS Singapore and holds full banking licenses across all operating jurisdictions.
                 </p>
               </div>
-            </div>
 
-            {/* Store buttons */}
-            <div className="flex items-center gap-3 shrink-0">
-              {[
-                { icon: "🍎", line1: "Download on the", line2: "App Store" },
-                { icon: "▶",  line1: "Get it on",       line2: "Google Play" },
-              ].map(({ icon, line1, line2 }) => (
-                <button
-                  key={line2}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg transition-colors"
-                  style={{
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)")
-                  }
-                >
-                  <span style={{ fontSize: 20 }}>{icon}</span>
-                  <div className="text-left">
-                    <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>
-                      {line1}
-                    </p>
-                    <p
-                      className="text-[13px] font-semibold text-white leading-tight"
-                      style={{ fontFamily: "var(--font-syne, Syne, sans-serif)" }}
-                    >
-                      {line2}
-                    </p>
+              {/* RIGHT — 2×2 trust badges */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 8,
+                }}
+                className="w-full md:w-[300px]"
+              >
+                {[
+                  { icon: "🛡",  label: "MAS Licensed",          sub: "Singapore"  },
+                  { icon: "🔐",  label: "ISO 27001 Certified",   sub: ""           },
+                  { icon: "✓",   label: "Deposit Insured",       sub: "FDIC"       },
+                  { icon: "📋",  label: "PCI DSS Level 1",       sub: "Compliant"  },
+                ].map((b) => (
+                  <div
+                    key={b.label}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 14px",
+                      minHeight: 60,
+                      borderRadius: 8,
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      backgroundColor: "rgba(255,255,255,0.04)",
+                    }}
+                  >
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{b.icon}</span>
+                    <div>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.85)", margin: 0, lineHeight: 1.3 }}>{b.label}</p>
+                      {b.sub && <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", margin: 0 }}>{b.sub}</p>}
+                    </div>
                   </div>
-                </button>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -298,21 +458,15 @@ export default function Footer() {
         className="py-6"
       >
         <div className="boa-container">
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            {TRUST_BADGES.map((badge, i) => (
-              <div key={badge.label} className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-[13px]">
-                  <span>{badge.icon}</span>
-                  <span style={{ color: "rgba(255,255,255,0.7)" }}>{badge.label}</span>
-                </div>
-                {i < TRUST_BADGES.length - 1 && (
-                  <span
-                    className="hidden sm:block"
-                    style={{ color: "rgba(255,255,255,0.15)", fontSize: 18 }}
-                  >
-                    |
-                  </span>
-                )}
+          {/* Mobile: 2×2 grid. Desktop: single row */}
+          <div
+            className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-4 sm:gap-6"
+            style={{ textAlign: "center" }}
+          >
+            {TRUST_BADGES.map((badge) => (
+              <div key={badge.label} className="flex items-center justify-center gap-2">
+                <TrustIcon type={badge.icon} />
+                <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 13 }}>{badge.label}</span>
               </div>
             ))}
           </div>
@@ -324,52 +478,50 @@ export default function Footer() {
       ══════════════════════════════════════════════════════════ */}
       <div style={{ backgroundColor: "#040A12" }} className="py-4">
         <div className="boa-container">
-          {/* Gold divider */}
-          <div
-            style={{
-              height: 1,
-              backgroundColor: "rgba(200,151,42,0.35)",
-              marginBottom: 16,
-            }}
-          />
+          <div style={{ height: 1, backgroundColor: "rgba(200,151,42,0.35)", marginBottom: 16 }} />
 
-          {/* Top row: copyright + regulatory */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 text-[12px]">
-            <p style={{ color: "rgba(255,255,255,0.4)" }}>
+          {/* C) Copyright + compliance text — stacked on mobile */}
+          <div className="flex flex-col md:flex-row items-center md:items-center justify-between gap-2">
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, textAlign: "center" }}>
               © 2026 Bank of Asia Online. All rights reserved.
             </p>
-            <p className="text-center" style={{ color: "rgba(255,255,255,0.35)" }}>
-              Member of the Deposit Insurance Corporation&nbsp;|&nbsp;Licensed and
-              regulated by MAS Singapore
+            {/* Split at pipe for mobile line break */}
+            <p style={{ color: "rgba(255,255,255,0.35)", textAlign: "center" }}>
+              <span style={{ fontSize: "clamp(11px, 1.5vw, 12px)", display: "inline" }}>
+                Member of the Deposit Insurance Corporation
+              </span>
+              <span className="hidden sm:inline" style={{ color: "rgba(255,255,255,0.2)", margin: "0 6px" }}>|</span>
+              <br className="sm:hidden" />
+              <span style={{ fontSize: "clamp(11px, 1.5vw, 12px)", display: "inline" }}>
+                Licensed and regulated by MAS Singapore
+              </span>
             </p>
           </div>
 
-          {/* Bottom row: links + logos */}
+          {/* D+E) Legal links + VISA/PCI — stacked on mobile */}
           <div
-            className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pt-4 mt-4"
+            className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-3 pt-4 mt-4"
             style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
           >
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              {COMPLIANCE_LINKS.map((link, i) => (
-                <span key={link.label} className="flex items-center gap-3">
-                  <Link
-                    href={link.href}
-                    className="text-[11.5px] transition-colors"
-                    style={{ color: "rgba(255,255,255,0.35)" }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
-                  >
-                    {link.label}
-                  </Link>
-                  {i < COMPLIANCE_LINKS.length - 1 && (
-                    <span style={{ color: "rgba(255,255,255,0.12)" }}>·</span>
-                  )}
-                </span>
+            {/* D) Legal links */}
+            <div
+              className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2"
+            >
+              {COMPLIANCE_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textDecoration: "none", transition: "color 0.15s" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.35)")}
+                >
+                  {link.label}
+                </Link>
               ))}
             </div>
 
-            {/* Payment badges */}
-            <div className="flex items-center gap-2.5 shrink-0">
+            {/* E) VISA + PCI DSS — centered on mobile, right-aligned on desktop */}
+            <div className="flex items-center gap-2.5 shrink-0 mt-3 sm:mt-0">
               <VisaSVG />
               <PciSVG />
             </div>

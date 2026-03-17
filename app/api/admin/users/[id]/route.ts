@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { sendActivationEmail, sendRestrictionEmail } from "@/lib/email";
 
 export async function GET(
   req: NextRequest,
@@ -134,6 +135,19 @@ export async function PATCH(
       ipAddress: req.headers.get("x-forwarded-for") || null,
     },
   });
+
+  // Send status-change emails (non-blocking)
+  if (body.status) {
+    prisma.user.findUnique({ where: { id }, select: { email: true, firstName: true, accounts: { select: { accountNumber: true, currency: true }, take: 1 } } }).then((u) => {
+      if (!u) return;
+      if (body.status === "ACTIVE") {
+        const acc = u.accounts[0];
+        sendActivationEmail(u.email, u.firstName, acc?.accountNumber ?? "", acc?.currency ?? "SGD").catch(console.error);
+      } else if (body.status === "RESTRICTED" || body.status === "DISABLED" || body.status === "SUSPENDED") {
+        sendRestrictionEmail(u.email, u.firstName, body.adminNotes ?? undefined).catch(console.error);
+      }
+    }).catch(console.error);
+  }
 
   return NextResponse.json({ success: true, user: updated });
 }

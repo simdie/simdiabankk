@@ -27,7 +27,7 @@ async function main() {
   console.log("✓  SystemSettings singleton ready");
 
   // ── 2. Admin user ─────────────────────────────────────────────────────────
-  const adminEmail = process.env.ADMIN_EMAIL ?? process.env.SMTP_USER ?? "admin@bankofasia.com";
+  const adminEmail = process.env.ADMIN_EMAIL ?? process.env.SMTP_USER ?? "admin@boasiaonline.com";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "Admin@BankOfAsia2025!";
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 

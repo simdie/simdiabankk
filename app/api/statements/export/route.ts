@@ -119,7 +119,7 @@ async function generateStatementPDF(opts: {
     function addFooter(pn: number, tp: number) {
       doc.moveTo(MARGIN, 812).lineTo(W - MARGIN, 812).lineWidth(0.5).strokeColor("#1a3a6b").stroke();
       doc.font("Helvetica").fontSize(7).fillColor("#777777");
-      doc.text("Bank of Asia Online  |  Regulated by MAS  |  SWIFT: BOASSGSG  |  www.bankofasia.com", MARGIN, 818, { lineBreak: false, width: CONTENT_W / 2 });
+      doc.text("Bank of Asia Online  |  Regulated by MAS  |  www.boasiaonline.com", MARGIN, 818, { lineBreak: false, width: CONTENT_W / 2 });
       doc.text("STRICTLY CONFIDENTIAL", MARGIN, 818, { align: "center", width: CONTENT_W, lineBreak: false });
       doc.text(`Page ${pn} of ${tp}`, MARGIN, 818, { align: "right", width: CONTENT_W, lineBreak: false });
     }
@@ -165,7 +165,7 @@ async function generateStatementPDF(opts: {
     // Bank address line
     doc.font("Helvetica").fontSize(7.5).fillColor("#777777");
     doc.text(
-      "Bank of Asia Online  ·  123 Financial District, Singapore 048946  ·  Tel: +65 6000 0000  ·  www.bankofasia.com  ·  SWIFT: BOASSGSG",
+      "Bank of Asia Online  ·  123 Financial District, Singapore 048946  ·  Tel: +65 6532 1234  ·  www.boasiaonline.com",
       MARGIN, 106, { lineBreak: false, width: CONTENT_W }
     );
 
@@ -174,7 +174,7 @@ async function generateStatementPDF(opts: {
 
     // ── ACCOUNT INFORMATION BOX ───────────────────────────────────────────────
     const acctBoxY = 124;
-    const acctBoxH = 118;
+    const acctBoxH = 136;
 
     // Fill + border
     doc.rect(MARGIN, acctBoxY, CONTENT_W, acctBoxH).fillColor("#f7f9fc").fill();
@@ -202,30 +202,35 @@ async function generateStatementPDF(opts: {
       ["Statement Period", `${fromStr} to ${toStr}`],
       ["Date Generated", generatedDateStr],
       ["IBAN", `BOASSGSG${last6}`],
-      ["SWIFT/BIC", "BOASSGSG"],
       ["Currency", currencyName],
     ];
 
-    let rowY = acctBoxY + 22;
-    const labelStyle = { fontSize: 7.5 as const, color: "#888888" as const, font: "Helvetica" as const };
-    const valueStyle = { fontSize: 8 as const, color: "#222222" as const, font: "Helvetica" as const };
+    // Draw left rows — address uses lineBreak:true to wrap cleanly
+    let leftRowY = acctBoxY + 22;
+    for (let i = 0; i < leftRows.length; i++) {
+      const [lbl, val] = leftRows[i];
+      const isAddr = lbl === "Address";
+      doc.font("Helvetica").fontSize(7.5).fillColor("#888888");
+      doc.text(lbl, colL, leftRowY, { lineBreak: false, width: 90 });
+      doc.font("Helvetica").fontSize(8).fillColor("#222222");
+      doc.text(val, valL, leftRowY, { lineBreak: isAddr, width: CONTENT_W / 2 - 100 });
+      if (isAddr) {
+        const addrH = doc.fontSize(8).heightOfString(val, { width: CONTENT_W / 2 - 100 });
+        leftRowY += Math.max(18, addrH + 6);
+      } else {
+        leftRowY += 18;
+      }
+    }
 
-    for (let i = 0; i < Math.max(leftRows.length, rightRows.length); i++) {
-      if (leftRows[i]) {
-        const [lbl, val] = leftRows[i];
-        doc.font("Helvetica").fontSize(7.5).fillColor("#888888");
-        doc.text(lbl, colL, rowY, { lineBreak: false, width: 90 });
-        doc.font("Helvetica").fontSize(8).fillColor("#222222");
-        doc.text(val, valL, rowY, { lineBreak: false, width: CONTENT_W / 2 - 100 });
-      }
-      if (rightRows[i]) {
-        const [lbl, val] = rightRows[i];
-        doc.font("Helvetica").fontSize(7.5).fillColor("#888888");
-        doc.text(lbl, colR, rowY, { lineBreak: false, width: 90 });
-        doc.font("Helvetica").fontSize(8).fillColor("#222222");
-        doc.text(val, valR, rowY, { lineBreak: false, width: CONTENT_W / 2 - 120 });
-      }
-      rowY += 18;
+    // Draw right rows independently
+    let rightRowY = acctBoxY + 22;
+    for (let i = 0; i < rightRows.length; i++) {
+      const [lbl, val] = rightRows[i];
+      doc.font("Helvetica").fontSize(7.5).fillColor("#888888");
+      doc.text(lbl, colR, rightRowY, { lineBreak: false, width: 90 });
+      doc.font("Helvetica").fontSize(8).fillColor("#222222");
+      doc.text(val, valR, rightRowY, { lineBreak: false, width: CONTENT_W / 2 - 120 });
+      rightRowY += 18;
     }
 
     // ── BALANCE SUMMARY BAR ───────────────────────────────────────────────────
@@ -352,17 +357,20 @@ async function generateStatementPDF(opts: {
     const summaryW = 215;
     const summaryX = MARGIN + noticesW + 10;
 
-    // Important Notices box
-    const noticesLineH = 13;
+    // Important Notices box — dynamic height, each line wraps correctly
     const noticesLines = [
-      "1. Please verify all transactions and report discrepancies within 14 days to support@bankofasia.com",
+      "1. Please verify all transactions and report discrepancies within 14 days to support@boasiaonline.com",
       "2. This statement covers the period stated above only.",
       "3. Unauthorized use of account information is prohibited.",
-      "4. For disputes or queries: +65 6000 0000",
+      "4. For disputes or queries: +65 6532 1234 (Singapore) or +1 (212) 401-8000 (USA)",
       "5. Computer generated — valid without wet signature.",
     ];
-    const noticesTextH = noticesLines.length * noticesLineH + 8;
-    const noticesH = 16 + noticesTextH + 8;
+    const noticeLineSpacing = 5;
+    let totalNoticesTextH = 0;
+    noticesLines.forEach(line => {
+      totalNoticesTextH += doc.fontSize(7.5).heightOfString(line, { width: noticesW - 16 }) + noticeLineSpacing;
+    });
+    const noticesH = 16 + totalNoticesTextH + 10;
 
     doc.rect(MARGIN, noticesY, noticesW, noticesH).fillColor("#f7f9fc").fill();
     doc.rect(MARGIN, noticesY, noticesW, noticesH).strokeColor("#c0c8d8").lineWidth(0.5).stroke();
@@ -370,11 +378,12 @@ async function generateStatementPDF(opts: {
     doc.font("Helvetica-Bold").fontSize(7.5).fillColor("#1a3a6b");
     doc.text("IMPORTANT NOTICES", MARGIN + 8, noticesY + 4, { lineBreak: false });
 
-    let nlY = noticesY + 20;
-    doc.font("Helvetica").fontSize(7.5).fillColor("#555555");
+    let nlY = noticesY + 22;
     noticesLines.forEach(line => {
-      doc.text(line, MARGIN + 8, nlY, { width: noticesW - 16, lineBreak: false });
-      nlY += noticesLineH;
+      doc.font("Helvetica").fontSize(7.5).fillColor("#555555");
+      const lineH = doc.heightOfString(line, { width: noticesW - 16 });
+      doc.text(line, MARGIN + 8, nlY, { width: noticesW - 16, lineBreak: true });
+      nlY += lineH + noticeLineSpacing;
     });
 
     // Account Summary box
@@ -431,30 +440,9 @@ async function generateStatementPDF(opts: {
     const x1 = MARGIN + 10;
     const x2 = W / 2 + 20;
 
-    // ── Left signature — Dr. James Wei ────────────────────────────────────────
+    // ── Dr. James Wei — signatory (no ink signature) ──────────────────────────
     doc.font("Helvetica").fontSize(7).fillColor("#aaaaaa");
     doc.text("Authorised Signatory", x1, sigY, { lineBreak: false });
-
-    const sy1 = sigY + 30;
-    doc.save();
-    doc.strokeColor("#0d1f3c").lineWidth(1.3).lineCap("round").lineJoin("round");
-    doc.moveTo(x1, sy1)
-      .bezierCurveTo(x1 + 6, sy1 - 14, x1 + 16, sy1 - 18, x1 + 28, sy1 - 10)
-      .bezierCurveTo(x1 + 38, sy1 - 4, x1 + 44, sy1 - 16, x1 + 56, sy1 - 20)
-      .bezierCurveTo(x1 + 66, sy1 - 24, x1 + 76, sy1 - 12, x1 + 88, sy1 - 8)
-      .bezierCurveTo(x1 + 96, sy1 - 4, x1 + 104, sy1 - 16, x1 + 116, sy1 - 6)
-      .stroke();
-    doc.moveTo(x1 + 20, sy1 - 8)
-      .bezierCurveTo(x1 + 26, sy1 + 2, x1 + 36, sy1 + 4, x1 + 48, sy1 - 4)
-      .bezierCurveTo(x1 + 58, sy1 - 10, x1 + 64, sy1 + 2, x1 + 72, sy1)
-      .strokeColor("#0d1f3c").lineWidth(0.9).stroke();
-    doc.moveTo(x1, sy1 + 4)
-      .bezierCurveTo(x1 + 30, sy1 + 10, x1 + 70, sy1 + 6, x1 + 120, sy1 + 8)
-      .strokeColor("#0d1f3c").lineWidth(0.7).stroke();
-    doc.moveTo(x1 + 2, sy1 - 2)
-      .bezierCurveTo(x1 - 2, sy1 - 10, x1 + 4, sy1 - 16, x1 + 10, sy1 - 12)
-      .strokeColor("#0d1f3c").lineWidth(0.8).stroke();
-    doc.restore();
 
     doc.moveTo(x1, sigY + 48).lineTo(x1 + 150, sigY + 48).strokeColor("#333333").lineWidth(0.7).stroke();
     doc.font("Helvetica-Bold").fontSize(8).fillColor("#0d1f3c");
@@ -464,40 +452,6 @@ async function generateStatementPDF(opts: {
     doc.text("Bank of Asia Online", x1, sigY + 74, { lineBreak: false });
     doc.font("Helvetica").fontSize(7).fillColor("#888888");
     doc.text("MAS License: BOA-OPS-2024-001", x1, sigY + 85, { lineBreak: false });
-
-    // ── Right signature — Ms. Sarah Chen ──────────────────────────────────────
-    doc.font("Helvetica").fontSize(7).fillColor("#aaaaaa");
-    doc.text("Authorised Signatory", x2, sigY, { lineBreak: false });
-
-    const sy2 = sigY + 30;
-    doc.save();
-    doc.strokeColor("#0d1f3c").lineWidth(1.3).lineCap("round").lineJoin("round");
-    doc.moveTo(x2, sy2)
-      .bezierCurveTo(x2 + 10, sy2 - 20, x2 + 24, sy2 - 22, x2 + 38, sy2 - 12)
-      .bezierCurveTo(x2 + 50, sy2 - 4, x2 + 56, sy2 - 18, x2 + 70, sy2 - 22)
-      .bezierCurveTo(x2 + 82, sy2 - 26, x2 + 94, sy2 - 10, x2 + 108, sy2 - 14)
-      .bezierCurveTo(x2 + 118, sy2 - 18, x2 + 126, sy2 - 6, x2 + 138, sy2 - 10)
-      .stroke();
-    doc.moveTo(x2 + 4, sy2 - 14)
-      .bezierCurveTo(x2 + 8, sy2 - 28, x2 + 20, sy2 - 30, x2 + 28, sy2 - 18)
-      .strokeColor("#0d1f3c").lineWidth(0.9).stroke();
-    doc.moveTo(x2 + 40, sy2 - 4)
-      .bezierCurveTo(x2 + 60, sy2 + 8, x2 + 90, sy2 + 6, x2 + 120, sy2 + 2)
-      .bezierCurveTo(x2 + 130, sy2, x2 + 136, sy2 - 4, x2 + 142, sy2 - 2)
-      .strokeColor("#0d1f3c").lineWidth(0.8).stroke();
-    doc.moveTo(x2 + 100, sy2 - 12)
-      .bezierCurveTo(x2 + 108, sy2 - 4, x2 + 114, sy2 + 2, x2 + 122, sy2 - 6)
-      .strokeColor("#0d1f3c").lineWidth(0.7).stroke();
-    doc.restore();
-
-    doc.moveTo(x2, sigY + 48).lineTo(x2 + 150, sigY + 48).strokeColor("#333333").lineWidth(0.7).stroke();
-    doc.font("Helvetica-Bold").fontSize(8).fillColor("#0d1f3c");
-    doc.text("Ms. Sarah Chen, LLB", x2, sigY + 52, { lineBreak: false });
-    doc.font("Helvetica").fontSize(7.5).fillColor("#555555");
-    doc.text("Head of Compliance & Risk", x2, sigY + 63, { lineBreak: false });
-    doc.text("Bank of Asia Online", x2, sigY + 74, { lineBreak: false });
-    doc.font("Helvetica").fontSize(7).fillColor("#888888");
-    doc.text("MAS License: BOA-COMP-2024-002", x2, sigY + 85, { lineBreak: false });
 
     // ── Official stamp (centered between signatures) ───────────────────────────
     const stampCX = 297;
@@ -516,10 +470,8 @@ async function generateStatementPDF(opts: {
       doc.text("BOA", stampCX - 12, stampCY - 12, { lineBreak: false });
     }
 
-    doc.font("Helvetica-Bold").fontSize(6.5).fillColor("#1a3a6b");
-    doc.text("✓ VERIFIED", stampCX - 27, stampCY + 8, { width: 54, align: "center", lineBreak: false });
-    doc.font("Helvetica-Bold").fontSize(5.5).fillColor("#1a3a6b");
-    doc.text("BANK OF ASIA ONLINE", stampCX - 27, stampCY + 18, { width: 54, align: "center", lineBreak: false });
+    doc.font("Helvetica-Bold").fontSize(7).fillColor("#1a3a6b");
+    doc.text("✓ VERIFIED", stampCX - 27, stampCY + 12, { width: 54, align: "center", lineBreak: false });
 
     // ── Final footer ──────────────────────────────────────────────────────────
     addFooter(pageNum, totalPages);

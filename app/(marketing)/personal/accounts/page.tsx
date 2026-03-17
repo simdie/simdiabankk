@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import FaqAccordion from "@/components/marketing/FaqAccordion";
 import type { FaqItem } from "@/components/marketing/FaqAccordion";
+import EditorialBanner from "@/components/marketing/EditorialBanner";
 
 // ---------------------------------------------------------------------------
 // FAQ data
@@ -66,6 +68,8 @@ interface AccountCardProps {
   features: string[];
   cta: string;
   href: string;
+  target?: string;
+  rel?: string;
   isFeatured?: boolean;
   featuredLabel?: string;
 }
@@ -79,6 +83,8 @@ function AccountCompareCard({
   features,
   cta,
   href,
+  target,
+  rel,
   isFeatured,
   featuredLabel,
 }: AccountCardProps) {
@@ -258,6 +264,8 @@ function AccountCompareCard({
       {/* CTA */}
       <Link
         href={href}
+        target={target}
+        rel={rel}
         style={{
           display: "block",
           width: "100%",
@@ -415,7 +423,7 @@ export default function PersonalAccountsPage() {
                   Compare Accounts
                 </a>
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "inline-block",
                     background: "transparent",
@@ -686,6 +694,18 @@ export default function PersonalAccountsPage() {
         </div>
       </section>
 
+      {/* Banner image */}
+      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <Image
+          src="/banner-image1.png"
+          alt="Bank of Asia personal accounts"
+          width={1920}
+          height={600}
+          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
+          priority={false}
+        />
+      </section>
+
       {/* ================================================================
           SECTION 2 — ACCOUNT COMPARISON
       ================================================================ */}
@@ -759,7 +779,7 @@ export default function PersonalAccountsPage() {
                 "Real-time balance & statements",
               ]}
               cta="Open Current Account"
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
             />
             <AccountCompareCard
               name="Savings Account"
@@ -775,7 +795,7 @@ export default function PersonalAccountsPage() {
                 "Linked to current account",
               ]}
               cta="Open Savings Account"
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
               isFeatured
               featuredLabel="Most Popular"
             />
@@ -792,7 +812,7 @@ export default function PersonalAccountsPage() {
                 "Automatic renewal option",
               ]}
               cta="Open Term Deposit"
-              href="/register"
+              href="/register" target="_blank" rel="noopener noreferrer"
             />
           </div>
         </div>
@@ -1399,6 +1419,15 @@ export default function PersonalAccountsPage() {
           <FaqAccordion faqs={FAQS} />
         </div>
       </section>
+
+      <EditorialBanner
+        headline="Open your account in minutes."
+        subtext="Multi-currency banking with no hidden fees. Join 50,000+ customers who trust Bank of Asia."
+        ctaText="Open an Account"
+        ctaHref="/register"
+        ctaText2="Compare accounts"
+        ctaHref2="/personal/accounts#compare"
+      />
     </main>
   );
 }

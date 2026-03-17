@@ -4,13 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const PRIMARY  = "https://i.imgur.com/BbHaV56.png";
-const FALLBACK = "https://i.imgur.com/SQSZD9i.png";
+const PRIMARY  = "/logo.png";
+const FALLBACK = "/logo.png";
 
 const SIZES = {
-  small:   { width: 140, height: 37 },
-  default: { width: 180, height: 48 },
-  large:   { width: 220, height: 59 },
+  small:   { width: 130, height: 44 },
+  default: { width: 170, height: 57 },
+  large:   { width: 210, height: 70 },
 } as const;
 
 interface LogoProps {

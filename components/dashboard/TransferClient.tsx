@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { CURRENCY_FLAGS, COUNTRIES, formatAmount } from "@/lib/utils";
 import Select from "@/components/ui/Select";
 
@@ -140,6 +141,36 @@ export default function TransferClient({
     correspondentBank: "", memo: "", relationship: "",
   });
 
+  // Pre-fill from saved beneficiary
+  const searchParams = useSearchParams();
+  const [prefillBeneficiary, setPrefillBeneficiary] = useState<{ name: string } | null>(null);
+
+  useEffect(() => {
+    const beneficiaryId = searchParams.get("beneficiary");
+    const presetType = searchParams.get("type");
+    if (!beneficiaryId) return;
+    fetch(`/api/beneficiaries/${beneficiaryId}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!data?.beneficiary) return;
+        const ben = data.beneficiary;
+        setTxType("INTERNATIONAL_WIRE");
+        setStep(1);
+        setWire((prev) => ({
+          ...prev,
+          beneficiaryName: ben.name ?? "",
+          bankName: ben.bankName ?? "",
+          swift: ben.swiftCode ?? "",
+          iban: ben.iban ?? "",
+          country: ben.country ?? "US",
+          bankAddress: ben.bankAddress ?? "",
+        }));
+        setPrefillBeneficiary({ name: ben.name });
+      })
+      .catch(() => null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const senderAccount = accounts.find((a) => a.id === senderAccountId);
 
   const accountOptions = accounts.map((a) => ({
@@ -253,10 +284,10 @@ export default function TransferClient({
             marginBottom: 24,
           }}>
             <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 6 }}>REFERENCE</div>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 15, color: "var(--color-accent)", fontWeight: 700 }}>
+            <div style={{ fontFamily: "'JetBrains Mono', 'Courier New', monospace", fontSize: 15, fontWeight: 500, color: "#00C896", letterSpacing: "0.03em" }}>
               {success.reference}
             </div>
-            <div style={{ marginTop: 12, fontFamily: "var(--font-syne)", fontSize: 24, fontWeight: 800, color: "var(--color-text-primary)" }}>
+            <div style={{ marginTop: 12, fontFamily: "'DM Sans', -apple-system, sans-serif", fontSize: "clamp(28px, 3vw, 36px)", fontWeight: 700, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
               {formatAmount(success.amount, success.currency)}
             </div>
           </div>
@@ -401,6 +432,31 @@ export default function TransferClient({
               {txType === "INTERNAL" ? "Recipient Details" : txType === "LOCAL_WIRE" ? "Beneficiary Details" : "International Beneficiary"}
             </h3>
 
+            {/* Pre-fill banner */}
+            {prefillBeneficiary && (
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "10px 16px", borderRadius: 10,
+                background: "rgba(0,212,255,0.07)", border: "1px solid rgba(0,212,255,0.2)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ color: "var(--color-accent)", fontSize: 14 }}>✦</span>
+                  <span style={{ fontSize: 13, color: "var(--color-accent)", fontWeight: 600 }}>
+                    Pre-filled from saved beneficiary: {prefillBeneficiary.name}
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setPrefillBeneficiary(null);
+                    setWire({ beneficiaryName: "", bankName: "", bankAddress: "", accountNumber: "", routingNumber: "", swift: "", iban: "", country: "US", correspondentBank: "", memo: "", relationship: "" });
+                  }}
+                  style={{ background: "none", border: "none", color: "rgba(0,212,255,0.5)", cursor: "pointer", fontSize: 12, padding: "2px 6px" }}
+                >
+                  Clear
+                </button>
+              </div>
+            )}
+
             {/* Sender account selector */}
             <div>
               <label style={labelStyle}>From Account</label>
@@ -529,7 +585,7 @@ export default function TransferClient({
                 display: "flex", justifyContent: "space-between", alignItems: "center",
               }}>
                 <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Available Balance</span>
-                <span style={{ fontFamily: "var(--font-syne)", fontSize: 16, fontWeight: 800, color: "var(--color-accent)" }}>
+                <span style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", fontSize: 18, fontWeight: 600, letterSpacing: "-0.01em", color: "#00C896" }}>
                   {formatAmount(senderAccount.balance, senderAccount.currency)}
                 </span>
               </div>
@@ -551,11 +607,11 @@ export default function TransferClient({
                     if (parts.length > 2) return;
                     setAmount(val);
                   }}
-                  style={{ fontFamily: "var(--font-syne)", fontSize: 28, fontWeight: 800, paddingRight: 80, height: 64 }}
+                  style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", fontSize: "clamp(24px, 3vw, 32px)", fontWeight: 600, letterSpacing: "-0.01em", color: "#FFFFFF", paddingRight: 80, height: 64 }}
                 />
                 <div style={{
                   position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
-                  fontSize: 14, fontWeight: 700, color: "var(--color-text-muted)",
+                  fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, color: "#9CA3AF",
                 }}>
                   {senderAccount?.currency ?? "USD"}
                 </div>
@@ -610,7 +666,7 @@ export default function TransferClient({
               ].map(([label, val]) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                   <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{label}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text-primary)" }}>{val}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", fontFamily: "'DM Sans', -apple-system, sans-serif" }}>{val}</span>
                 </div>
               ))}
             </div>

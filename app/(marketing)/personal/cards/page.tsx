@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import FaqAccordion from "@/components/marketing/FaqAccordion";
 import type { FaqItem } from "@/components/marketing/FaqAccordion";
+import EditorialBanner from "@/components/marketing/EditorialBanner";
 
 // ── FAQ data ──────────────────────────────────────────────
 
@@ -569,13 +571,8 @@ export default function CardsPage() {
 
         <div className="boa-container" style={{ position: "relative", zIndex: 1, width: "100%" }}>
           <div
-            style={{
-              display: "grid",
-              gap: 48,
-              alignItems: "center",
-              gridTemplateColumns: "repeat(1, minmax(0, 1fr))",
-            }}
-            className="lg:grid-cols-[50%_50%]"
+            style={{ display: "grid", gap: 48, alignItems: "center" }}
+            className="grid-cols-1 lg:grid-cols-[50%_50%]"
           >
             {/* LEFT — text stack */}
             <motion.div
@@ -642,7 +639,7 @@ export default function CardsPage() {
                 style={{ display: "flex", gap: 12, flexWrap: "wrap" }}
               >
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "inline-block",
                     background: "var(--boa-teal)",
@@ -697,74 +694,259 @@ export default function CardsPage() {
               </motion.div>
             </motion.div>
 
-            {/* RIGHT — 3D spinning cards (hidden on mobile) */}
+            {/* RIGHT — Globe with floating cards (hidden on mobile) */}
             <div
               className="hidden lg:flex"
-              style={{ justifyContent: "center", alignItems: "center" }}
+              style={{
+                position: "relative",
+                width: "100%",
+                minHeight: "520px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <div style={{ position: "relative", width: 500, height: 560 }}>
-                {/* VISA card — floats gently */}
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-                  style={{ position: "absolute", top: 80, left: 20, zIndex: 10 }}
-                >
-                  <SpinningCard
-                    front={<VisaCardFront />}
-                    back={<VisaCardBack />}
-                    duration={9}
-                  />
-                </motion.div>
+              {/* Background glow */}
+              <div
+                style={{
+                  position: "absolute",
+                  width: 300,
+                  height: 300,
+                  borderRadius: "50%",
+                  background: "rgba(0,200,150,0.06)",
+                  filter: "blur(60px)",
+                  zIndex: 0,
+                }}
+              />
 
-                {/* Mastercard — floats on a slightly different rhythm */}
-                <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 0.8,
-                  }}
-                  style={{ position: "absolute", top: 120, right: 20, zIndex: 20 }}
-                >
-                  <SpinningCard
-                    front={<MastercardFront />}
-                    back={<MastercardBack />}
-                    duration={11}
-                  />
-                </motion.div>
+              {/* Globe — slowly rotating */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                style={{
+                  position: "absolute",
+                  width: 420,
+                  height: 420,
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle at 35% 35%, #1E3A5F, #0A1628 70%)",
+                  border: "1px solid rgba(0,200,150,0.15)",
+                  overflow: "hidden",
+                  boxShadow: "0 0 60px rgba(0,200,150,0.08), inset 0 0 60px rgba(0,0,0,0.4)",
+                }}
+              >
+                <svg width="420" height="420" style={{ opacity: 0.6 }}>
+                  {/* North America */}
+                  {[
+                    [65,90],[75,95],[85,92],[95,100],[70,108],[80,112],[90,108],
+                    [100,115],[110,110],[75,120],[85,118],[95,122],[105,125],
+                    [115,120],[80,130],[90,128],[100,132],[110,135],[120,128],
+                    [85,142],[95,138],[105,142],[115,138],[125,142],[130,135],
+                    [70,98],[60,105],[65,115],
+                  ].map(([cx,cy], i) => (
+                    <circle key={`na${i}`} cx={cx} cy={cy} r="2" fill="#00C896" opacity="0.7"/>
+                  ))}
+                  {/* South America */}
+                  {[
+                    [105,188],[115,185],[110,195],[120,192],[108,205],[118,202],
+                    [112,215],[122,212],[116,225],[124,222],[118,235],[126,232],
+                    [120,245],[128,242],[122,255],[125,265],[128,272],
+                  ].map(([cx,cy], i) => (
+                    <circle key={`sa${i}`} cx={cx} cy={cy} r="2" fill="#00C896" opacity="0.7"/>
+                  ))}
+                  {/* Europe */}
+                  {[
+                    [188,82],[198,80],[208,82],[218,80],[192,92],[202,90],
+                    [212,88],[222,90],[188,100],[198,98],[208,96],[218,98],
+                    [228,95],[192,108],[202,106],[212,108],[220,106],
+                  ].map(([cx,cy], i) => (
+                    <circle key={`eu${i}`} cx={cx} cy={cy} r="2" fill="#00C896" opacity="0.7"/>
+                  ))}
+                  {/* Africa */}
+                  {[
+                    [192,142],[202,140],[212,142],[222,140],[188,152],[198,150],
+                    [208,152],[218,150],[228,148],[192,162],[202,160],[212,162],
+                    [222,160],[196,172],[206,170],[216,172],[200,182],[210,180],
+                    [204,192],[212,190],[206,202],[212,210],[208,220],[210,230],
+                    [208,238],[209,245],
+                  ].map(([cx,cy], i) => (
+                    <circle key={`af${i}`} cx={cx} cy={cy} r="2" fill="#00C896" opacity="0.7"/>
+                  ))}
+                  {/* Asia */}
+                  {[
+                    [235,75],[245,72],[255,75],[265,72],[275,75],[285,72],[295,75],
+                    [238,85],[248,82],[258,85],[268,82],[278,85],[288,82],[298,85],[308,82],
+                    [240,95],[250,92],[260,95],[270,92],[280,95],[290,92],[300,95],[310,92],[320,90],
+                    [245,105],[255,102],[265,105],[275,102],[285,105],[295,102],[305,105],[315,102],[325,100],
+                    [248,115],[258,112],[268,115],[278,112],[288,115],[298,112],[308,115],[318,112],
+                    [250,125],[260,122],[270,125],[280,122],[290,125],[300,122],[310,125],
+                    [255,135],[265,132],[275,135],[285,132],[295,135],
+                    [260,145],[270,142],[280,145],[265,155],[275,152],[268,162],[275,168],[270,175],
+                  ].map(([cx,cy], i) => (
+                    <circle key={`as${i}`} cx={cx} cy={cy} r="2" fill="#00C896" opacity="0.7"/>
+                  ))}
+                  {/* Australia */}
+                  {[
+                    [305,228],[315,225],[325,228],[335,225],[345,228],[308,238],
+                    [318,235],[328,238],[338,235],[348,232],[312,248],[322,245],
+                    [332,248],[342,245],[318,258],[328,255],[335,258],[322,265],[330,262],
+                  ].map(([cx,cy], i) => (
+                    <circle key={`au${i}`} cx={cx} cy={cy} r="2" fill="#00C896" opacity="0.7"/>
+                  ))}
+                </svg>
+              </motion.div>
 
-                {/* Floating badge between the cards */}
-                <motion.div
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                  style={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 30,
-                    background: "var(--boa-teal)",
-                    borderRadius: 9999,
-                    padding: "8px 16px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 12,
-                      fontFamily: "var(--font-dm-sans)",
-                      fontWeight: 600,
-                      color: "#fff",
-                    }}
-                  >
-                    ✓ Instant issuance
+              {/* Orbital ring 1 */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                style={{
+                  position: "absolute",
+                  width: 500,
+                  height: 140,
+                  borderRadius: "50%",
+                  border: "1px solid rgba(0,200,150,0.25)",
+                  transform: "rotateX(75deg)",
+                }}
+              />
+              {/* Orbital ring 2 */}
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+                style={{
+                  position: "absolute",
+                  width: 480,
+                  height: 120,
+                  borderRadius: "50%",
+                  border: "1px dashed rgba(200,151,42,0.2)",
+                  transform: "rotateX(75deg) rotateZ(45deg)",
+                }}
+              />
+
+              {/* VISA card floating top-left */}
+              <motion.div
+                animate={{ y: [0, -14, 0], x: [0, 5, 0] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                style={{
+                  position: "absolute",
+                  top: "12%",
+                  left: "2%",
+                  width: 240,
+                  height: 148,
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, #0D2144 0%, #1A3A6E 60%, #0A2855 100%)",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  padding: 20,
+                  boxShadow: "0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)",
+                  zIndex: 10,
+                  backdropFilter: "blur(10px)",
+                  boxSizing: "border-box" as const,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase" as const }}>
+                    Bank of Asia
                   </span>
-                </motion.div>
-              </div>
+                  <svg width="28" height="22" viewBox="0 0 28 22">
+                    <rect x="0" y="0" width="28" height="22" rx="4" fill="#C8972A" opacity="0.9"/>
+                    <rect x="10" y="0" width="8" height="22" fill="#A07820" opacity="0.5"/>
+                    <rect x="0" y="7" width="28" height="8" fill="#A07820" opacity="0.5"/>
+                    <rect x="11" y="8" width="6" height="6" rx="1" fill="#C8972A"/>
+                  </svg>
+                </div>
+                <div style={{ fontFamily: "'JetBrains Mono','Courier New',monospace", fontSize: 13, color: "#fff", letterSpacing: "0.2em", marginBottom: 14 }}>
+                  •••• •••• •••• 4821
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                  <div>
+                    <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 7, letterSpacing: "0.1em", marginBottom: 2, textTransform: "uppercase" as const }}>Cardholder</div>
+                    <div style={{ color: "#fff", fontSize: 10, letterSpacing: "0.08em" }}>JAMES CHEN</div>
+                    <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 8, marginTop: 2 }}>VALID 08/28</div>
+                  </div>
+                  <span style={{ fontFamily: "Georgia,serif", fontStyle: "italic", fontWeight: 700, fontSize: 18, color: "#fff" }}>
+                    VISA
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Mastercard floating bottom-right */}
+              <motion.div
+                animate={{ y: [0, -10, 0], x: [0, -4, 0] }}
+                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                style={{
+                  position: "absolute",
+                  bottom: "10%",
+                  right: "0%",
+                  width: 230,
+                  height: 142,
+                  borderRadius: 14,
+                  background: "linear-gradient(135deg, #1A0808 0%, #3D1515 60%, #1A0808 100%)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  padding: 18,
+                  boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
+                  zIndex: 10,
+                  boxSizing: "border-box" as const,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 8, letterSpacing: "0.15em", textTransform: "uppercase" as const }}>
+                    Bank of Asia
+                  </span>
+                  <svg width="36" height="24" viewBox="0 0 36 24">
+                    <circle cx="13" cy="12" r="11" fill="#EB001B" opacity="0.95"/>
+                    <circle cx="23" cy="12" r="11" fill="#F79E1B" opacity="0.95"/>
+                    <ellipse cx="18" cy="12" rx="4" ry="11" fill="#FF5F00" opacity="0.95"/>
+                  </svg>
+                </div>
+                <div style={{ fontFamily: "'JetBrains Mono','Courier New',monospace", fontSize: 12, color: "#fff", letterSpacing: "0.18em", marginBottom: 14 }}>
+                  •••• •••• •••• 9203
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                  <div>
+                    <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 7, letterSpacing: "0.1em", marginBottom: 2, textTransform: "uppercase" as const }}>Cardholder</div>
+                    <div style={{ color: "#fff", fontSize: 10, letterSpacing: "0.08em" }}>SARAH WONG</div>
+                    <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 8, marginTop: 2 }}>09/27</div>
+                  </div>
+                  <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 10, letterSpacing: "0.05em" }}>mastercard</span>
+                </div>
+              </motion.div>
+
+              {/* Instant issuance badge */}
+              <motion.div
+                animate={{ scale: [1, 1.06, 1], opacity: [0.9, 1, 0.9] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                style={{
+                  position: "absolute",
+                  bottom: "28%",
+                  left: "8%",
+                  background: "#00C896",
+                  color: "#fff",
+                  borderRadius: 9999,
+                  padding: "8px 18px",
+                  fontSize: 12,
+                  fontFamily: "var(--font-dm-sans)",
+                  fontWeight: 600,
+                  boxShadow: "0 8px 24px rgba(0,200,150,0.4)",
+                  zIndex: 11,
+                  whiteSpace: "nowrap" as const,
+                }}
+              >
+                ✓ Instant issuance
+              </motion.div>
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Banner image */}
+      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <Image
+          key="banner-image6-v2"
+          src="/banner-image6.png"
+          alt="Bank of Asia virtual cards"
+          width={1920}
+          height={600}
+          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
+          priority={false}
+        />
       </section>
 
       {/* ══════════════════════════════════════════
@@ -1302,6 +1484,15 @@ export default function CardsPage() {
           <FaqAccordion faqs={FAQS} />
         </div>
       </section>
+
+      <EditorialBanner
+        headline="Your card, ready in seconds."
+        subtext="Generate a virtual VISA or Mastercard instantly from your dashboard. No waiting, no paperwork, no fees."
+        ctaText="Get My Card"
+        ctaHref="/register"
+        ctaText2="Learn about security"
+        ctaHref2="/security"
+      />
     </>
   );
 }

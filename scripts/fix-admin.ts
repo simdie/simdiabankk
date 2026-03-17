@@ -7,7 +7,7 @@ const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL! });
 const prisma = new PrismaClient({ adapter } as any);
 
 prisma.user.update({
-  where: { email: "admin@bankofasia.com" },
+  where: { email: "admin@boasiaonline.com" },
   data: { role: "ADMIN", status: "ACTIVE" },
 }).then((u) => {
   console.log("✓ Admin fixed:", u.email, "role:", u.role);

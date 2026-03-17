@@ -29,6 +29,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://www.bankofasia.com/sitemap.xml",
+    sitemap: "https://www.boasiaonline.com/sitemap.xml",
   };
 }

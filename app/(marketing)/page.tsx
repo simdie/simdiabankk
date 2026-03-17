@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 
 /* ── Icons ─────────────────────────────────────────────────── */
@@ -543,7 +544,7 @@ export default function HomePage() {
               {/* 4. CTAs */}
               <motion.div variants={heroChild} className="flex flex-wrap gap-4">
                 <Link
-                  href="/register"
+                  href="/register" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg font-semibold text-white transition-all"
                   style={{
                     backgroundColor: "var(--boa-teal)",
@@ -998,6 +999,34 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════
+          SECTION 4.5 — EDITORIAL IMAGE BANNER
+      ══════════════════════════════════════════════════════ */}
+
+      {/* Image section — clean full-width, no overlay */}
+      <section
+        style={{
+          marginTop: "clamp(56px, 7vw, 96px)",
+          marginBottom: "clamp(56px, 7vw, 96px)",
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          src="/homepage-image1.png"
+          alt="Bank of Asia customers"
+          width={1920}
+          height={600}
+          style={{
+            width: "100%",
+            height: "clamp(280px, 35vw, 500px)",
+            objectFit: "cover",
+            objectPosition: "center",
+            display: "block",
+          }}
+          priority={false}
+        />
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
           SECTION 5 — WHY BANK OF ASIA
       ══════════════════════════════════════════════════════ */}
       <section className="boa-section" style={{ backgroundColor: "#F8F9FA" }}>
@@ -1224,7 +1253,7 @@ export default function HomePage() {
               Join thousands of customers banking with confidence across Asia-Pacific.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center", marginBottom: 32 }}>
-              <Link href="/register"
+              <Link href="/register" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center rounded-lg font-semibold text-white transition-all"
                 style={{ backgroundColor: "var(--boa-teal)", padding: "16px 40px", fontSize: 17, fontFamily: "var(--font-dm-sans, DM Sans, sans-serif)" }}
                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--boa-teal-dim)")}

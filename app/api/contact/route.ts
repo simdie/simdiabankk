@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { sendContactFormEmail } from "@/lib/email";
 
 const schema = z.object({
   name:    z.string().min(2, "Please enter your full name.").max(100),
-  email:   z.email("Please enter a valid email address."),
+  email:   z.string().email("Please enter a valid email address."),
+  phone:   z.string().optional(),
   subject: z.string().min(1, "Please select a subject."),
   message: z.string().min(10, "Message must be at least 10 characters.").max(2000),
 });
@@ -18,11 +20,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: first?.message ?? "Invalid input." }, { status: 400 });
     }
 
-    const { name, email, subject, message } = result.data;
+    const { name, email, phone, subject, message } = result.data;
 
-    // Log to server — in production, send via Nodemailer to support@bankofasia.com
     console.log(`[contact] From: ${name} <${email}> | Subject: ${subject}`);
-    console.log(`[contact] Message: ${message.slice(0, 120)}…`);
+
+    // Send to support + confirmation to user (non-blocking)
+    sendContactFormEmail({ name, email, phone, subject, message }).catch((err) =>
+      console.error("[contact] Email send error:", err)
+    );
 
     return NextResponse.json(
       { success: true, message: "Your message has been received. We will respond within 1–2 business days." },
