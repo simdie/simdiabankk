@@ -47,7 +47,7 @@ export async function executeInternalTransfer(input: InternalTransferInput) {
 
   if (amount <= 0) throw new Error("Amount must be greater than zero");
 
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx: any) => {
     // Lock sender account (SELECT FOR UPDATE)
     const [senderRow] = await tx.$queryRaw<Array<{ id: string; balance: string; status: string; currency: string; user_id: string }>>`
       SELECT id, balance, status, currency, "userId" as user_id
@@ -129,7 +129,7 @@ export async function executeWireTransfer(input: WireTransferInput) {
 
   if (amount <= 0) throw new Error("Amount must be greater than zero");
 
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx: any) => {
     // Lock sender account
     const [senderRow] = await tx.$queryRaw<Array<{ id: string; balance: string; status: string; user_id: string }>>`
       SELECT id, balance, status, "userId" as user_id
@@ -195,7 +195,7 @@ export async function executeAdminDeposit(input: AdminDepositInput) {
 
   if (amount <= 0) throw new Error("Amount must be greater than zero");
 
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx: any) => {
     // Lock receiver account
     const [accountRow] = await tx.$queryRaw<Array<{ id: string; status: string; currency: string; balance: string }>>`
       SELECT id, status, currency, balance FROM accounts WHERE id = ${targetAccountId} FOR UPDATE
@@ -251,7 +251,7 @@ export interface AdminDebitInput {
 export async function executeAdminDebit(input: AdminDebitInput) {
   const { targetAccountId, amount, description, adminUserId, ipAddress } = input;
 
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx: any) => {
     const account = await tx.account.findUnique({
       where: { id: targetAccountId },
     });
@@ -296,7 +296,7 @@ export async function executeAdminDebit(input: AdminDebitInput) {
 // 5. CONFIRM EMAIL-GATED TRANSACTION
 // ─────────────────────────────────────────────
 export async function confirmEmailTransaction(token: string) {
-  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+  return prisma.$transaction(async (tx: any) => {
     const transaction = await tx.transaction.findFirst({
       where: { emailConfirmToken: token, status: "AWAITING_CONFIRMATION" },
     });

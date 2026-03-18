@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import { registerSchema } from "@/lib/validations";
 import { generateAccountNumber } from "@/lib/utils";
 import { sendEmail } from "@/lib/email/send";
@@ -51,7 +50,7 @@ export async function POST(req: NextRequest) {
     const displayId = `BOA${new Date().getFullYear().toString().slice(-2)}${_random6}`;
 
     // Create user + account in a transaction
-    const user = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const user = await prisma.$transaction(async (tx: any) => {
       const newUser = await tx.user.create({
         data: {
           email,
