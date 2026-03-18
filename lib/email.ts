@@ -17,7 +17,7 @@ const SUPPORT = process.env.EMAIL_SUPPORT ?? "christiammader@gmail.com";
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ??
   process.env.NEXTAUTH_URL ??
-  "http://localhost:3000";
+  "https://www.boasiaonline.com";
 
 // ─── Core send helper ─────────────────────────────────────────────────────────
 

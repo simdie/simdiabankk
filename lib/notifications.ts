@@ -95,7 +95,7 @@ export async function notifyTransfer(opts: {
         </tr>`).join("")}
       </table>
       <div style="text-align:center;margin-bottom:20px">
-        <a href="${process.env.NEXTAUTH_URL || "http://localhost:3000"}/admin/transactions" style="display:inline-block;background:#0066AA;color:#fff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px">
+        <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://www.boasiaonline.com"}/admin/transactions" style="display:inline-block;background:#0066AA;color:#fff;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:8px;font-size:14px">
           Review in Admin Panel →
         </a>
       </div>

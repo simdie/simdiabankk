@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
       data: { passwordResetToken: token, passwordResetExpiry: expiry },
     });
 
-    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset-password?token=${token}`;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "https://www.boasiaonline.com";
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
     let emailError: string | null = null;
     try {

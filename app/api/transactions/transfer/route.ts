@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (result.requiresEmailConfirm && result.emailConfirmToken) {
-        const baseUrl = process.env.NEXTAUTH_URL ?? process.env.APP_URL ?? "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "https://www.boasiaonline.com";
         const confirmUrl = `${baseUrl}/api/transactions/confirm?token=${result.emailConfirmToken}`;
         const cancelUrl = `${baseUrl}/api/transactions/confirm?token=${result.emailConfirmToken}&cancel=true`;
         sendTransferConfirmEmail(user.email, {
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
       });
 
       if (result.requiresEmailConfirm && result.emailConfirmToken) {
-        const baseUrl = process.env.NEXTAUTH_URL ?? process.env.APP_URL ?? "http://localhost:3000";
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "https://www.boasiaonline.com";
         const confirmUrl = `${baseUrl}/api/transactions/confirm?token=${result.emailConfirmToken}`;
         const cancelUrl = `${baseUrl}/api/transactions/confirm?token=${result.emailConfirmToken}&cancel=true`;
         sendTransferConfirmEmail(user.email, {
