@@ -50,6 +50,6 @@ export async function GET(req: NextRequest) {
     total,
     page,
     pages: Math.ceil(total / limit),
-    actionTypes: actionTypes.map((a) => a.action),
+    actionTypes: actionTypes.map((a: { action: string }) => a.action),
   });
 }
