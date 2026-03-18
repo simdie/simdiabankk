@@ -141,6 +141,6 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({
-    deposits: deposits.map((d) => ({ ...d, amount: Number(d.amount) })),
+    deposits: deposits.map((d: any) => ({ ...d, amount: Number(d.amount) })),
   });
 }
