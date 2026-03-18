@@ -46,9 +46,9 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({
-    users: users.map((u) => ({
+    users: users.map((u: any) => ({
       ...u,
-      accounts: u.accounts.map((a) => ({ ...a, balance: Number(a.balance) })),
+      accounts: u.accounts.map((a: any) => ({ ...a, balance: Number(a.balance) })),
     })),
     total,
     page,

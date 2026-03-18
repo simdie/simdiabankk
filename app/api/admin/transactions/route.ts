@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({
-    transactions: transactions.map((t) => ({ ...t, amount: Number(t.amount) })),
+    transactions: transactions.map((t: any) => ({ ...t, amount: Number(t.amount) })),
     total,
     page,
     pages: Math.ceil(total / limit),

@@ -49,11 +49,11 @@ export async function GET(
   return NextResponse.json({
     user: {
       ...user,
-      accounts: user.accounts.map((a) => ({
+      accounts: user.accounts.map((a: any) => ({
         ...a,
         balance: Number(a.balance),
-        sentTransactions: a.sentTransactions.map((t) => ({ ...t, amount: Number(t.amount) })),
-        receivedTransactions: a.receivedTransactions.map((t) => ({ ...t, amount: Number(t.amount) })),
+        sentTransactions: a.sentTransactions.map((t: any) => ({ ...t, amount: Number(t.amount) })),
+        receivedTransactions: a.receivedTransactions.map((t: any) => ({ ...t, amount: Number(t.amount) })),
       })),
     },
   });
