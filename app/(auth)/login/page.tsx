@@ -4,6 +4,7 @@ import { useState, useRef, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 
 type Step = "credentials" | "2fa" | "blocked";
@@ -211,21 +212,29 @@ function LoginInner() {
 
       {/* ═══ MOBILE LAYOUT ═══ */}
       <div className="flex flex-col lg:hidden" style={{ minHeight: "100vh", position: "relative", zIndex: 1 }}>
-        {/* Top 35%: Hero */}
+        {/* Top hero — logo + tagline + trust pills */}
         <div style={{
-          flex: "0 0 35vh", minHeight: 220,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          padding: "32px 24px 24px",
+          display: "flex", flexDirection: "column", alignItems: "center",
+          paddingTop: 48, paddingBottom: 32, gap: 0,
           background: "linear-gradient(180deg, rgba(0,212,255,0.06) 0%, transparent 100%)",
-          position: "relative",
         }}>
-          <BOAShield size={64} />
-          <div style={{ fontFamily: "var(--font-syne)", fontSize: 16, fontWeight: 800, color: "var(--color-accent)", letterSpacing: "0.08em", marginTop: 12 }}>BANK OF ASIA ONLINE</div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 4 }}>SECURE DIGITAL BANKING</div>
-          {/* Trust badges */}
-          <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap", justifyContent: "center" }}>
-            {["🔒 SSL Secured", "⚡ Instant", "🌍 Global"].map(b => (
-              <span key={b} style={{ padding: "3px 10px", borderRadius: 999, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 600 }}>{b}</span>
+          {/* Logo */}
+          <Image
+            src="/logo-dark-bg.png"
+            alt="Bank of Asia Online"
+            width={180}
+            height={56}
+            style={{ objectFit: "contain", marginBottom: 20 }}
+            priority
+          />
+          {/* Tagline */}
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 20px" }}>
+            Secure Digital Banking
+          </p>
+          {/* Trust pills */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+            {["🔒 SSL Secured", "⚡ Instant", "🌏 Global"].map(b => (
+              <span key={b} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", borderRadius: 100, padding: "5px 14px", fontSize: 12 }}>{b}</span>
             ))}
           </div>
         </div>

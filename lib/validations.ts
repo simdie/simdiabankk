@@ -36,6 +36,8 @@ export const registerSchema = z.object({
   country: z.string().max(100).optional().or(z.literal("")),
   idType: z.string().optional().or(z.literal("")),
   idNumber: z.string().max(100).optional().or(z.literal("")),
+  securityQuestion: z.string().optional().or(z.literal("")),
+  securityAnswer: z.string().min(3).optional().or(z.literal("")),
 });
 
 export const loginSchema = z.object({

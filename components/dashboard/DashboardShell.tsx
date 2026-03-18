@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { LogOut } from "lucide-react";
 
 interface Props {
   user: { id: string; firstName: string; lastName: string; email: string; role: string };
@@ -51,7 +52,6 @@ const MOBILE_NAV = [
   { href: "/dashboard/accounts", icon: "🏦", label: "Accounts" },
   { href: "/dashboard/transfer", icon: "↗", label: "Transfer" },
   { href: "/dashboard/cards", icon: "▣", label: "Cards" },
-  { href: "/dashboard/settings", icon: "⚙", label: "More" },
 ];
 
 export default function DashboardShell({ user, globalNotice, children }: Props) {
@@ -193,6 +193,7 @@ export default function DashboardShell({ user, globalNotice, children }: Props) 
         padding: "10px 8px",
         borderTop: "1px solid rgba(255,255,255,0.05)",
         display: "flex", flexDirection: "column", gap: 4, flexShrink: 0,
+        ...(inMobile ? { position: "sticky", bottom: 0, background: "rgba(6,12,24,0.97)", zIndex: 10 } : {}),
       }}>
         {(!collapsed || inMobile) && (
           <div style={{
@@ -239,12 +240,18 @@ export default function DashboardShell({ user, globalNotice, children }: Props) 
           style={{
             display: "flex", alignItems: "center",
             justifyContent: (collapsed && !inMobile) ? "center" : "flex-start",
-            gap: (collapsed && !inMobile) ? 0 : 7,
-            padding: (collapsed && !inMobile) ? "8px" : "7px 10px", borderRadius: 8,
-            fontSize: 12, color: "rgba(255,255,255,0.28)",
-            background: "none", border: "none", cursor: "pointer", width: "100%",
-          }}>
-          <span>↩</span>
+            gap: (collapsed && !inMobile) ? 0 : 8,
+            padding: (collapsed && !inMobile) ? "8px" : "9px 12px", borderRadius: 8,
+            fontSize: 13, fontWeight: 600, color: "#EF4444",
+            background: "rgba(239,68,68,0.1)",
+            border: "1px solid rgba(239,68,68,0.2)",
+            cursor: "pointer", width: "100%",
+            transition: "background 0.15s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.2)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.1)")}
+        >
+          <LogOut size={15} strokeWidth={2.2} />
           {(!collapsed || inMobile) && "Sign Out"}
         </button>
       </div>
@@ -457,6 +464,17 @@ export default function DashboardShell({ user, globalNotice, children }: Props) 
               </Link>
             );
           })}
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+              padding: "4px 12px", background: "none", border: "none", cursor: "pointer",
+              color: "#F87171", fontSize: 10, fontWeight: 600,
+            }}
+          >
+            <LogOut size={18} strokeWidth={2} />
+            <span>Sign Out</span>
+          </button>
         </nav>
       )}
     </div>

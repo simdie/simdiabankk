@@ -29,30 +29,12 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
-  const {
-    firstName, lastName, phone, dateOfBirth, gender, nationality,
-    addressLine1, addressLine2, city, state, zipCode, country,
-    idType, idNumber, idExpiry,
-  } = body;
+  const { phone } = body;
 
   await prisma.user.update({
     where: { id: session.user.id },
     data: {
-      firstName: firstName || undefined,
-      lastName: lastName || undefined,
       phone: phone || null,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-      gender: gender || null,
-      nationality: nationality || null,
-      addressLine1: addressLine1 || null,
-      addressLine2: addressLine2 || null,
-      city: city || null,
-      state: state || null,
-      zipCode: zipCode || null,
-      country: country || null,
-      idType: idType || null,
-      idNumber: idNumber || null,
-      idExpiry: idExpiry ? new Date(idExpiry) : null,
     },
   });
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Eye, EyeOff, Lock } from "lucide-react";
 
 interface User {
   firstName: string; lastName: string; email: string; phone: string | null;
@@ -21,6 +22,7 @@ export default function SettingsClient({ user }: { user: User }) {
   const [pwMsg, setPwMsg] = useState("");
   const [pwError, setPwError] = useState("");
 
+  const [showToken, setShowToken] = useState(false);
   const [twoFAEnabled, setTwoFAEnabled] = useState(user.twoFactorEnabled);
   const [qrCode, setQrCode] = useState("");
   const [manualKey, setManualKey] = useState("");
@@ -35,7 +37,7 @@ export default function SettingsClient({ user }: { user: User }) {
     try {
       const res = await fetch("/api/user/profile", {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, phone }),
+        body: JSON.stringify({ phone }),
       });
       setProfileMsg(res.ok ? "Profile updated successfully" : "Failed to update profile");
     } finally { setProfileSaving(false); }
@@ -103,8 +105,20 @@ export default function SettingsClient({ user }: { user: User }) {
       {/* ── Profile ── */}
       <Section title="Profile Information" icon="👤">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <Field label="First Name"><input className="input-nexus" value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
-          <Field label="Last Name"><input className="input-nexus" value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
+          <Field label="First Name">
+            <div style={{ position: "relative" }}>
+              <input value={firstName} disabled style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", cursor: "not-allowed", width: "100%", borderRadius: 8, padding: "10px 40px 10px 14px", fontSize: 14, boxSizing: "border-box" as const }} />
+              <Lock size={14} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.2)" }} />
+            </div>
+            <p style={{ fontSize: 11, color: "#6B7280", marginTop: 4 }}>Contact admin to update your name.</p>
+          </Field>
+          <Field label="Last Name">
+            <div style={{ position: "relative" }}>
+              <input value={lastName} disabled style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.35)", cursor: "not-allowed", width: "100%", borderRadius: 8, padding: "10px 40px 10px 14px", fontSize: 14, boxSizing: "border-box" as const }} />
+              <Lock size={14} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.2)" }} />
+            </div>
+            <p style={{ fontSize: 11, color: "#6B7280", marginTop: 4 }}>Contact admin to update your name.</p>
+          </Field>
         </div>
         <Field label="Email Address">
           <div style={{ position: "relative" }}>
@@ -201,8 +215,17 @@ export default function SettingsClient({ user }: { user: User }) {
                   Expires: {new Date(user.transferTokenExp).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </div>
               )}
-              <div style={{ marginTop: 10, fontFamily: "var(--font-jetbrains-mono, monospace)", fontSize: 13, color: "var(--color-accent)", letterSpacing: 3 }}>
-                {"•".repeat(8)}
+              <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontFamily: "var(--font-jetbrains-mono, monospace)", fontSize: 13, color: "var(--color-accent)", letterSpacing: showToken ? 2 : 3 }}>
+                  {showToken ? (user.transferToken ?? "") : "•".repeat(8)}
+                </span>
+                <button
+                  onClick={() => setShowToken((v) => !v)}
+                  title={showToken ? "Hide token" : "Show token"}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", padding: 0, display: "flex", alignItems: "center" }}
+                >
+                  {showToken ? <EyeOff size={14} strokeWidth={2} /> : <Eye size={14} strokeWidth={2} />}
+                </button>
               </div>
             </div>
             <p style={{ fontSize: 12, color: "var(--color-text-muted)", lineHeight: 1.6 }}>

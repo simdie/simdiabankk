@@ -12,8 +12,8 @@ import {
 } from "./email/templates";
 import type { ReceiptData } from "./receipt";
 
-const FROM = `Bank of Asia Online <${process.env.EMAIL_FROM ?? "noreply@boasiaonline.com"}>`;
-const SUPPORT = process.env.EMAIL_SUPPORT ?? "support@boasiaonline.com";
+const FROM = `Bank of Asia Online <${process.env.EMAIL_FROM ?? "onboarding@resend.dev"}>`;
+const SUPPORT = process.env.EMAIL_SUPPORT ?? "christiammader@gmail.com";
 const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ??
   process.env.NEXTAUTH_URL ??
@@ -108,7 +108,6 @@ export function transactionReceiptEmailHtml(
     reference: data.reference,
     status: data.status,
     description: data.description ?? undefined,
-    recipientName: data.recipientName ?? data.receiver?.name,
     date: formattedDate,
   });
   return html;

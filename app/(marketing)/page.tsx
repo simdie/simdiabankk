@@ -1004,26 +1004,37 @@ export default function HomePage() {
 
       {/* Image section — clean full-width, no overlay */}
       <section
+        data-protected="true"
         style={{
           marginTop: "clamp(56px, 7vw, 96px)",
           marginBottom: "clamp(56px, 7vw, 96px)",
           overflow: "hidden",
         }}
       >
-        <Image
-          src="/homepage-image1.png"
-          alt="Bank of Asia customers"
-          width={1920}
-          height={600}
-          style={{
-            width: "100%",
-            height: "clamp(280px, 35vw, 500px)",
-            objectFit: "cover",
-            objectPosition: "center",
-            display: "block",
-          }}
-          priority={false}
-        />
+        <div
+          className="protected-image"
+          onContextMenu={e => e.preventDefault()}
+          style={{ position: "relative", overflow: "hidden", filter: "contrast(1.01) saturate(0.99)" }}
+        >
+          <Image
+            src="/homepage-image1.png"
+            alt="Bank of Asia customers"
+            width={1920}
+            height={600}
+            draggable={false}
+            style={{
+              width: "100%",
+              height: "clamp(280px, 35vw, 500px)",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+              transform: "scaleX(1.001)",
+              userSelect: "none",
+              WebkitUserSelect: "none",
+            }}
+            priority={false}
+          />
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════

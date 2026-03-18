@@ -6,7 +6,9 @@ import {
   executeInternalTransfer,
   executeWireTransfer,
 } from "@/lib/transactions";
-import { sendTransferConfirmEmail, sendReceiptEmail } from "@/lib/email";
+import { sendTransferConfirmEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email/send";
+import { tmplTransaction } from "@/lib/email/templates";
 import { notifyTransfer } from "@/lib/notifications";
 
 const internalSchema = z.object({
@@ -78,7 +80,11 @@ export async function POST(req: NextRequest) {
           reference: result.transaction.reference,
           confirmUrl,
           cancelUrl,
-        }).catch(() => {});
+        }).then(() => {
+          console.log("[transfer] Confirm email sent to:", user.email);
+        }).catch((err) => {
+          console.error("[transfer] Confirm email failed:", err);
+        });
       }
       notifyTransfer({
         senderName: `${user.firstName} ${user.lastName}`,
@@ -87,21 +93,23 @@ export async function POST(req: NextRequest) {
         type: result.transaction.type,
         reference: result.transaction.reference,
         senderUserId: session.user.id,
-      }).catch(() => {});
-      // Send receipt if transaction is immediately completed (no email confirm pending)
-      if (!result.requiresEmailConfirm && result.transaction.status === "COMPLETED") {
-        sendReceiptEmail(user.email, {
-          reference: result.transaction.reference,
-          type: result.transaction.type,
-          status: result.transaction.status,
-          amount: Number(result.transaction.amount),
-          currency: result.transaction.currency,
-          description: result.transaction.description ?? null,
-          createdAt: result.transaction.createdAt,
-          sender: { name: `${user.firstName} ${user.lastName}`, accountNumber: parsed.data.senderAccountId, currency: result.transaction.currency },
-          receiver: null,
-          externalDetails: null,
-        }).catch(() => {});
+      }).catch((err) => { console.error("[transfer] Notify failed:", err); });
+      // Send receipt if transaction is immediately completed
+      if (!result.requiresEmailConfirm) {
+        await sendEmail({
+          to: user.email,
+          subject: `Transaction ${result.transaction.reference} — ${result.transaction.currency} ${Number(result.transaction.amount).toFixed(2)}`,
+          html: tmplTransaction({
+            firstName: user.firstName,
+            reference: result.transaction.reference,
+            amount: String(Number(result.transaction.amount)),
+            currency: result.transaction.currency,
+            type: result.transaction.type,
+            status: result.transaction.status,
+            description: result.transaction.description ?? "",
+            date: result.transaction.createdAt.toISOString(),
+          }),
+        });
       }
       return NextResponse.json({ success: true, transaction: result.transaction, requiresEmailConfirm: result.requiresEmailConfirm });
     }
@@ -128,7 +136,11 @@ export async function POST(req: NextRequest) {
           reference: result.transaction.reference,
           confirmUrl,
           cancelUrl,
-        }).catch(() => {});
+        }).then(() => {
+          console.log("[wire] Confirm email sent to:", user.email);
+        }).catch((err) => {
+          console.error("[wire] Confirm email failed:", err);
+        });
       }
       notifyTransfer({
         senderName: `${user.firstName} ${user.lastName}`,
@@ -137,7 +149,24 @@ export async function POST(req: NextRequest) {
         type: result.transaction.type,
         reference: result.transaction.reference,
         senderUserId: session.user.id,
-      }).catch(() => {});
+      }).catch((err) => { console.error("[wire] Notify failed:", err); });
+      // Send receipt for wire transfers
+      if (!result.requiresEmailConfirm) {
+        await sendEmail({
+          to: user.email,
+          subject: `Transaction ${result.transaction.reference} — ${result.transaction.currency} ${Number(result.transaction.amount).toFixed(2)}`,
+          html: tmplTransaction({
+            firstName: user.firstName,
+            reference: result.transaction.reference,
+            amount: String(Number(result.transaction.amount)),
+            currency: result.transaction.currency,
+            type: result.transaction.type,
+            status: result.transaction.status,
+            description: result.transaction.description ?? "",
+            date: result.transaction.createdAt.toISOString(),
+          }),
+        });
+      }
       return NextResponse.json({ success: true, transaction: result.transaction, requiresEmailConfirm: result.requiresEmailConfirm });
     }
 

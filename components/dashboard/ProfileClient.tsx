@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Lock, FileText, Image as ImageIcon } from "lucide-react";
 import Select from "@/components/ui/Select";
 import DatePicker from "@/components/ui/DatePicker";
 
@@ -60,7 +61,15 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
   const [idUploading, setIdUploading] = useState(false);
   const [idSuccess, setIdSuccess] = useState("");
   const [idError, setIdError] = useState("");
+  const [previewDoc, setPreviewDoc] = useState<{ url: string; fileType: string; fileName: string } | null>(null);
+  const [documents, setDocuments] = useState<Array<{ id: string; fileName: string; fileType: string; fileSize: number; fileUrl: string; documentType: string; uploadedAt: string }>>([]);
+  const [docDeleteConfirm, setDocDeleteConfirm] = useState<{ id: string; fileName: string; documentType: string } | null>(null);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch("/api/user/documents").then(r => r.json()).then(d => setDocuments(d.documents ?? []));
+  }, [idSuccess]);
 
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
   const avatarColor = getInitialsColor(user.firstName + user.lastName);
@@ -75,7 +84,7 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
       const res = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ phone: form.phone }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to save"); return; }
@@ -108,6 +117,34 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
       setIdUploading(false);
     }
   }
+
+  async function handleDeleteDoc(docId: string) {
+    setDeletingDocId(docId);
+    try {
+      const res = await fetch(`/api/user/documents/${docId}`, { method: "DELETE" });
+      if (res.ok) {
+        setDocuments(prev => prev.filter(d => d.id !== docId));
+      } else {
+        alert("Failed to delete document");
+      }
+    } catch {
+      alert("Network error");
+    } finally {
+      setDeletingDocId(null);
+      setDocDeleteConfirm(null);
+    }
+  }
+
+  // Read-only display with lock icon
+  const ReadField = ({ label, value }: { label: string; value: string }) => (
+    <div>
+      <label style={labelStyle}>{label}</label>
+      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "12px 16px", color: "rgba(255,255,255,0.5)", fontSize: 15, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span>{value || "—"}</span>
+        <Lock size={13} color="rgba(255,255,255,0.2)" />
+      </div>
+    </div>
+  );
 
   const F = ({ label, name, type = "text", readOnly }: { label: string; name: keyof typeof form; type?: string; readOnly?: boolean }) => (
     <div>
@@ -224,52 +261,47 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
 
       {/* Personal Information */}
       <div style={cardStyle}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f0f4ff", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f0f4ff", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
           <span>👤</span> Personal Information
         </h3>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginBottom: 20 }}>Personal details are managed by administrators. Contact support to request changes.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
-          <F label="First Name" name="firstName" />
-          <F label="Last Name" name="lastName" />
+          <ReadField label="First Name" value={user.firstName} />
+          <ReadField label="Last Name" value={user.lastName} />
           <div>
             <label style={labelStyle}>Email Address</label>
-            <input value={user.email} readOnly style={{ ...inputStyle, opacity: 0.5, cursor: "not-allowed" }} />
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 8, padding: "12px 16px", color: "rgba(255,255,255,0.5)", fontSize: 15, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span>{user.email}</span>
+              <Lock size={13} color="rgba(255,255,255,0.2)" />
+            </div>
           </div>
-          <F label="Phone Number" name="phone" type="tel" />
-          <F label="Date of Birth" name="dateOfBirth" type="date" />
           <div>
-            <label style={labelStyle}>Gender</label>
-            <Select
-              value={form.gender}
-              onChange={v => setForm(p => ({ ...p, gender: v }))}
-              options={[
-                { value: "", label: "Select gender" },
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
-                { value: "Prefer not to say", label: "Prefer not to say" },
-              ]}
-            />
+            <label style={labelStyle}>Phone Number</label>
+            <input type="tel" value={form.phone} onChange={(e) => setForm(p => ({ ...p, phone: e.target.value }))} style={inputStyle} placeholder="+1 555 000 0000" />
           </div>
-          <F label="Nationality" name="nationality" />
+          <ReadField label="Date of Birth" value={form.dateOfBirth ? new Date(form.dateOfBirth).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ""} />
+          <ReadField label="Gender" value={form.gender} />
+          <ReadField label="Nationality" value={form.nationality} />
         </div>
       </div>
 
       {/* Home Address */}
       <div style={cardStyle}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f0f4ff", marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f0f4ff", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
           <span>🏠</span> Home Address
         </h3>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginBottom: 20 }}>Address information is managed by administrators.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
           <div style={{ gridColumn: "1 / -1" }}>
-            <F label="Address Line 1" name="addressLine1" />
+            <ReadField label="Address Line 1" value={form.addressLine1} />
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
-            <F label="Address Line 2 (Optional)" name="addressLine2" />
+            <ReadField label="Address Line 2" value={form.addressLine2} />
           </div>
-          <F label="City" name="city" />
-          <F label="State / Province" name="state" />
-          <F label="ZIP / Postal Code" name="zipCode" />
-          <F label="Country" name="country" />
+          <ReadField label="City" value={form.city} />
+          <ReadField label="State / Province" value={form.state} />
+          <ReadField label="ZIP / Postal Code" value={form.zipCode} />
+          <ReadField label="Country" value={form.country} />
         </div>
       </div>
 
@@ -406,6 +438,93 @@ export default function ProfileClient({ user }: { user: UserProfile }) {
           )}
         </div>
       </div>
+
+      {/* Uploaded Documents */}
+      <div style={cardStyle}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f0f4ff", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+          <span>📋</span> Uploaded Documents
+        </h3>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 20, lineHeight: 1.6 }}>
+          Documents you have uploaded for identity verification.
+        </p>
+        {documents.length === 0 ? (
+          <div style={{ padding: "24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 13, background: "rgba(255,255,255,0.02)", borderRadius: 10, border: "1px solid rgba(255,255,255,0.05)" }}>
+            No documents uploaded yet.
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {documents.map((doc) => {
+              const isPdf = doc.fileType === "application/pdf";
+              const fileSizeMB = (doc.fileSize / 1024 / 1024).toFixed(2);
+              const ext = doc.fileName.split(".").pop()?.toUpperCase() || "FILE";
+              const uploadDate = new Date(doc.uploadedAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+              const uploadTime = new Date(doc.uploadedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+              return (
+                <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 8, background: isPdf ? "rgba(255,59,92,0.1)" : "rgba(0,212,255,0.1)", border: `1px solid ${isPdf ? "rgba(255,59,92,0.2)" : "rgba(0,212,255,0.2)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {isPdf ? <FileText size={18} color="#FF3B5C" /> : <ImageIcon size={18} color="#00D4FF" />}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#f0f4ff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.documentType}</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{doc.fileName} · {fileSizeMB} MB</div>
+                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", marginTop: 1 }}>Uploaded {uploadDate} at {uploadTime}</div>
+                  </div>
+                  <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>{ext}</span>
+                  <button onClick={() => setPreviewDoc({ url: doc.fileUrl, fileType: doc.fileType, fileName: doc.fileName })} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "#00D4FF", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
+                    View
+                  </button>
+                  <button
+                    onClick={() => setDocDeleteConfirm({ id: doc.id, fileName: doc.fileName, documentType: doc.documentType })}
+                    disabled={deletingDocId === doc.id}
+                    style={{ padding: "7px 12px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.25)", background: "rgba(239,68,68,0.07)", color: "#EF4444", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0, opacity: deletingDocId === doc.id ? 0.5 : 1 }}
+                  >
+                    {deletingDocId === doc.id ? "…" : "Delete"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Document delete confirm modal */}
+      {docDeleteConfirm && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "#0F2040", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: 32, maxWidth: 380, width: "100%" }}>
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px", fontSize: 20 }}>🗑️</div>
+            <h3 style={{ color: "white", fontSize: 17, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>Delete Document?</h3>
+            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 14px", marginBottom: 14 }}>
+              <div style={{ color: "#f0f4ff", fontSize: 13, fontWeight: 600 }}>{docDeleteConfirm.documentType}</div>
+              <div style={{ color: "#6B7280", fontSize: 12, marginTop: 2 }}>{docDeleteConfirm.fileName}</div>
+            </div>
+            <p style={{ color: "#EF4444", fontSize: 12, textAlign: "center", marginBottom: 18 }}>⚠️ This cannot be undone.</p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setDocDeleteConfirm(null)} style={{ flex: 1, padding: "10px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white", borderRadius: 10, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>Cancel</button>
+              <button onClick={() => handleDeleteDoc(docDeleteConfirm.id)} style={{ flex: 2, padding: "10px", background: "#DC2626", border: "none", color: "white", borderRadius: 10, cursor: "pointer", fontSize: 13, fontWeight: 600 }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Document preview modal */}
+      {previewDoc && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setPreviewDoc(null)}>
+          <div style={{ background: "#0d1a30", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 24, maxWidth: "90vw", maxHeight: "90vh", overflow: "auto" }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#f0f4ff" }}>{previewDoc.fileName}</span>
+              <div style={{ display: "flex", gap: 10 }}>
+                <a href={previewDoc.url} target="_blank" rel="noreferrer" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "#00D4FF", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>Open in new tab</a>
+                <button onClick={() => setPreviewDoc(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", padding: "0 4px" }}>✕</button>
+              </div>
+            </div>
+            {previewDoc.fileType === "application/pdf" ? (
+              <iframe src={previewDoc.url} style={{ width: "min(760px, 80vw)", height: "70vh", borderRadius: 8, border: "none" }} />
+            ) : (
+              <img src={previewDoc.url} alt={previewDoc.fileName} style={{ maxWidth: "min(760px, 80vw)", maxHeight: "70vh", borderRadius: 8, display: "block" }} />
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Save button */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>

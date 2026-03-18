@@ -113,6 +113,8 @@ model User {
   adminNotes          String?
   passwordResetToken  String?
   passwordResetExpiry DateTime?
+  securityQuestion    String?
+  securityAnswer      String?
 
   accounts              Account[]
   auditLogs             AuditLog[]
@@ -121,6 +123,7 @@ model User {
   supportMessages       SupportMessage[]
   userNotifications     UserNotification[]
   passwordResetTokens   PasswordResetToken[]
+  documents             Document[]
 
   @@map("users")
 }
@@ -242,22 +245,38 @@ model LoginHistory {
 }
 
 model SupportMessage {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
+  ticketId    String?   @unique @default(cuid())
   subject     String
   category    String
-  priority    String   @default("NORMAL")
+  priority    String    @default("NORMAL")
   message     String
   reference   String?
-  status      String   @default("SENT")
+  status      String    @default("OPEN")
   adminReply  String?
   repliedAt   DateTime?
-  isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  isRead      Boolean   @default(false)
+  closedAt    DateTime?
+  closedBy    String?
+  createdAt   DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies SupportReply[]
 
   @@map("support_messages")
+}
+
+model SupportReply {
+  id        String   @id @default(cuid())
+  messageId String
+  body      String
+  fromAdmin Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  message SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("support_replies")
 }
 
 model UserNotification {
@@ -295,4 +314,19 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  userId       String
+  fileName     String
+  fileType     String
+  fileSize     Int
+  fileUrl      String
+  documentType String   @default("Identity Document")
+  uploadedAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
 }

@@ -139,3 +139,36 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ success: true, user: { ...updatedUser, passwordHash: undefined } });
 }
+
+// DELETE — permanently delete a user and all their data
+export async function DELETE(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user || (session.user as any).role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { userId } = await req.json();
+  if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+
+  // Prevent admin from deleting themselves
+  if (userId === session.user.id) {
+    return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
+  }
+
+  const target = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, email: true, firstName: true, lastName: true } });
+  if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+  await prisma.user.delete({ where: { id: userId } });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: session.user.id,
+      action: "ADMIN_DELETE_USER",
+      target: userId,
+      details: { deletedUser: { email: target.email, name: `${target.firstName} ${target.lastName}` } },
+      ipAddress: req.headers.get("x-forwarded-for") || null,
+    },
+  });
+
+  return NextResponse.json({ success: true });
+}

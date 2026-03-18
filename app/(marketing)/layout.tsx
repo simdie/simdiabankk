@@ -4,6 +4,7 @@ import Navbar from "@/components/marketing/Navbar";
 import Footer from "@/components/marketing/Footer";
 import ScrollToTop from "@/components/marketing/ScrollToTop";
 import PageTransition from "@/components/marketing/PageTransition";
+import ImageProtection from "@/components/marketing/ImageProtection";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@bankofasia",
+    site: "@boasiaonline",
   },
 };
 
@@ -75,6 +76,7 @@ export default function MarketingLayout({
       </main>
       <Footer />
       <ScrollToTop />
+      <ImageProtection />
     </div>
   );
 }

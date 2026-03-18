@@ -1830,3 +1830,53 @@ select {
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+
+/* ── Security page hero — 2-column grid on desktop ─────── */
+.security-hero-grid {
+  grid-template-columns: 55fr 45fr;
+}
+.security-hero-visual {
+  display: flex;
+}
+@media (max-width: 768px) {
+  .security-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .security-hero-visual {
+    display: none !important;
+  }
+}
+
+/* ── Global image drag protection ───────────────────────── */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* ── Banner image protection ────────────────────────────── */
+[data-protected] img,
+[data-protected] {
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+[data-protected] img {
+  pointer-events: none;
+}
+
+.protected-image {
+  pointer-events: none;
+  -webkit-touch-callout: none;
+}
+
+/* ── Live clock responsive visibility ──────────────────── */
+.live-clock-mobile { display: none; }
+.live-clock-desktop { display: block; }
+@media (max-width: 640px) {
+  .live-clock-mobile { display: block; margin-top: 6px; }
+  .live-clock-desktop { display: none; }
+}

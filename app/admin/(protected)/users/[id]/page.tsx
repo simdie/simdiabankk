@@ -98,8 +98,16 @@ export default function AdminUserDetailPage() {
   const [tokenExpiry, setTokenExpiry] = useState("24h");
   const [tokenLoading, setTokenLoading] = useState(false);
   const [newToken, setNewToken] = useState("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
-  const [tab, setTab] = useState<"overview" | "accounts" | "transactions" | "security" | "admin" | "messages">("overview");
+  const [tab, setTab] = useState<"overview" | "accounts" | "transactions" | "security" | "admin" | "messages" | "documents">("overview");
+  const [documents, setDocuments] = useState<Array<{ id: string; fileName: string; fileType: string; fileSize: number; fileUrl: string; documentType: string; uploadedAt: string }>>([]);
+  const [docsLoaded, setDocsLoaded] = useState(false);
+  const [docPreview, setDocPreview] = useState<{ url: string; fileType: string; fileName: string } | null>(null);
+  const [docDeleteConfirm, setDocDeleteConfirm] = useState<{ id: string; fileName: string; documentType: string; uploadedAt: string } | null>(null);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
 
   const [msgSubject, setMsgSubject] = useState("");
   const [msgBody, setMsgBody] = useState("");
@@ -186,6 +194,20 @@ export default function AdminUserDetailPage() {
       await fetchUser();
     } catch { showToast("Failed to update email", "error"); }
     finally { setEmailChanging(false); }
+  }
+
+  async function deleteUser() {
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error || "Failed to delete user", "error"); return; }
+      window.location.href = "/admin/users";
+    } catch { showToast("Failed to delete user", "error"); }
+    finally { setDeleting(false); }
   }
 
   async function reset2FA() {
@@ -293,7 +315,34 @@ export default function AdminUserDetailPage() {
     { key: "security",      label: "Security" },
     { key: "admin",         label: "Admin" },
     { key: "messages",      label: "Messages" },
+    { key: "documents",     label: `Docs${documents.length > 0 ? ` (${documents.length})` : ""}` },
   ];
+
+  async function loadDocuments() {
+    if (docsLoaded) return;
+    const res = await fetch(`/api/admin/users/${id}/documents`);
+    const data = await res.json();
+    setDocuments(data.documents ?? []);
+    setDocsLoaded(true);
+  }
+
+  async function handleDeleteDoc(docId: string) {
+    setDeletingDocId(docId);
+    try {
+      const res = await fetch(`/api/admin/users/${id}/documents/${docId}`, { method: "DELETE" });
+      if (res.ok) {
+        setDocuments(prev => prev.filter(d => d.id !== docId));
+        showToast("Document deleted successfully");
+      } else {
+        showToast("Failed to delete document", "error");
+      }
+    } catch {
+      showToast("Network error", "error");
+    } finally {
+      setDeletingDocId(null);
+      setDocDeleteConfirm(null);
+    }
+  }
 
   /* ────────────────────────────────────────── */
   return (
@@ -354,6 +403,43 @@ export default function AdminUserDetailPage() {
         </div>
       )}
 
+      {/* Delete User Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.85)" }}>
+          <div className="w-full max-w-md" style={{ background: "#0d1a30", border: "1px solid rgba(255,59,92,0.3)", borderRadius: 16, padding: "28px 24px" }}>
+            <div style={{ fontSize: 36, textAlign: "center", marginBottom: 16 }}>⚠️</div>
+            <h3 style={{ fontFamily: "var(--font-syne)", fontSize: 18, fontWeight: 700, color: "var(--color-danger)", marginBottom: 10, textAlign: "center" }}>
+              Permanently Delete User
+            </h3>
+            <p style={{ color: "var(--color-text-muted)", fontSize: 13, marginBottom: 16, textAlign: "center", lineHeight: 1.6 }}>
+              This will permanently delete <strong style={{ color: "var(--color-text-primary)" }}>{user?.firstName} {user?.lastName}</strong> and ALL their data including accounts, transactions, and documents. This cannot be undone.
+            </p>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ ...lbl, marginBottom: 8 }}>
+                Type <strong style={{ color: "var(--color-danger)" }}>DELETE</strong> to confirm
+              </label>
+              <input
+                className="input-nexus w-full box-border"
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                placeholder="Type DELETE to confirm"
+                autoFocus
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => { setDeleteModalOpen(false); setDeleteConfirmText(""); }} className="btn-ghost w-full">Cancel</button>
+              <button
+                onClick={deleteUser}
+                disabled={deleting || deleteConfirmText !== "DELETE"}
+                className="w-full"
+                style={{ padding: "11px", borderRadius: 10, border: "none", cursor: deleteConfirmText === "DELETE" ? "pointer" : "not-allowed", background: "linear-gradient(135deg,#FF3B5C,#cc1f3a)", color: "#fff", fontWeight: 800, fontSize: 14, opacity: deleteConfirmText === "DELETE" ? 1 : 0.4 }}>
+                {deleting ? "Deleting…" : "Delete Permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── HEADER ── */}
       <div className="p-4">
         <Link href="/admin/users" style={{ color: "var(--color-text-muted)", textDecoration: "none", fontSize: 13 }}
@@ -405,13 +491,19 @@ export default function AdminUserDetailPage() {
             </button>
           )}
         </div>
+        <button
+          onClick={() => { setDeleteModalOpen(true); setDeleteConfirmText(""); }}
+          className="w-full"
+          style={{ marginTop: 10, padding: "10px 8px", fontSize: 12, borderRadius: 8, border: "1px solid rgba(255,59,92,0.35)", background: "rgba(255,59,92,0.06)", color: "var(--color-danger)", fontWeight: 700, cursor: "pointer", letterSpacing: "0.04em" }}>
+          🗑 Delete User Account
+        </button>
       </div>
 
       {/* ── TABS (scrollable) ── */}
       <div className="overflow-x-auto scrollbar-hide" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex min-w-max px-4">
           {tabs.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key as any)}
+            <button key={t.key} onClick={() => { setTab(t.key as any); if (t.key === "documents") loadDocuments(); }}
               className="whitespace-nowrap"
               style={{
                 padding: "11px 13px", fontSize: 13, fontWeight: tab === t.key ? 700 : 500,
@@ -955,7 +1047,93 @@ export default function AdminUserDetailPage() {
           </>
         )}
 
+        {/* ══ DOCUMENTS ══ */}
+        {tab === "documents" && (
+          <Card>
+            <CardTitle>Uploaded Documents</CardTitle>
+            {documents.length === 0 ? (
+              <div style={{ padding: "24px", textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>No documents uploaded by this user.</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {documents.map((doc) => {
+                  const isPdf = doc.fileType === "application/pdf";
+                  const fileSizeMB = (doc.fileSize / 1024 / 1024).toFixed(2);
+                  const ext = doc.fileName.split(".").pop()?.toUpperCase() || "FILE";
+                  const uploadDate = new Date(doc.uploadedAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+                  const uploadTime = new Date(doc.uploadedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+                  return (
+                    <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 8, background: isPdf ? "rgba(255,59,92,0.1)" : "rgba(0,212,255,0.1)", border: `1px solid ${isPdf ? "rgba(255,59,92,0.2)" : "rgba(0,212,255,0.2)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16 }}>
+                        {isPdf ? "📄" : "🖼"}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--color-text-primary)" }}>{doc.documentType}</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{doc.fileName} · {fileSizeMB} MB</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 1 }}>Uploaded {uploadDate} at {uploadTime}</div>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>{ext}</span>
+                      <button onClick={() => setDocPreview({ url: doc.fileUrl, fileType: doc.fileType, fileName: doc.fileName })} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "var(--color-accent)", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
+                        View
+                      </button>
+                      <button
+                        onClick={() => setDocDeleteConfirm({ id: doc.id, fileName: doc.fileName, documentType: doc.documentType, uploadedAt: doc.uploadedAt })}
+                        disabled={deletingDocId === doc.id}
+                        style={{ padding: "7px 12px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.25)", background: "rgba(239,68,68,0.07)", color: "#EF4444", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0, opacity: deletingDocId === doc.id ? 0.5 : 1 }}
+                      >
+                        {deletingDocId === doc.id ? "…" : "Delete"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        )}
+
       </div>
+
+      {/* Document delete confirm modal */}
+      {docDeleteConfirm && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+          <div style={{ background: "#0F2040", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: 32, maxWidth: 400, width: "100%" }}>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontSize: 22 }}>🗑️</div>
+            <h3 style={{ color: "white", fontSize: 18, fontWeight: 700, textAlign: "center", marginBottom: 8 }}>Delete Document</h3>
+            <p style={{ color: "#9CA3AF", fontSize: 14, lineHeight: 1.6, textAlign: "center", marginBottom: 12 }}>Permanently delete this document?</p>
+            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+              <div style={{ color: "white", fontSize: 13, fontWeight: 600 }}>{docDeleteConfirm.documentType}</div>
+              <div style={{ color: "#6B7280", fontSize: 12, marginTop: 3 }}>{docDeleteConfirm.fileName}</div>
+              <div style={{ color: "#6B7280", fontSize: 11, marginTop: 3 }}>
+                Uploaded {new Date(docDeleteConfirm.uploadedAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
+              </div>
+            </div>
+            <p style={{ color: "#EF4444", fontSize: 12, textAlign: "center", marginBottom: 20 }}>⚠️ This cannot be undone.</p>
+            <div style={{ display: "flex", gap: 12 }}>
+              <button onClick={() => setDocDeleteConfirm(null)} style={{ flex: 1, padding: 12, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white", borderRadius: 10, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>Cancel</button>
+              <button onClick={() => handleDeleteDoc(docDeleteConfirm.id)} style={{ flex: 2, padding: 12, background: "#DC2626", border: "none", color: "white", borderRadius: 10, cursor: "pointer", fontSize: 14, fontWeight: 600 }}>Delete Permanently</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Document preview modal */}
+      {docPreview && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }} onClick={() => setDocPreview(null)}>
+          <div style={{ background: "#0d1a30", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 24, maxWidth: "90vw", maxHeight: "90vh", overflow: "auto" }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)" }}>{docPreview.fileName}</span>
+              <div style={{ display: "flex", gap: 10 }}>
+                <a href={docPreview.url} target="_blank" rel="noreferrer" style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "var(--color-accent)", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>Open in new tab</a>
+                <button onClick={() => setDocPreview(null)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", padding: "0 4px" }}>✕</button>
+              </div>
+            </div>
+            {docPreview.fileType === "application/pdf" ? (
+              <iframe src={docPreview.url} style={{ width: "min(760px, 80vw)", height: "70vh", borderRadius: 8, border: "none" }} />
+            ) : (
+              <img src={docPreview.url} alt={docPreview.fileName} style={{ maxWidth: "min(760px, 80vw)", maxHeight: "70vh", borderRadius: 8, display: "block" }} />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

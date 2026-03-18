@@ -3,6 +3,13 @@ import { auth } from "@/lib/auth";
 import { executeAdminDeposit } from "@/lib/transactions";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { sendEmail } from "@/lib/email/send";
+import { tmplTransaction } from "@/lib/email/templates";
+
+const TRANSACTION_TYPE_LABELS = [
+  "Deposit", "Transfer", "Cash App", "VAT Payment", "Withdrawal",
+  "Credit Balance", "International Wire", "Local Wire", "Check Payment", "PayPal Transfer",
+] as const;
 
 const schema = z.object({
   targetAccountId: z.string(),
@@ -10,6 +17,7 @@ const schema = z.object({
   description: z.string().min(10).max(300),
   internalNotes: z.string().max(500).optional(),
   type: z.enum(["CREDIT", "DEBIT"]).default("CREDIT"),
+  transactionType: z.enum(TRANSACTION_TYPE_LABELS).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -24,13 +32,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten().fieldErrors }, { status: 422 });
   }
 
+  const finalDescription = parsed.data.transactionType
+    ? `[${parsed.data.transactionType}] ${parsed.data.description}`
+    : parsed.data.description;
+
   try {
     if (parsed.data.type === "DEBIT") {
       const { executeAdminDebit } = await import("@/lib/transactions");
       const result = await executeAdminDebit({
         targetAccountId: parsed.data.targetAccountId,
         amount: parsed.data.amount,
-        description: parsed.data.description,
+        description: finalDescription,
         adminUserId: session.user.id,
         ipAddress: req.headers.get("x-forwarded-for") || undefined,
       });
@@ -54,7 +66,7 @@ export async function POST(req: NextRequest) {
       const result = await executeAdminDeposit({
         targetAccountId: parsed.data.targetAccountId,
         amount: parsed.data.amount,
-        description: parsed.data.description,
+        description: finalDescription,
         adminUserId: session.user.id,
         ipAddress: req.headers.get("x-forwarded-for") || undefined,
       });
@@ -69,6 +81,28 @@ export async function POST(req: NextRequest) {
             details: { note: parsed.data.internalNotes },
             ipAddress: req.headers.get("x-forwarded-for") || null,
           },
+        });
+      }
+
+      // Send email notification to the user
+      const account = await prisma.account.findUnique({
+        where: { id: parsed.data.targetAccountId },
+        include: { user: { select: { email: true, firstName: true } } },
+      });
+      if (account?.user?.email) {
+        await sendEmail({
+          to: account.user.email,
+          subject: `Account Update — ${result.transaction.reference}`,
+          html: tmplTransaction({
+            firstName: account.user.firstName,
+            reference: result.transaction.reference,
+            amount: String(Number(result.transaction.amount)),
+            currency: result.transaction.currency,
+            type: result.transaction.type,
+            status: result.transaction.status,
+            description: result.transaction.description ?? "",
+            date: result.transaction.createdAt.toISOString(),
+          }),
         });
       }
 

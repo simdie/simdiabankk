@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { formatAmount } from "@/lib/utils";
 import Select from "@/components/ui/Select";
+import { Trash2 } from "lucide-react";
 
 const G = "#F0B429";
 
@@ -55,6 +56,12 @@ export default function AdminUsersClient() {
   const [tokenExpiry, setTokenExpiry] = useState("24h");
   const [generatedToken, setGeneratedToken] = useState<{ token: string; expiresAt: string } | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
+
+  // Delete user state
+  const [deleteModal, setDeleteModal] = useState<User | null>(null);
+  const [deleteEmailInput, setDeleteEmailInput] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteErr, setDeleteErr] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -150,6 +157,21 @@ export default function AdminUsersClient() {
       setSelected((u) => u ? { ...u, transferToken: null, transferTokenExp: null } : null);
       setSaveMsg("Transfer token revoked");
     } finally { setTokenLoading(false); }
+  }
+
+  async function confirmDeleteUser() {
+    if (!deleteModal) return;
+    setDeleting(true); setDeleteErr("");
+    try {
+      const res = await fetch(`/api/admin/users/${deleteModal.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) { setDeleteErr(data.error ?? "Failed to delete user"); return; }
+      setUsers((prev) => prev.filter((u) => u.id !== deleteModal.id));
+      setTotal((t) => t - 1);
+      if (selected?.id === deleteModal.id) setSelected(null);
+      setDeleteModal(null);
+      setDeleteEmailInput("");
+    } finally { setDeleting(false); }
   }
 
   return (
@@ -412,6 +434,28 @@ export default function AdminUsersClient() {
                 <p style={{ fontSize: 11, color: "var(--color-text-muted)" }}>Resetting forces the user to re-enroll with a new authenticator code.</p>
               </PanelSection>
 
+              {/* Danger zone */}
+              <PanelSection title="Danger Zone">
+                <button
+                  onClick={() => { setDeleteModal(selected); setDeleteEmailInput(""); setDeleteErr(""); }}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 8,
+                    padding: "9px 16px", borderRadius: 8, cursor: "pointer", width: "100%",
+                    background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.3)",
+                    color: "#F87171", fontSize: 13, fontWeight: 600,
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.15)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
+                >
+                  <Trash2 size={15} />
+                  Delete User Account
+                </button>
+                <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 6 }}>
+                  Permanently deletes the user, all accounts, transactions, and cards. Cannot be undone.
+                </p>
+              </PanelSection>
+
               {/* Transfer token */}
               <PanelSection title="Transfer Token">
                 {selected.transferToken && !generatedToken && (
@@ -461,6 +505,56 @@ export default function AdminUsersClient() {
           </div>
         )}
       </div>
+
+      {/* Delete user modal */}
+      {deleteModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: "#0d1a30", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 16, padding: "32px 28px", maxWidth: 440, width: "100%", margin: "0 16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Trash2 size={16} color="#F87171" />
+              </div>
+              <h3 style={{ fontFamily: "var(--font-syne)", fontSize: 18, fontWeight: 700, color: "#fff" }}>Delete User Account</h3>
+            </div>
+            <p style={{ color: "var(--color-text-muted)", fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
+              This will permanently delete <strong style={{ color: "#fff" }}>{deleteModal.firstName} {deleteModal.lastName}</strong>&apos;s account,
+              all transactions, cards, and data. <strong style={{ color: "#F87171" }}>This cannot be undone.</strong>
+            </p>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--color-text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              Type the user&apos;s email to confirm
+            </label>
+            <input
+              className="input-nexus"
+              type="email"
+              placeholder={deleteModal.email}
+              value={deleteEmailInput}
+              onChange={(e) => setDeleteEmailInput(e.target.value)}
+              style={{ marginBottom: 8, fontSize: 13 }}
+            />
+            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginBottom: 16 }}>{deleteModal.email}</p>
+            {deleteErr && (
+              <div style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#F87171", fontSize: 12, marginBottom: 14 }}>
+                {deleteErr}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => { setDeleteModal(null); setDeleteEmailInput(""); setDeleteErr(""); }} className="btn-ghost" style={{ flex: 1 }}>Cancel</button>
+              <button
+                onClick={confirmDeleteUser}
+                disabled={deleting || deleteEmailInput !== deleteModal.email}
+                style={{
+                  flex: 1, padding: "10px 16px", borderRadius: 8, cursor: deleteEmailInput === deleteModal.email ? "pointer" : "not-allowed",
+                  background: deleteEmailInput === deleteModal.email ? "rgba(239,68,68,0.85)" : "rgba(239,68,68,0.2)",
+                  color: "#fff", fontWeight: 700, fontSize: 13, border: "none",
+                  opacity: deleting ? 0.7 : 1, transition: "background 0.15s",
+                }}
+              >
+                {deleting ? "Deleting…" : "Delete Permanently"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation modal */}
       {confirmModal && (

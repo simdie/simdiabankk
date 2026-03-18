@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { generateToken } from "@/lib/utils";
 import { z } from "zod";
-import { sendTransferTokenEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email/send";
+import { tmplTransferToken } from "@/lib/email/templates";
 
 const EXPIRY_HOURS: Record<string, number> = { "1h": 1, "6h": 6, "24h": 24, "72h": 72 };
 
@@ -42,17 +43,15 @@ export async function POST(
     },
   });
 
-  // Send token email (non-blocking)
-  const expiresDisplay = exp.toLocaleString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
-    hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore",
+  // Send token email
+  const expiresDisplay = exp.toLocaleString("en-SG", {
+    dateStyle: "medium", timeStyle: "short",
   }) + " SGT";
-  sendTransferTokenEmail(user.email, {
-    firstName: user.firstName,
-    token,
-    expiresAt: expiresDisplay,
-    issuedBy: (session.user as any).email ?? undefined,
-  }).catch(console.error);
+  await sendEmail({
+    to: user.email,
+    subject: "Your Bank of Asia Transfer Security Token",
+    html: tmplTransferToken({ firstName: user.firstName, token, expiresAt: expiresDisplay }),
+  });
 
   return NextResponse.json({ token, expiresAt: exp.toISOString() });
 }

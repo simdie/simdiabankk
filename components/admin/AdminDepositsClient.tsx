@@ -15,6 +15,11 @@ const DEBIT_DESC_PRESETS = [
 
 const G = "#F0B429";
 
+const TRANSACTION_TYPES = [
+  "Deposit", "Transfer", "Cash App", "VAT Payment", "Withdrawal",
+  "Credit Balance", "International Wire", "Local Wire", "Check Payment", "PayPal Transfer",
+];
+
 const DESC_PRESETS = [
   "Regulatory compliance settlement — Ref: BOA-COMP-AUTO",
   "Client onboarding bonus — Approved by compliance",
@@ -33,6 +38,7 @@ export default function AdminDepositsClient() {
   const [selectedUser, setSelectedUser] = useState<UserResult | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [amount, setAmount] = useState("");
+  const [transactionType, setTransactionType] = useState("");
   const [description, setDescription] = useState("");
   const [internalNotes, setInternalNotes] = useState("");
   const [opType, setOpType] = useState<'CREDIT' | 'DEBIT'>('CREDIT');
@@ -62,12 +68,12 @@ export default function AdminDepositsClient() {
     try {
       const res = await fetch("/api/admin/deposits", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetAccountId: selectedAccount.id, amount: parseFloat(amount), description, internalNotes, type: opType }),
+        body: JSON.stringify({ targetAccountId: selectedAccount.id, amount: parseFloat(amount), description, internalNotes, type: opType, ...(transactionType ? { transactionType } : {}) }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Deposit failed"); return; }
       setSuccessRef(data.transaction.reference);
-      setAmount(""); setDescription(""); setInternalNotes("");
+      setAmount(""); setTransactionType(""); setDescription(""); setInternalNotes("");
       setConfirmOpen(false);
     } finally { setSubmitting(false); }
   }
@@ -204,6 +210,17 @@ export default function AdminDepositsClient() {
                     {selectedAccount.currency}
                   </span>
                 </div>
+              </div>
+
+              {/* Transaction Type */}
+              <div>
+                <label style={labelStyle}>Transaction Type</label>
+                <Select
+                  value={transactionType}
+                  onChange={(v) => setTransactionType(v)}
+                  options={TRANSACTION_TYPES.map((t) => ({ value: t, label: t }))}
+                  placeholder="— Select transaction type —"
+                />
               </div>
 
               {/* Description presets */}

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import { SessionTimeout } from "@/components/dashboard/SessionTimeout";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -24,6 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       user={{ ...user, id: session.user.id }}
       globalNotice={settings?.globalNotice ?? null}
     >
+      <SessionTimeout />
       {children}
     </DashboardShell>
   );

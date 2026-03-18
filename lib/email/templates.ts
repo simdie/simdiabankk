@@ -1,197 +1,232 @@
-import { emailBase } from "./base-template";
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-// ─── 1. Welcome / Pending ────────────────────────────────────────────────────
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.boasiaonline.com";
+const EMAIL_LOGO = "https://i.imgur.com/KKzsZal.png";
 
-export function welcomePendingEmail({
-  firstName,
-  email,
-  accountNumber,
-}: {
-  firstName: string;
-  email: string;
-  accountNumber: string;
-}): { subject: string; html: string } {
-  const html = emailBase(
-    `
-    <h1>Welcome, ${firstName}!</h1>
-    <p>Your application has been received and is under review. We're excited to have you join Bank of Asia Online.</p>
+// ─── Layout wrapper ───────────────────────────────────────────────────────────
 
-    <div class="card">
-      <table class="detail-table">
-        <tr>
-          <td>Account Number</td>
-          <td style="font-family:'Courier New',monospace;">${accountNumber}</td>
-        </tr>
-        <tr>
-          <td>Email</td>
-          <td>${email}</td>
-        </tr>
-        <tr>
-          <td>Status</td>
-          <td><span class="badge-warning" style="background:rgba(200,151,42,0.15);color:#C8972A;border:1px solid rgba(200,151,42,0.3);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">PENDING</span></td>
-        </tr>
-      </table>
-    </div>
-
-    <p>Our team will review your application within 24 hours. You'll receive an email confirmation once your account is activated.</p>
-
-    <div class="security-notice">
-      <p>&#x26A0; If you did not create this account, contact us immediately at security@boasiaonline.com.</p>
-    </div>
-    `,
-    `Your Bank of Asia Online application is under review.`
-  );
-  return {
-    subject: "Welcome to Bank of Asia Online — Application Received",
-    html,
-  };
+function wrap(content: string, preheader = ""): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bank of Asia Online</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+${preheader ? `<div style="display:none;font-size:1px;line-height:1px;max-height:0;overflow:hidden;mso-hide:all;color:#f4f4f5">${preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>` : ""}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f5">
+<tr><td align="center" style="padding:40px 16px">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;border:1px solid #e4e4e7">
+<!-- Header -->
+<tr><td align="center" style="background:#0a1628;padding:28px 40px 24px;border-radius:8px 8px 0 0;border-bottom:3px solid #00c896">
+<!--[if !mso]><!-->
+<img src="${EMAIL_LOGO}" alt="Bank of Asia Online" width="200" height="auto" style="display:block;margin:0 auto;width:200px;max-width:200px;height:auto;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" />
+<!--<![endif]-->
+<!--[if mso]><div style="font-family:Georgia,serif;font-size:22px;font-weight:700;letter-spacing:0.1em;text-align:center;color:#FFFFFF">BANK OF <span style="color:#00C896">ASIA</span> ONLINE</div><![endif]-->
+</td></tr>
+<!-- Body -->
+<tr><td style="padding:40px 40px 32px">
+${content}
+</td></tr>
+<!-- Footer -->
+<tr><td style="background:#fafafa;border-top:1px solid #e4e4e7;padding:24px 40px;text-align:center">
+<p style="color:#a1a1aa;font-size:12px;margin:3px 0;font-family:Arial,sans-serif">Bank of Asia Online &middot; 123 Financial District &middot; Singapore 048946</p>
+<p style="color:#a1a1aa;font-size:12px;margin:3px 0;font-family:Arial,sans-serif">
+<a href="${SITE}" style="color:#a1a1aa;text-decoration:underline">www.boasiaonline.com</a>&nbsp;&middot;&nbsp;<a href="mailto:support@boasiaonline.com" style="color:#a1a1aa;text-decoration:underline">support@boasiaonline.com</a>
+</p>
+</td></tr>
+<!-- Bottom bar -->
+<tr><td style="background:#0d1b3e;padding:14px 40px;text-align:center;border-radius:0 0 8px 8px">
+<p style="color:#4b5563;font-size:11px;margin:2px 0;font-family:Arial,sans-serif">&copy; 2026 Bank of Asia Online. All rights reserved.</p>
+<p style="font-size:11px;margin:2px 0;font-family:Arial,sans-serif">
+<a href="${SITE}/privacy" style="color:#4b5563;text-decoration:none">Privacy Policy</a>&nbsp;&middot;&nbsp;<a href="${SITE}/terms" style="color:#4b5563;text-decoration:none">Terms of Service</a>&nbsp;&middot;&nbsp;<a href="${SITE}/security" style="color:#4b5563;text-decoration:none">Security</a>
+</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
 }
 
-// ─── 2. Account Activated ────────────────────────────────────────────────────
+// ─── Helper components ─────────────────────────────────────────────────────────
 
-export function accountActivatedEmail({
-  firstName,
-  email,
-  accountNumber,
-  currency,
-}: {
+/** Two-column data table row */
+function row(label: string, value: string, last = false): string {
+  const border = last ? "" : "border-bottom:1px solid #f0f0f0;";
+  return `<tr>
+<td style="padding:11px 0;${border}color:#71717a;font-size:13px;font-family:Arial,sans-serif;width:42%;vertical-align:top">${label}</td>
+<td style="padding:11px 0;${border}color:#18181b;font-size:13px;font-family:Arial,sans-serif;text-align:right;font-weight:500;vertical-align:top">${value}</td>
+</tr>`;
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$", GBP: "£", EUR: "€", AUD: "A$",
+  CAD: "C$", CHF: "Fr", JPY: "¥", CNY: "¥",
+  AED: "د.إ", SGD: "S$", HKD: "HK$", NZD: "NZ$",
+};
+
+/** Prominent centered amount display */
+function amountBlock(amount: string, currency: string, label = "Amount"): string {
+  const s = CURRENCY_SYMBOLS[currency] ?? "";
+  const amt = Number(amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `<div style="background:#f0fdf9;border:1px solid #d1fae5;border-radius:8px;padding:28px;text-align:center;margin:24px 0">
+<div style="font-size:11px;color:#71717a;letter-spacing:0.1em;margin-bottom:8px;font-family:Arial,sans-serif">${label.toUpperCase()}</div>
+<div style="font-size:36px;font-weight:700;color:#064e3b;font-family:'Courier New',Courier,monospace;letter-spacing:-0.5px">${s}${amt} ${currency}</div>
+</div>`;
+}
+
+/** Inline status badge */
+function badge(status: string): string {
+  const map: Record<string, { bg: string; color: string; border: string }> = {
+    COMPLETED:             { bg: "#f0fdf9", color: "#065f46", border: "#a7f3d0" },
+    ACTIVE:                { bg: "#f0fdf9", color: "#065f46", border: "#a7f3d0" },
+    PENDING:               { bg: "#fffbeb", color: "#92400e", border: "#fde68a" },
+    AWAITING_CONFIRMATION: { bg: "#eff6ff", color: "#1e40af", border: "#bfdbfe" },
+    FAILED:                { bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+    RESTRICTED:            { bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+    SUSPENDED:             { bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+    DISABLED:              { bg: "#f9fafb", color: "#374151", border: "#d1d5db" },
+  };
+  const style = map[status] ?? { bg: "#f9fafb", color: "#374151", border: "#d1d5db" };
+  return `<span style="display:inline-block;background:${style.bg};color:${style.color};border:1px solid ${style.border};padding:4px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.06em;font-family:Arial,sans-serif">${status.replace(/_/g, " ")}</span>`;
+}
+
+/** Red security warning box */
+function securityWarning(msg: string): string {
+  return `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:14px 18px;margin:20px 0">
+<p style="color:#991b1b;font-size:13px;margin:0;font-family:Arial,sans-serif">&#9888;&#xFE0E; ${msg}</p>
+</div>`;
+}
+
+/** Centered CTA button */
+function ctaButton(text: string, url: string, color = "#00875a"): string {
+  return `<div style="text-align:center;margin:28px 0">
+<a href="${url}" style="display:inline-block;background:${color};color:#ffffff;padding:14px 36px;border-radius:6px;font-size:15px;font-weight:600;text-decoration:none;font-family:Arial,sans-serif">${text}</a>
+</div>`;
+}
+
+// ─── 1. Registration pending ───────────────────────────────────────────────────
+
+export function tmplRegistrationPending(d: {
   firstName: string;
-  email: string;
   accountNumber: string;
   currency: string;
-}): { subject: string; html: string } {
-  const html = emailBase(
-    `
-    <h1>Your account is active.</h1>
-    <p><span class="badge-success" style="background:rgba(0,200,150,0.15);color:#00C896;border:1px solid rgba(0,200,150,0.3);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">ACTIVATED</span></p>
-
-    <div class="card">
-      <table class="detail-table">
-        <tr>
-          <td>Account Number</td>
-          <td style="font-family:'Courier New',monospace;">${accountNumber}</td>
-        </tr>
-        <tr>
-          <td>Email</td>
-          <td>${email}</td>
-        </tr>
-        <tr>
-          <td>Primary Currency</td>
-          <td>${currency}</td>
-        </tr>
-        <tr>
-          <td>Account Type</td>
-          <td>Individual Savings</td>
-        </tr>
-      </table>
-    </div>
-
-    <p>You can now log in and start banking. Your account is fully verified and ready to use.</p>
-
-    <div style="text-align:center;margin:28px 0;">
-      <a href="https://www.boasiaonline.com/login" class="btn">Log In to Your Account &rarr;</a>
-    </div>
-
-    <div class="card">
-      <h2 style="font-size:14px;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;">First steps</h2>
-      <p style="margin:0 0 8px;">&#x2714; <span class="highlight">Enable 2FA</span> &mdash; Go to Settings &rarr; Security to set up two-factor authentication.</p>
-      <p style="margin:0 0 8px;">&#x2714; <span class="highlight">Fund your account</span> &mdash; Make your first deposit to activate full banking features.</p>
-      <p style="margin:0;">&#x2714; <span class="highlight">Explore virtual cards</span> &mdash; Create a virtual card for secure online purchases.</p>
-    </div>
-    `,
-    `Your Bank of Asia Online account is now active and ready to use.`
-  );
-  return {
-    subject: "Your Bank of Asia Online account is now active ✓",
-    html,
-  };
+}): string {
+  return wrap(`
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Welcome to Bank of Asia Online</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, your application has been received and is currently under review. Our compliance team will verify and activate your account within 24 hours.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e4e4e7;border-radius:8px;margin-bottom:24px">
+<tr><td style="padding:20px 24px">
+<p style="color:#a1a1aa;font-size:11px;letter-spacing:0.1em;margin:0 0 4px;font-family:Arial,sans-serif">ACCOUNT NUMBER</p>
+<p style="color:#18181b;font-size:17px;font-weight:700;font-family:'Courier New',Courier,monospace;margin:0 0 16px;letter-spacing:0.05em">${d.accountNumber}</p>
+<p style="color:#a1a1aa;font-size:11px;letter-spacing:0.1em;margin:0 0 4px;font-family:Arial,sans-serif">PRIMARY CURRENCY</p>
+<p style="color:#18181b;font-size:14px;font-weight:500;margin:0;font-family:Arial,sans-serif">${d.currency}</p>
+</td></tr>
+</table>
+${securityWarning("If you did not create this account, contact <strong>security@boasiaonline.com</strong> immediately.")}`,
+    `Your Bank of Asia Online account is pending review, ${d.firstName}.`);
 }
 
-// ─── 3. Transaction Receipt ──────────────────────────────────────────────────
+// ─── 2. Account activated ──────────────────────────────────────────────────────
 
-export function transactionReceiptEmail({
-  firstName,
-  amount,
-  currency,
-  type,
-  reference,
-  status,
-  description,
-  recipientName,
-  date,
-}: {
+export function tmplAccountActivated(d: {
   firstName: string;
+  accountNumber: string;
+  currency: string;
+}): string {
+  return wrap(`
+<div style="background:#f0fdf9;border:1px solid #d1fae5;border-radius:8px;padding:16px 20px;margin-bottom:24px">
+<p style="color:#065f46;font-size:13px;font-weight:600;margin:0;font-family:Arial,sans-serif">&#10003; Your account has been verified and activated</p>
+</div>
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Your Account is Now Active</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, welcome to Bank of Asia Online. Your identity has been verified and your account is ready to use.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d1fae5;border-radius:8px;background:#f0fdf9;margin-bottom:28px">
+<tr><td style="padding:20px 24px">
+<p style="color:#6b7280;font-size:11px;letter-spacing:0.1em;margin:0 0 4px;font-family:Arial,sans-serif">ACCOUNT NUMBER</p>
+<p style="color:#064e3b;font-size:20px;font-weight:700;font-family:'Courier New',Courier,monospace;margin:0 0 16px;letter-spacing:0.05em">${d.accountNumber}</p>
+<p style="color:#6b7280;font-size:11px;letter-spacing:0.1em;margin:0 0 4px;font-family:Arial,sans-serif">PRIMARY CURRENCY</p>
+<p style="color:#065f46;font-size:14px;font-weight:600;margin:0;font-family:Arial,sans-serif">${d.currency}</p>
+</td></tr>
+</table>
+${ctaButton("Log In to Your Account &rarr;", `${SITE}/login`)}
+<p style="color:#a1a1aa;font-size:12px;text-align:center;margin:0;font-family:Arial,sans-serif">Recommended first steps: Enable 2FA &middot; Fund your account &middot; Generate a virtual card</p>`,
+    `Your Bank of Asia Online account is active, ${d.firstName}.`);
+}
+
+// ─── 3. Transaction confirmation ───────────────────────────────────────────────
+
+export function tmplTransaction(d: {
+  firstName: string;
+  reference: string;
   amount: string;
   currency: string;
   type: string;
-  reference: string;
   status: string;
-  description?: string;
-  recipientName?: string;
+  description: string;
   date: string;
-}): { subject: string; html: string } {
-  const statusBadge =
-    status === "COMPLETED"
-      ? `<span class="badge-success" style="background:rgba(0,200,150,0.15);color:#00C896;border:1px solid rgba(0,200,150,0.3);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">COMPLETED</span>`
-      : `<span class="badge-warning" style="background:rgba(200,151,42,0.15);color:#C8972A;border:1px solid rgba(200,151,42,0.3);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">PENDING</span>`;
-
-  const currencySymbols: Record<string, string> = {
-    USD: "$", EUR: "€", GBP: "£", SGD: "S$", HKD: "HK$",
-    AUD: "A$", JPY: "¥", CAD: "C$", CHF: "Fr", NZD: "NZ$",
-  };
-  const symbol = currencySymbols[currency] ?? "";
-
-  const html = emailBase(
-    `
-    <h2>Transaction Confirmed</h2>
-    <p>Hello ${firstName}, here is your transaction receipt.</p>
-
-    <div style="text-align:center;margin:24px 0;">
-      <div class="amount">${symbol}${amount}</div>
-      <div style="margin-top:8px;">${statusBadge}</div>
-    </div>
-
-    <div class="card">
-      <table class="detail-table">
-        <tr><td>Reference</td><td style="font-family:'Courier New',monospace;font-size:13px;">${reference}</td></tr>
-        <tr><td>Type</td><td>${type.replace(/_/g, " ")}</td></tr>
-        <tr><td>Date</td><td>${date}</td></tr>
-        <tr><td>Currency</td><td>${currency}</td></tr>
-        ${description ? `<tr><td>Description</td><td>${description}</td></tr>` : ""}
-        ${recipientName ? `<tr><td>Recipient</td><td>${recipientName}</td></tr>` : ""}
-      </table>
-    </div>
-
-    <div style="text-align:center;margin:24px 0;">
-      <a href="https://www.boasiaonline.com/dashboard/transactions" class="btn">Download Receipt &rarr;</a>
-      &nbsp;&nbsp;
-      <a href="https://www.boasiaonline.com/dashboard/transactions" class="btn btn-outline" style="background:transparent;border:1.5px solid rgba(255,255,255,0.3);color:#FFFFFF;display:inline-block;font-size:15px;font-weight:600;padding:14px 32px;border-radius:8px;text-decoration:none;margin:8px 0;">View Transaction</a>
-    </div>
-
-    <div class="security-notice">
-      <p>&#x26A0; If you did not authorise this transaction, please contact us immediately at security@boasiaonline.com and freeze your account from the dashboard.</p>
-    </div>
-    `,
-    `Transaction ${reference} — ${symbol}${amount} ${status.toLowerCase()}`
-  );
-  return {
-    subject: `Transaction ${reference} — ${amount} ${currency}`,
-    html,
-  };
+}): string {
+  const dt = new Date(d.date).toLocaleString("en-SG", { dateStyle: "medium", timeStyle: "short" });
+  return wrap(`
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Transaction Receipt</h2>
+<p style="color:#71717a;margin:0 0 4px;font-size:14px;font-family:Arial,sans-serif">Hello ${d.firstName}, here is your transaction summary.</p>
+${amountBlock(d.amount, d.currency)}
+<div style="text-align:center;margin:-12px 0 24px">${badge(d.status)}</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px">
+${row("Reference", `<span style="font-family:'Courier New',Courier,monospace;font-size:12px">${d.reference}</span>`)}
+${row("Type", d.type.replace(/_/g, " "))}
+${row("Date &amp; Time", dt)}
+${d.description ? row("Description", d.description, true) : row("Status", d.status.replace(/_/g, " "), true)}
+</table>
+${securityWarning("If you did not authorise this transaction, contact <strong>security@boasiaonline.com</strong> immediately.")}
+${ctaButton("View in Dashboard", `${SITE}/dashboard`)}`,
+    `Transaction ${d.reference} — ${d.status.toLowerCase()}.`);
 }
 
-// ─── 4. Email Confirm Transfer ───────────────────────────────────────────────
+// ─── 4. Transaction status update ─────────────────────────────────────────────
 
-export function emailConfirmTransferEmail({
-  firstName,
-  amount,
-  currency,
-  recipientName,
-  reference,
-  confirmUrl,
-  cancelUrl,
-  expiresAt,
-}: {
+export function tmplTransactionStatusUpdate(d: {
+  firstName: string;
+  reference: string;
+  amount: string;
+  currency: string;
+  previousStatus: string;
+  newStatus: string;
+  description?: string;
+  date: string;
+}): string {
+  const dt = new Date(d.date).toLocaleString("en-SG", { dateStyle: "medium", timeStyle: "short" });
+  return wrap(`
+<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 18px;margin-bottom:24px">
+<p style="color:#92400e;font-size:13px;font-weight:600;margin:0;font-family:Arial,sans-serif">&#8635; Your transaction status has been updated</p>
+</div>
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Transaction Status Update</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, a transaction on your account has had its status updated by our team.
+</p>
+${amountBlock(d.amount, d.currency, "Transaction Amount")}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px">
+${row("Reference", `<span style="font-family:'Courier New',Courier,monospace;font-size:12px">${d.reference}</span>`)}
+${row("Previous Status", badge(d.previousStatus))}
+${row("New Status", badge(d.newStatus))}
+${row("Date &amp; Time", dt)}
+${d.description ? row("Description", d.description, true) : `<!-- no desc -->`}
+</table>
+<p style="color:#71717a;font-size:13px;margin:0 0 24px;line-height:1.7;font-family:Arial,sans-serif">
+If you have questions about this update, please contact our support team with your transaction reference number.
+</p>
+${ctaButton("View in Dashboard", `${SITE}/dashboard`)}`,
+    `Transaction ${d.reference} status updated to ${d.newStatus.toLowerCase()}.`);
+}
+
+// ─── 5. Email-confirm transfer ─────────────────────────────────────────────────
+
+export function tmplConfirmTransfer(d: {
   firstName: string;
   amount: string;
   currency: string;
@@ -200,252 +235,220 @@ export function emailConfirmTransferEmail({
   confirmUrl: string;
   cancelUrl: string;
   expiresAt: string;
-}): { subject: string; html: string } {
-  const html = emailBase(
-    `
-    <div style="text-align:center;margin-bottom:20px;">
-      <span class="badge-warning" style="background:rgba(200,151,42,0.15);color:#C8972A;border:1px solid rgba(200,151,42,0.3);padding:6px 16px;border-radius:100px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">&#x26A0; ACTION REQUIRED</span>
-    </div>
-
-    <h1>Please confirm your transfer</h1>
-    <p>Hello ${firstName}, a transfer from your account requires your confirmation before it can proceed.</p>
-
-    <div class="card" style="border:1px solid rgba(200,151,42,0.3);">
-      <table class="detail-table">
-        <tr><td>Amount</td><td style="color:#C8972A;font-weight:700;">${amount} ${currency}</td></tr>
-        ${recipientName ? `<tr><td>To</td><td>${recipientName}</td></tr>` : ""}
-        <tr><td>Reference</td><td style="font-family:'Courier New',monospace;font-size:13px;">${reference}</td></tr>
-      </table>
-    </div>
-
-    <p>This transfer requires your confirmation. Click the button below to authorise it.</p>
-
-    <div style="text-align:center;margin:28px 0 16px;">
-      <a href="${confirmUrl}" class="btn">&#x2713; Confirm Transfer</a>
-    </div>
-
-    <div style="text-align:center;margin-bottom:20px;">
-      <a href="${cancelUrl}" style="display:inline-block;background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.4);color:#EF4444;font-size:14px;font-weight:600;padding:11px 28px;border-radius:8px;text-decoration:none;">&#x2717; Cancel Transfer</a>
-    </div>
-
-    <p style="text-align:center;font-size:13px;color:#6B7280;">Link expires: ${expiresAt}</p>
-
-    <div class="security-notice">
-      <p><strong>DO NOT</strong> click confirm if you did not initiate this transfer. Contact us immediately at security@boasiaonline.com — your account may be compromised.</p>
-    </div>
-    `,
-    `Action required: confirm your transfer of ${amount} ${currency}`
-  );
-  return {
-    subject: "⚠️ Action Required — Confirm Your Transfer",
-    html,
-  };
+}): string {
+  return wrap(`
+<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 18px;margin-bottom:24px">
+<p style="color:#92400e;font-size:13px;font-weight:600;margin:0;font-family:Arial,sans-serif">&#9888;&#xFE0E; Action required — confirm or cancel this transfer</p>
+</div>
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Confirm Your Transfer</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, we received a request to initiate a transfer from your Bank of Asia Online account. Please confirm or cancel below.
+</p>
+${amountBlock(d.amount, d.currency, "Transfer Amount")}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px">
+${d.recipientName ? row("Recipient", d.recipientName) : ""}
+${row("Reference", `<span style="font-family:'Courier New',Courier,monospace;font-size:12px">${d.reference}</span>`)}
+${row("Link expires", d.expiresAt, true)}
+</table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px">
+<tr>
+<td style="padding-right:8px">
+<a href="${d.confirmUrl}" style="display:block;background:#00875a;color:#ffffff;padding:14px;border-radius:6px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;font-family:Arial,sans-serif">&#10003; Confirm Transfer</a>
+</td>
+<td style="padding-left:8px">
+<a href="${d.cancelUrl}" style="display:block;background:#ffffff;color:#991b1b;border:1px solid #fecaca;padding:14px;border-radius:6px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;font-family:Arial,sans-serif">&#10007; Cancel Transfer</a>
+</td>
+</tr>
+</table>
+${securityWarning("If you did not initiate this transfer, cancel immediately and contact <strong>security@boasiaonline.com</strong>.")}`,
+    `Action required: confirm your transfer of ${d.amount} ${d.currency}.`);
 }
 
-// ─── 5. Transfer Token ───────────────────────────────────────────────────────
+// ─── 6. Transfer security token ───────────────────────────────────────────────
 
-export function transferTokenEmail({
-  firstName,
-  token,
-  expiresAt,
-  issuedBy,
-}: {
+export function tmplTransferToken(d: {
   firstName: string;
   token: string;
   expiresAt: string;
-  issuedBy?: string;
-}): { subject: string; html: string } {
-  const now = new Date().toLocaleString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
-    hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore",
-  });
-
-  const html = emailBase(
-    `
-    <h2>Transfer Security Token</h2>
-    <p>Hello ${firstName}, your administrator has issued a one-time transfer token for your account.</p>
-
-    <div style="text-align:center;margin:28px 0;">
-      <div style="font-family:'Courier New',monospace;font-size:28px;font-weight:700;color:#00C896;letter-spacing:0.18em;background:rgba(0,200,150,0.07);border:1px solid rgba(0,200,150,0.25);border-radius:10px;padding:20px 28px;display:inline-block;word-break:break-all;">${token}</div>
-    </div>
-
-    <div class="card">
-      <table class="detail-table">
-        <tr><td>Expires</td><td>${expiresAt}</td></tr>
-        <tr><td>Issued</td><td>${now} SGT</td></tr>
-        ${issuedBy ? `<tr><td>Issued by</td><td>${issuedBy}</td></tr>` : ""}
-      </table>
-    </div>
-
-    <p>Enter this token when prompted during your next transfer. It can only be used once.</p>
-
-    <div class="security-notice">
-      <p>&#x1F512; This token is strictly confidential. <strong>Never share it with anyone</strong>, including Bank of Asia Online staff. If you did not request this token, contact security@boasiaonline.com immediately.</p>
-    </div>
-    `,
-    `Your Bank of Asia transfer security token is ready.`
-  );
-  return {
-    subject: "Your Bank of Asia Transfer Security Token",
-    html,
-  };
+}): string {
+  return wrap(`
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Transfer Security Token</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, your administrator has issued a one-time transfer authorisation token for your account.
+</p>
+<div style="background:#f0fdf9;border:1px solid #d1fae5;border-radius:8px;padding:28px;text-align:center;margin-bottom:24px">
+<p style="color:#6b7280;font-size:11px;letter-spacing:0.1em;margin:0 0 14px;font-family:Arial,sans-serif">YOUR TRANSFER TOKEN</p>
+<div style="font-family:'Courier New',Courier,monospace;font-size:22px;font-weight:700;color:#064e3b;letter-spacing:0.25em;padding:16px 20px;background:#ffffff;border:1px solid #d1fae5;border-radius:6px;display:inline-block;word-break:break-all">${d.token}</div>
+<p style="color:#6b7280;font-size:12px;margin:14px 0 0;font-family:Arial,sans-serif">Expires: ${d.expiresAt}</p>
+</div>
+${securityWarning("This token is strictly confidential. <strong>Never share it</strong> with anyone, including Bank of Asia Online staff.")}`,
+    `Your transfer security token is ready.`);
 }
 
-// ─── 6. Account Restricted ───────────────────────────────────────────────────
+// ─── 7. Admin support reply ────────────────────────────────────────────────────
 
-export function accountRestrictedEmail({
-  firstName,
-  restrictionMessage,
-}: {
+export function tmplAdminReply(d: {
   firstName: string;
-  restrictionMessage: string;
-}): { subject: string; html: string } {
-  const html = emailBase(
-    `
-    <div style="text-align:center;margin-bottom:20px;">
-      <span class="badge-warning" style="background:rgba(200,151,42,0.15);color:#C8972A;border:1px solid rgba(200,151,42,0.3);padding:6px 16px;border-radius:100px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">ACCOUNT NOTICE</span>
-    </div>
-
-    <h2>Account Status Update</h2>
-    <p>Hello ${firstName}, we're writing to inform you of an important update regarding your Bank of Asia Online account.</p>
-
-    <div class="card" style="border:1px solid rgba(239,68,68,0.3);">
-      <p style="color:#FCA5A5;margin:0;">${restrictionMessage}</p>
-    </div>
-
-    <p>Please contact our compliance team for assistance. We're here to help resolve this as quickly as possible.</p>
-
-    <div style="text-align:center;margin:24px 0;">
-      <a href="https://www.boasiaonline.com/contact" class="btn">Contact Support &rarr;</a>
-    </div>
-
-    <p style="font-size:13px;">You can also reach our compliance team directly at <a href="mailto:compliance@boasiaonline.com" style="color:#00C896;">compliance@boasiaonline.com</a></p>
-    `,
-    `Important notice regarding your Bank of Asia Online account.`
-  );
-  return {
-    subject: "Important Notice Regarding Your Bank of Asia Account",
-    html,
-  };
+  ticketId: string;
+  subject: string;
+  replyContent: string;
+  adminName: string;
+}): string {
+  return wrap(`
+<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 18px;margin-bottom:24px">
+<p style="color:#1e40af;font-size:13px;font-weight:600;margin:0;font-family:Arial,sans-serif">&#128233; New reply on your support ticket</p>
+</div>
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Support Team Reply</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, the Bank of Asia Online support team has replied to your ticket.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e4e4e7;border-radius:8px;margin-bottom:24px">
+<tr><td style="padding:20px 24px">
+${row("Ticket Reference", `<span style="font-family:'Courier New',Courier,monospace;font-size:12px;color:#1e40af">${d.ticketId}</span>`)}
+${row("Subject", d.subject, true)}
+</td></tr>
+</table>
+<div style="border:1px solid #e4e4e7;border-left:3px solid #0d1b3e;border-radius:0 8px 8px 0;padding:20px 24px;margin-bottom:28px">
+<p style="color:#a1a1aa;font-size:11px;letter-spacing:0.1em;margin:0 0 12px;font-family:Arial,sans-serif">REPLY FROM SUPPORT</p>
+<div style="color:#18181b;font-size:14px;line-height:1.8;white-space:pre-wrap;font-family:Arial,sans-serif">${d.replyContent}</div>
+<p style="color:#71717a;font-size:12px;margin:14px 0 0;font-family:Arial,sans-serif">&mdash; ${d.adminName}, Bank of Asia Online Support</p>
+</div>
+${ctaButton("View Full Conversation", `${SITE}/dashboard/support`)}`,
+    `Support has replied to your ticket ${d.ticketId}.`);
 }
 
-// ─── 7. Password Reset ───────────────────────────────────────────────────────
+// ─── 8. Password reset ────────────────────────────────────────────────────────
 
-export function passwordResetEmail({
-  firstName,
-  resetUrl,
-  expiresIn,
-}: {
+export function tmplPasswordReset(d: {
   firstName: string;
   resetUrl: string;
-  expiresIn: string;
-}): { subject: string; html: string } {
-  const html = emailBase(
-    `
-    <h2>Password Reset Request</h2>
-    <p>Hello ${firstName}, we received a request to reset the password for your Bank of Asia Online account.</p>
-
-    <div style="text-align:center;margin:28px 0;">
-      <a href="${resetUrl}" class="btn">Reset My Password &rarr;</a>
-    </div>
-
-    <p style="text-align:center;font-size:13px;color:#6B7280;">This link expires in ${expiresIn}.</p>
-
-    <div class="security-notice">
-      <p>If you didn&apos;t request a password reset, you can safely ignore this email &mdash; your account is safe and your password will not change.</p>
-    </div>
-
-    <p style="font-size:12px;color:#4B5563;word-break:break-all;">
-      If the button above doesn&apos;t work, copy and paste this URL into your browser:<br/>
-      <span style="color:#6B7280;">${resetUrl}</span>
-    </p>
-    `,
-    `Reset your Bank of Asia Online password.`
-  );
-  return {
-    subject: "Reset your Bank of Asia Online password",
-    html,
-  };
+}): string {
+  return wrap(`
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Password Reset Request</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.firstName}, we received a request to reset the password for your Bank of Asia Online account. Click the button below to set a new password.
+</p>
+${ctaButton("Reset My Password &rarr;", d.resetUrl)}
+<p style="color:#a1a1aa;font-size:12px;text-align:center;margin:-16px 0 24px;font-family:Arial,sans-serif">This link expires in 1 hour.</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e4e4e7;border-radius:8px;margin-bottom:20px">
+<tr><td style="padding:16px 20px">
+<p style="color:#71717a;font-size:13px;margin:0;line-height:1.7;font-family:Arial,sans-serif">If the button doesn't work, paste this URL into your browser:<br><span style="color:#00875a;font-size:12px;word-break:break-all">${d.resetUrl}</span></p>
+</td></tr>
+</table>
+${securityWarning("If you did not request a password reset, you can safely ignore this email. Your account remains secure.")}`,
+    `Password reset link for your Bank of Asia Online account.`);
 }
 
-// ─── 8. Contact Form (admin notification) ────────────────────────────────────
+// ─── 9. Contact form — admin notification ─────────────────────────────────────
 
-export function contactFormEmail({
-  name,
-  email,
-  phone,
-  subject,
-  message,
-}: {
+export function tmplContactAdmin(d: {
   name: string;
   email: string;
   phone?: string;
   subject: string;
   message: string;
-}): { subject: string; html: string } {
-  const submitted = new Date().toLocaleString("en-US", {
-    year: "numeric", month: "long", day: "numeric",
-    hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore",
-  });
+  timestamp: string;
+}): string {
+  return wrap(`
+<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 18px;margin-bottom:24px">
+<p style="color:#92400e;font-size:13px;font-weight:600;margin:0;font-family:Arial,sans-serif">&#128236; New contact form submission</p>
+</div>
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Contact Form Submission</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;font-family:Arial,sans-serif">A visitor has submitted the contact form on boasiaonline.com.</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e4e4e7;border-radius:8px;margin-bottom:24px">
+<tr><td style="padding:4px 20px">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+${row("Name", d.name)}
+${row("Email", `<a href="mailto:${d.email}" style="color:#00875a;text-decoration:none">${d.email}</a>`)}
+${row("Phone", d.phone ?? "Not provided")}
+${row("Subject", d.subject)}
+${row("Submitted", d.timestamp, true)}
+</table>
+</td></tr>
+</table>
+<div style="border:1px solid #e4e4e7;border-radius:8px;padding:20px 24px;margin-bottom:20px">
+<p style="color:#a1a1aa;font-size:11px;letter-spacing:0.1em;margin:0 0 12px;font-family:Arial,sans-serif">MESSAGE</p>
+<div style="color:#18181b;font-size:14px;line-height:1.8;white-space:pre-wrap;font-family:Arial,sans-serif">${d.message}</div>
+</div>
+<p style="color:#71717a;font-size:13px;margin:0;font-family:Arial,sans-serif">Reply to this email to respond directly to ${d.name} at ${d.email}.</p>`);
+}
 
-  const html = emailBase(
-    `
-    <h2>New Contact Submission</h2>
-    <p>A new message has been submitted via the Bank of Asia Online contact form.</p>
+// ─── 10. Contact form — sender confirmation ────────────────────────────────────
 
-    <div class="card">
-      <table class="detail-table">
-        <tr><td>Name</td><td>${name}</td></tr>
-        <tr><td>Email</td><td>${email}</td></tr>
-        ${phone ? `<tr><td>Phone</td><td>${phone}</td></tr>` : ""}
-        <tr><td>Subject</td><td>${subject}</td></tr>
-        <tr><td>Submitted</td><td>${submitted} SGT</td></tr>
-      </table>
-    </div>
+export function tmplContactConfirm(d: {
+  name: string;
+  subject: string;
+  preview: string;
+}): string {
+  return wrap(`
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">We received your message</h2>
+<p style="color:#71717a;margin:0 0 28px;font-size:14px;line-height:1.7;font-family:Arial,sans-serif">
+Hello ${d.name}, thank you for reaching out to Bank of Asia Online. Your message has been received and a member of our team will respond within 1&ndash;2 business days.
+</p>
+<div style="border:1px solid #e4e4e7;border-left:3px solid #0d1b3e;border-radius:0 8px 8px 0;padding:20px 24px;margin-bottom:28px">
+<p style="color:#a1a1aa;font-size:11px;letter-spacing:0.1em;margin:0 0 8px;font-family:Arial,sans-serif">YOUR MESSAGE</p>
+<p style="color:#18181b;font-size:14px;font-weight:600;margin:0 0 10px;font-family:Arial,sans-serif">${d.subject}</p>
+<p style="color:#71717a;font-size:13px;line-height:1.8;white-space:pre-wrap;margin:0;font-family:Arial,sans-serif">${d.preview}</p>
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e4e4e7;border-radius:8px;margin-bottom:28px">
+<tr><td style="padding:16px 20px">
+<p style="color:#71717a;font-size:13px;margin:0 0 8px;font-family:Arial,sans-serif">For urgent matters, contact us directly:</p>
+<p style="color:#18181b;font-size:13px;margin:0;font-family:Arial,sans-serif">&#9993; <a href="mailto:support@boasiaonline.com" style="color:#00875a;text-decoration:none">support@boasiaonline.com</a></p>
+</td></tr>
+</table>
+${ctaButton("Visit boasiaonline.com", SITE)}`,
+    `Your message has been received — we'll be in touch within 1–2 business days.`);
+}
 
-    <div class="card">
-      <p style="color:#E5E7EB;white-space:pre-wrap;margin:0;">${message}</p>
-    </div>
+// ─── Legacy exports ────────────────────────────────────────────────────────────
 
-    <div style="text-align:center;margin:24px 0;">
-      <a href="mailto:${email}" class="btn">Reply to ${name} &rarr;</a>
-    </div>
-    `,
-    `New contact form submission from ${name} — ${subject}`
-  );
+export function welcomePendingEmail(d: { firstName: string; email: string; accountNumber: string }) {
+  return { subject: "Welcome to Bank of Asia Online — Application Received", html: tmplRegistrationPending({ firstName: d.firstName, accountNumber: d.accountNumber, currency: "USD" }) };
+}
+
+export function accountActivatedEmail(d: { firstName: string; email: string; accountNumber: string; currency: string }) {
+  return { subject: "Your Bank of Asia Online Account is Now Active", html: tmplAccountActivated(d) };
+}
+
+export function transactionReceiptEmail(d: { firstName: string; amount: string; currency: string; type: string; reference: string; status: string; description?: string; date: string }) {
+  return { subject: `Transaction Receipt — ${d.reference}`, html: tmplTransaction({ firstName: d.firstName, reference: d.reference, amount: d.amount, currency: d.currency, type: d.type, status: d.status, description: d.description ?? "", date: d.date }) };
+}
+
+export function emailConfirmTransferEmail(d: { firstName: string; amount: string; currency: string; recipientName?: string; reference: string; confirmUrl: string; cancelUrl: string; expiresAt: string }) {
+  return { subject: "Action Required — Confirm Your Transfer", html: tmplConfirmTransfer(d) };
+}
+
+export function transferTokenEmail(d: { firstName: string; token: string; expiresAt: string }) {
+  return { subject: "Your Bank of Asia Transfer Security Token", html: tmplTransferToken(d) };
+}
+
+export function accountRestrictedEmail(d: { firstName: string; restrictionMessage: string }) {
   return {
-    subject: `New Contact Form Submission — ${subject}`,
-    html,
+    subject: "Important: Your Bank of Asia Online Account Status",
+    html: wrap(`
+<h2 style="color:#18181b;margin:0 0 8px;font-size:22px;font-weight:700;font-family:Arial,sans-serif">Account Status Update</h2>
+<p style="color:#71717a;margin:0 0 24px;font-size:14px;font-family:Arial,sans-serif">Hello ${d.firstName},</p>
+<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:20px 24px;margin-bottom:24px">
+<p style="color:#991b1b;font-size:14px;line-height:1.7;margin:0;font-family:Arial,sans-serif">${d.restrictionMessage}</p>
+</div>
+<p style="color:#71717a;font-size:13px;margin:0;font-family:Arial,sans-serif">If you have questions, contact <a href="mailto:support@boasiaonline.com" style="color:#00875a;text-decoration:none">support@boasiaonline.com</a>.</p>`),
   };
 }
 
-// ─── 8b. Contact Form (user confirmation) ────────────────────────────────────
+export function passwordResetEmail(d: { firstName: string; resetUrl: string; expiresIn?: string }) {
+  return { subject: "Reset Your Bank of Asia Online Password", html: tmplPasswordReset(d) };
+}
 
-export function contactConfirmationEmail({
-  name,
-  subject,
-}: {
-  name: string;
-  subject: string;
-}): { subject: string; html: string } {
-  const html = emailBase(
-    `
-    <h1>We received your message.</h1>
-    <p>Hi ${name}, thank you for reaching out to Bank of Asia Online.</p>
+export function contactFormEmail(d: { name: string; email: string; phone?: string; subject: string; message: string }) {
+  return {
+    subject: `New Contact: ${d.subject} — from ${d.name}`,
+    html: tmplContactAdmin({ ...d, timestamp: new Date().toLocaleString("en-SG", { dateStyle: "full", timeStyle: "short" }) }),
+  };
+}
 
-    <div class="card">
-      <p style="margin:0;"><span style="color:#9CA3AF;">Your enquiry about:</span> <span class="highlight">${subject}</span><br/>
-      <span style="color:#9CA3AF;">Status:</span> <span class="badge-success" style="background:rgba(0,200,150,0.15);color:#00C896;border:1px solid rgba(0,200,150,0.3);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">RECEIVED</span></p>
-    </div>
-
-    <p>Our support team will review your message and respond within 24 hours during business hours (Mon–Fri, 8 am–8 pm SGT).</p>
-
-    <p>For urgent matters, call us at <span class="highlight">+65 6000 0000</span> or email <a href="mailto:security@boasiaonline.com" style="color:#00C896;">security@boasiaonline.com</a> for security emergencies.</p>
-    `,
-    `We received your message — Bank of Asia Online will respond within 24 hours.`
-  );
+export function contactConfirmationEmail(d: { name: string; subject: string }) {
   return {
     subject: "We received your message — Bank of Asia Online",
-    html,
+    html: tmplContactConfirm({ name: d.name, subject: d.subject, preview: "" }),
   };
 }

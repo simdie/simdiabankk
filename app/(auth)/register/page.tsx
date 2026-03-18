@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
@@ -11,6 +12,17 @@ const CURRENCIES = ["USD", "EUR", "GBP", "SGD", "CAD", "AUD", "CHF", "JPY", "CNY
 const STEPS = ["Personal", "Account", "Identity", "Address", "Security", "Review"];
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.code, label: c.name, flag: c.flag }));
 const NATIONALITY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name, flag: c.flag }));
+
+const SECURITY_QUESTIONS = [
+  "What was the name of your first pet?",
+  "What city were you born in?",
+  "What is your mother's maiden name?",
+  "What was the name of your primary school?",
+  "What was your childhood nickname?",
+  "What is the name of your favourite teacher?",
+  "What was the make of your first car?",
+  "What is your oldest sibling's middle name?",
+];
 
 interface FormData {
   // Step 0
@@ -36,6 +48,8 @@ interface FormData {
   // Step 4
   password: string;
   confirmPassword: string;
+  securityQuestion: string;
+  securityAnswer: string;
   agreeTerms: boolean;
 }
 
@@ -256,7 +270,9 @@ export default function RegisterPage() {
     email: "", currency: "USD",
     dateOfBirth: "", gender: "", nationality: "", idType: "", idNumber: "",
     addressLine1: "", addressLine2: "", city: "", state: "", zipCode: "", country: "US",
-    password: "", confirmPassword: "", agreeTerms: false,
+    password: "", confirmPassword: "",
+    securityQuestion: SECURITY_QUESTIONS[0], securityAnswer: "",
+    agreeTerms: false,
   });
 
   const set = (key: keyof FormData, val: string | boolean) => {
@@ -288,6 +304,8 @@ export default function RegisterPage() {
       else if (!/[0-9]/.test(form.password)) e.password = "Must have number";
       else if (!/[^A-Za-z0-9]/.test(form.password)) e.password = "Must have symbol";
       if (form.password !== form.confirmPassword) e.confirmPassword = "Passwords do not match";
+      if (!form.securityQuestion) e.securityQuestion = "Please select a security question";
+      if (!form.securityAnswer.trim() || form.securityAnswer.trim().length < 3) e.securityAnswer = "Answer must be at least 3 characters";
     }
     if (step === 5 && !form.agreeTerms) e.agreeTerms = "You must agree to the terms";
     setErrors(e);
@@ -323,6 +341,8 @@ export default function RegisterPage() {
           country: form.country || undefined,
           idType: form.idType || undefined,
           idNumber: form.idNumber || undefined,
+          securityQuestion: form.securityQuestion || undefined,
+          securityAnswer: form.securityAnswer || undefined,
         }),
       });
       const data = await res.json();
@@ -392,10 +412,32 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex overflow-hidden" style={{ background: "var(--color-nexus-950)" }}>
+    <div className="min-h-screen flex flex-col lg:flex-row overflow-hidden" style={{ background: "var(--color-nexus-950)" }}>
       <div className="fixed inset-0 z-0">
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 50% at 30% 50%, rgba(0,212,255,0.07) 0%, transparent 60%), radial-gradient(ellipse 50% 70% at 80% 30%, rgba(100,40,180,0.07) 0%, transparent 60%)" }} />
         <div className="nexus-grid" />
+      </div>
+
+      {/* Mobile header — hidden on desktop */}
+      <div className="lg:hidden flex flex-col items-center relative z-10" style={{ background: "#0a1628", padding: "28px 24px 24px", width: "100%" }}>
+        <Image
+          src="/logo-dark-bg.png"
+          alt="Bank of Asia Online"
+          width={160}
+          height={52}
+          style={{ objectFit: "contain", display: "block", marginBottom: 10 }}
+          priority
+        />
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 14px", textAlign: "center" }}>
+          Open Your Account
+        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+          {["🔒 SSL Secured", "⚡ Instant", "🌏 Global"].map((t) => (
+            <span key={t} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 100, padding: "4px 12px", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>
+              {t}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* Left — Card Preview */}
@@ -423,7 +465,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right — Form */}
-      <div className="relative z-10 flex items-center justify-center" style={{ flex: 1, padding: "40px 32px", background: "rgba(3,5,10,0.5)", borderLeft: "1px solid rgba(255,255,255,0.04)", overflowY: "auto" }}>
+      <div className="relative z-10 flex items-start lg:items-center justify-center" style={{ flex: 1, padding: "28px 24px 40px", background: "rgba(3,5,10,0.5)", borderLeft: "1px solid rgba(255,255,255,0.04)", overflowY: "auto" }}>
         <div style={{ width: "100%", maxWidth: 480, padding: "20px 0" }}>
           <div style={{ marginBottom: 24 }}>
             <h2 style={{ fontFamily: "var(--font-syne)", fontSize: 26, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 6 }}>
@@ -436,7 +478,7 @@ export default function RegisterPage() {
 
           <StepIndicator current={step} steps={STEPS} />
 
-          <div className="animate-fade-slide-up" key={step}>
+          <div className="animate-fade-slide-up" key={step} style={{ position: "relative", zIndex: 10 }}>
 
             {/* ── STEP 0: Personal ── */}
             {step === 0 && (
@@ -612,6 +654,35 @@ export default function RegisterPage() {
                   )}
                   {errors.confirmPassword && <FieldError msg={errors.confirmPassword} />}
                 </div>
+
+                {/* Security Question */}
+                <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 16 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--color-accent)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}>Security Question</div>
+                  <p style={{ fontSize: 12, color: "var(--color-text-muted)", marginBottom: 14, lineHeight: 1.5 }}>
+                    Used to verify your identity when resetting your password.
+                  </p>
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={labelStyle}>Security Question *</label>
+                    <Select
+                      options={SECURITY_QUESTIONS.map((q) => ({ value: q, label: q }))}
+                      value={form.securityQuestion}
+                      onChange={(v) => set("securityQuestion", v)}
+                    />
+                    {errors.securityQuestion && <FieldError msg={errors.securityQuestion} />}
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Your Answer *</label>
+                    <input
+                      type="text"
+                      className="input-nexus"
+                      placeholder="Your answer (case-insensitive)"
+                      value={form.securityAnswer}
+                      onChange={(e) => set("securityAnswer", e.target.value)}
+                      minLength={3}
+                    />
+                    {errors.securityAnswer && <FieldError msg={errors.securityAnswer} />}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -632,10 +703,11 @@ export default function RegisterPage() {
                     ...(form.country ? [["Country", COUNTRY_OPTIONS.find((c) => c.value === form.country)?.label ?? form.country]] : []),
                     ...(form.idType ? [["ID Type", form.idType.replace(/_/g, " ")]] : []),
                     ["Password", "✓ Set"],
+                    ["Security Question", form.securityQuestion ? "✓ Set" : "—"],
                   ].map(([label, value]) => (
                     <div key={label} style={{ display: "flex", justifyContent: "space-between", paddingBottom: 8, marginBottom: 8, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                       <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{label}</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: label === "Password" ? "var(--color-success)" : "var(--color-text-primary)", textAlign: "right", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis" }}>{value}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: (label === "Password" || label === "Security Question") ? "var(--color-success)" : "var(--color-text-primary)", textAlign: "right", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis" }}>{value}</span>
                     </div>
                   ))}
                 </div>
@@ -658,7 +730,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Navigation */}
-          <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+          <div style={{ display: "flex", gap: 12, marginTop: 24, position: "relative", zIndex: 1 }}>
             {step > 0 && (
               <button type="button" onClick={() => setStep((s) => s - 1)} className="btn-ghost" style={{ flex: 1 }} disabled={loading}>
                 ← Back

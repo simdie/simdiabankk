@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { generateTicketNumber } from "@/lib/ticket";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -21,15 +22,18 @@ export async function POST(req: NextRequest) {
   });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+  const ticketId = generateTicketNumber();
+
   const supportMsg = await prisma.supportMessage.create({
     data: {
       userId: session.user.id,
+      ticketId,
       subject: body.subject,
       category: body.category || "General Inquiry",
       priority: body.priority || "NORMAL",
       message: body.message,
       reference: body.reference || null,
-      status: "SENT",
+      status: "OPEN",
     },
   });
 
@@ -53,5 +57,5 @@ export async function POST(req: NextRequest) {
     sendEmail(adminEmail, `[Support] ${body.subject} — ${user.firstName} ${user.lastName}`, html).catch(() => {});
   }
 
-  return NextResponse.json({ message: supportMsg }, { status: 201 });
+  return NextResponse.json({ message: { ...supportMsg, replies: [] } }, { status: 201 });
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Pencil } from "lucide-react";
 import { CURRENCY_FLAGS, formatAmount } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import DatePicker from "@/components/ui/DatePicker";
@@ -24,6 +25,88 @@ const TYPE_COLORS: Record<string, string> = {
   WIRE_TRANSFER: "#a78bfa",
   ADMIN_DEPOSIT: "#00e5a0",
 };
+
+function EditModal({ tx, onClose, onSuccess }: { tx: Tx; onClose: () => void; onSuccess: (updated: Tx) => void }) {
+  const [newStatus, setNewStatus] = useState(tx.status);
+  const [description, setDescription] = useState(tx.description ?? "");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const hasChanges = newStatus !== tx.status || description !== (tx.description ?? "");
+
+  async function handleSave() {
+    setSubmitting(true); setError("");
+    try {
+      const body: any = {};
+      if (newStatus !== tx.status) body.status = newStatus;
+      if (description !== (tx.description ?? "")) body.description = description;
+      const res = await fetch(`/api/admin/transactions/${tx.id}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Update failed"); return; }
+      onSuccess({ ...tx, status: data.transaction.status, description: data.transaction.description });
+    } finally { setSubmitting(false); }
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: "#0d1a30", border: "1px solid rgba(240,180,41,0.2)", borderRadius: 16, padding: "28px 24px", maxWidth: 480, width: "90%" }}>
+        <h3 style={{ fontFamily: "var(--font-syne)", fontSize: 18, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 6 }}>Edit Transaction</h3>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 12, marginBottom: 20 }}>
+          Ref: <span style={{ fontFamily: "var(--font-jetbrains-mono)", color: "var(--color-accent)" }}>{tx.reference}</span>
+        </p>
+        {/* Read-only info */}
+        <div style={{ padding: "14px 16px", borderRadius: 10, background: "rgba(0,0,0,0.3)", marginBottom: 20, display: "flex", flexDirection: "column", gap: 8 }}>
+          {[
+            ["Type", tx.type.replace(/_/g, " ")],
+            ["Amount", formatAmount(tx.amount, tx.currency)],
+            ["Date", new Date(tx.createdAt).toLocaleString()],
+          ].map(([l, v]) => (
+            <div key={l} style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{l}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-primary)" }}>{v}</span>
+            </div>
+          ))}
+        </div>
+        {/* Status */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", marginBottom: 7, letterSpacing: "0.06em", textTransform: "uppercase" }}>Status</label>
+          <Select
+            value={newStatus}
+            onChange={(v) => setNewStatus(v)}
+            options={["COMPLETED", "FAILED", "PENDING", "AWAITING_CONFIRMATION"].map((s) => ({ value: s, label: s }))}
+          />
+        </div>
+        {/* Description */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", marginBottom: 7, letterSpacing: "0.06em", textTransform: "uppercase" }}>Description</label>
+          <textarea
+            className="input-nexus"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={3}
+            style={{ resize: "vertical", width: "100%", boxSizing: "border-box" }}
+            placeholder="Transaction description…"
+          />
+        </div>
+        {/* Warning */}
+        <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B", fontSize: 12, marginBottom: 16 }}>
+          ⚠ Changes are permanent and will be logged in the audit trail.
+        </div>
+        {error && <div style={{ padding: "10px 14px", borderRadius: 8, background: "rgba(255,59,92,0.08)", border: "1px solid rgba(255,59,92,0.2)", color: "var(--color-danger)", fontSize: 13, marginBottom: 14 }}>{error}</div>}
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1 }}>Cancel</button>
+          <button onClick={handleSave} disabled={submitting || !hasChanges}
+            style={{ flex: 1, padding: "11px", borderRadius: 10, border: "none", cursor: "pointer", background: `linear-gradient(135deg, ${G}, #d4991f)`, color: "#03050a", fontWeight: 800, fontSize: 14, opacity: !hasChanges ? 0.4 : 1 }}>
+            {submitting ? "Saving…" : "Save Changes"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function OverrideModal({ tx, onClose, onSuccess }: { tx: Tx; onClose: () => void; onSuccess: () => void }) {
   const [newStatus, setNewStatus] = useState(tx.status);
@@ -128,6 +211,7 @@ export default function AdminTransactionsClient() {
   const [bulkSubmitting, setBulkSubmitting] = useState(false);
 
   const [overrideTx, setOverrideTx] = useState<Tx | null>(null);
+  const [editTx, setEditTx] = useState<Tx | null>(null);
   const [detailTx, setDetailTx] = useState<Tx | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -308,9 +392,14 @@ export default function AdminTransactionsClient() {
                     {new Date(tx.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </td>
                   <td>
-                    <button onClick={() => setOverrideTx(tx)} style={{ fontSize: 11, fontWeight: 700, color: G, background: "rgba(240,180,41,0.08)", border: "1px solid rgba(240,180,41,0.2)", padding: "4px 10px", borderRadius: 6, cursor: "pointer" }}>
-                      Override
-                    </button>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <button onClick={() => setEditTx(tx)} title="Edit transaction" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "var(--color-accent)", cursor: "pointer" }}>
+                        <Pencil size={12} strokeWidth={2.2} />
+                      </button>
+                      <button onClick={() => setOverrideTx(tx)} style={{ fontSize: 11, fontWeight: 700, color: G, background: "rgba(240,180,41,0.08)", border: "1px solid rgba(240,180,41,0.2)", padding: "4px 10px", borderRadius: 6, cursor: "pointer" }}>
+                        Override
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -379,6 +468,9 @@ export default function AdminTransactionsClient() {
           <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page === pages} className="btn-ghost" style={{ padding: "7px 16px" }}>Next →</button>
         </div>
       )}
+
+      {/* Edit modal */}
+      {editTx && <EditModal tx={editTx} onClose={() => setEditTx(null)} onSuccess={(updated) => { setTxs((prev) => prev.map((t) => t.id === updated.id ? updated : t)); setEditTx(null); }} />}
 
       {/* Override modal */}
       {overrideTx && <OverrideModal tx={overrideTx} onClose={() => setOverrideTx(null)} onSuccess={() => { setOverrideTx(null); setRefreshKey((k) => k + 1); }} />}

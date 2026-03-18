@@ -11,6 +11,7 @@ export default async function AdminMessagesPage() {
     orderBy: { createdAt: "desc" },
     include: {
       user: { select: { id: true, firstName: true, lastName: true, email: true } },
+      replies: { orderBy: { createdAt: "asc" } },
     },
   });
 

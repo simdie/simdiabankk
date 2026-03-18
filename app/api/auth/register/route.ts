@@ -3,7 +3,8 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations";
 import { generateAccountNumber } from "@/lib/utils";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email/send";
+import { tmplRegistrationPending } from "@/lib/email/templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
       dateOfBirth, gender, nationality,
       addressLine1, addressLine2, city, state, zipCode, country,
       idType, idNumber,
+      securityQuestion, securityAnswer,
     } = parsed.data;
 
     // Check email uniqueness
@@ -34,6 +36,9 @@ export async function POST(req: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
+    const securityAnswerHash = securityAnswer
+      ? await bcrypt.hash(securityAnswer.toLowerCase().trim(), 10)
+      : null;
 
     // Generate unique account number
     const accountNumber = await generateAccountNumber(
@@ -68,6 +73,8 @@ export async function POST(req: NextRequest) {
           country: country || null,
           idType: idType || null,
           idNumber: idNumber || null,
+          securityQuestion: securityQuestion || null,
+          securityAnswer: securityAnswerHash,
         },
       });
 
@@ -93,8 +100,12 @@ export async function POST(req: NextRequest) {
       return newUser;
     });
 
-    // Send welcome email (non-blocking)
-    sendWelcomeEmail(email, firstName, accountNumber).catch(console.error);
+    // Send registration email
+    await sendEmail({
+      to: email,
+      subject: "Welcome to Bank of Asia Online — Application Received",
+      html: tmplRegistrationPending({ firstName, accountNumber, currency }),
+    });
 
     return NextResponse.json(
       {

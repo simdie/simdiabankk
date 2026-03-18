@@ -937,16 +937,19 @@ export default function CardsPage() {
       </section>
 
       {/* Banner image */}
-      <section style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
-        <Image
-          key="banner-image6-v2"
-          src="/banner-image6.png"
-          alt="Bank of Asia virtual cards"
-          width={1920}
-          height={600}
-          style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block" }}
-          priority={false}
-        />
+      <section data-protected="true" style={{ marginTop: "clamp(48px, 6vw, 80px)", marginBottom: "clamp(48px, 6vw, 80px)", overflow: "hidden", width: "100%" }}>
+        <div className="protected-image" onContextMenu={e => e.preventDefault()} style={{ position: "relative", overflow: "hidden", filter: "contrast(1.01) saturate(0.99)" }}>
+          <Image
+            key="banner-image6-v2"
+            src="/banner-image6.png"
+            alt="Bank of Asia virtual cards"
+            width={1920}
+            height={600}
+            draggable={false}
+            style={{ width: "100%", height: "clamp(220px, 28vw, 420px)", objectFit: "cover", objectPosition: "center", display: "block", transform: "scaleX(1.001)", userSelect: "none", WebkitUserSelect: "none" }}
+            priority={false}
+          />
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════

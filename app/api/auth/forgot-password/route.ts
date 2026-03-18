@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email/send";
+import { tmplPasswordReset } from "@/lib/email/templates";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -29,7 +30,11 @@ export async function POST(req: NextRequest) {
 
     let emailError: string | null = null;
     try {
-      await sendPasswordResetEmail(email, user.firstName, resetUrl);
+      await sendEmail({
+        to: email,
+        subject: "Reset Your Bank of Asia Online Password",
+        html: tmplPasswordReset({ firstName: user.firstName, resetUrl }),
+      });
     } catch (emailErr: any) {
       console.error("[FORGOT_PASSWORD] Email send failed:", emailErr);
       emailError = emailErr?.message || "Email delivery failed";

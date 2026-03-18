@@ -18,6 +18,7 @@ export default async function SupportPage() {
     where: { userId: session.user.id },
     orderBy: { createdAt: "desc" },
     take: 20,
+    include: { replies: { orderBy: { createdAt: "asc" } } },
   });
 
   return (

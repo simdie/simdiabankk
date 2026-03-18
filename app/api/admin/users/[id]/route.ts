@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { sendActivationEmail, sendRestrictionEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email/send";
+import { tmplAccountActivated, accountRestrictedEmail } from "@/lib/email/templates";
 
 export async function GET(
   req: NextRequest,
@@ -136,18 +137,72 @@ export async function PATCH(
     },
   });
 
-  // Send status-change emails (non-blocking)
-  if (body.status) {
-    prisma.user.findUnique({ where: { id }, select: { email: true, firstName: true, accounts: { select: { accountNumber: true, currency: true }, take: 1 } } }).then((u) => {
-      if (!u) return;
+  // Send status-change emails
+  if (body.status === "ACTIVE" || body.status === "RESTRICTED" || body.status === "DISABLED" || body.status === "SUSPENDED") {
+    const u = await prisma.user.findUnique({
+      where: { id },
+      select: { email: true, firstName: true, accounts: { select: { accountNumber: true, currency: true }, take: 1 } },
+    });
+    if (u) {
       if (body.status === "ACTIVE") {
         const acc = u.accounts[0];
-        sendActivationEmail(u.email, u.firstName, acc?.accountNumber ?? "", acc?.currency ?? "SGD").catch(console.error);
-      } else if (body.status === "RESTRICTED" || body.status === "DISABLED" || body.status === "SUSPENDED") {
-        sendRestrictionEmail(u.email, u.firstName, body.adminNotes ?? undefined).catch(console.error);
+        await sendEmail({
+          to: u.email,
+          subject: "✓ Your Bank of Asia Online Account is Now Active",
+          html: tmplAccountActivated({ firstName: u.firstName, accountNumber: acc?.accountNumber ?? "N/A", currency: acc?.currency ?? "USD" }),
+        });
+      } else {
+        const { html, subject } = accountRestrictedEmail({ firstName: u.firstName, restrictionMessage: body.adminNotes ?? "Your account status has been updated. Please contact support for more information." });
+        await sendEmail({ to: u.email, subject, html });
       }
-    }).catch(console.error);
+    }
   }
 
   return NextResponse.json({ success: true, user: updated });
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session?.user || (session.user as any).role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  if (id === session.user.id) {
+    return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
+  }
+
+  try {
+    await prisma.auditLog.deleteMany({ where: { userId: id } });
+    await prisma.transaction.deleteMany({
+      where: {
+        OR: [
+          { senderAccount: { userId: id } },
+          { receiverAccount: { userId: id } },
+        ],
+      },
+    });
+    await prisma.virtualCard.deleteMany({ where: { account: { userId: id } } });
+    await prisma.account.deleteMany({ where: { userId: id } });
+    await prisma.user.delete({ where: { id } });
+
+    await prisma.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "USER_DELETED",
+        target: id,
+        details: { deletedBy: session.user.id } as any,
+        ipAddress: req.headers.get("x-forwarded-for") || null,
+      },
+    }).catch(() => {});
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE_USER]", err);
+    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
+  }
 }

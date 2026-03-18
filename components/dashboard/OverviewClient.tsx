@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { CURRENCY_FLAGS, formatAmount } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { LiveClock } from "@/components/dashboard/LiveClock";
 
 interface Account {
   id: string; accountNumber: string; currency: string;
@@ -211,17 +212,27 @@ export default function OverviewClient({ user, accounts, recentTxs, stats }: Pro
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
 
-      {/* ── Greeting ── */}
-      <div className="animate-fade-slide-up">
-        <h1 style={{
-          fontFamily: "var(--font-syne)", fontSize: 26, fontWeight: 700,
-          color: "var(--color-text-primary)", marginBottom: 4,
-        }}>
-          {getGreeting()}, {user.firstName} 👋
-        </h1>
-        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
-          Here&apos;s your financial overview for today.
-        </p>
+      {/* ── Greeting + Clock ── */}
+      <div className="animate-fade-slide-up" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <h1 style={{
+            fontFamily: "var(--font-syne)", fontSize: 26, fontWeight: 700,
+            color: "var(--color-text-primary)", marginBottom: 4,
+          }}>
+            {getGreeting()}, {user.firstName} 👋
+          </h1>
+          <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
+            Here&apos;s your financial overview for today.
+          </p>
+          {/* Compact clock — mobile only */}
+          <div className="live-clock-mobile">
+            <LiveClock compact />
+          </div>
+        </div>
+        {/* Full clock — desktop only */}
+        <div className="live-clock-desktop">
+          <LiveClock />
+        </div>
       </div>
 
       {/* ── Hero balance card ── */}

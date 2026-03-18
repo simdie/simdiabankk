@@ -37,11 +37,23 @@ export async function POST(req: NextRequest) {
 
     const publicUrl = `/uploads/id-docs/${filename}`;
 
-    // Update user record with the document path
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { idDocument: publicUrl },
-    });
+    // Update user record with the document path and create Document record
+    await Promise.all([
+      prisma.user.update({
+        where: { id: session.user.id },
+        data: { idDocument: publicUrl },
+      }),
+      prisma.document.create({
+        data: {
+          userId: session.user.id,
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          fileUrl: publicUrl,
+          documentType: "Identity Document",
+        },
+      }),
+    ]);
 
     return NextResponse.json({ success: true, url: publicUrl });
   } catch (err) {
