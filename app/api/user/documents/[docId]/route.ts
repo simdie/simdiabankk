@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { unlink } from "fs/promises";
-import { join } from "path";
+import { del } from "@vercel/blob";
 
 export async function DELETE(
   req: NextRequest,
@@ -24,11 +23,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Document not found" }, { status: 404 });
     }
 
-    try {
-      const filePath = join(process.cwd(), "public", doc.fileUrl);
-      await unlink(filePath);
-    } catch {
-      // File may already be missing
+    // Delete from Vercel Blob if stored there
+    if (doc.fileUrl.includes("blob.vercel-storage.com")) {
+      try { await del(doc.fileUrl); } catch { /* non-fatal */ }
     }
 
     await prisma.document.delete({ where: { id: docId } });

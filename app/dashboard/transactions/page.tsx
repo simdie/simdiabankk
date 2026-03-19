@@ -35,6 +35,9 @@ export default async function TransactionsPage() {
       transactions={transactions.map((t) => ({
         ...t,
         amount: Number(t.amount),
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt?.toISOString() ?? null,
+        emailConfirmedAt: t.emailConfirmedAt?.toISOString() ?? null,
         externalDetails: t.externalDetails as Record<string, string> | null,
       }))}
       userId={session.user.id}

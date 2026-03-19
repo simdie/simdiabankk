@@ -10,7 +10,8 @@ interface Account { id: string; accountNumber: string; currency: string; balance
 interface Transaction {
   id: string; reference: string; type: string; status: string;
   amount: number; currency: string; description: string | null;
-  createdAt: Date; updatedAt: Date;
+  createdAt: Date | string; updatedAt: Date | string | null;
+  emailConfirmedAt?: Date | string | null;
   senderAccount: { accountNumber: string; currency: string; user: { firstName: string; lastName: string } } | null;
   receiverAccount: { accountNumber: string; currency: string; user: { firstName: string; lastName: string } } | null;
   externalDetails: Record<string, string> | null;

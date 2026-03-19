@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import Select from "@/components/ui/Select";
 import { formatAmount } from "@/lib/utils";
@@ -8,7 +8,8 @@ import { formatAmount } from "@/lib/utils";
 interface Tx {
   id: string; reference: string; type: string; status: string;
   amount: number; currency: string; description: string | null;
-  createdAt: Date; updatedAt: Date;
+  createdAt: Date | string; updatedAt: Date | string | null;
+  emailConfirmedAt?: Date | string | null;
   senderAccount: { accountNumber: string; currency: string; userId: string } | null;
   receiverAccount: { accountNumber: string; currency: string; userId: string } | null;
   externalDetails: Record<string, string> | null;
@@ -182,8 +183,8 @@ export default function TransactionsClient({ transactions, userId }: { transacti
                 const isExpanded = expanded === tx.id;
 
                 return (
-                  <>
-                    <tr key={tx.id} style={{ cursor: "pointer" }} onClick={() => setExpanded(isExpanded ? null : tx.id)}>
+                  <React.Fragment key={tx.id}>
+                    <tr style={{ cursor: "pointer" }} onClick={() => setExpanded(isExpanded ? null : tx.id)}>
                       <td>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <div style={{
@@ -275,7 +276,7 @@ export default function TransactionsClient({ transactions, userId }: { transacti
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>

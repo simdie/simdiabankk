@@ -31,10 +31,18 @@ export default async function StatementsPage() {
 
   return (
     <StatementsClient
-      accounts={accounts.map(a => ({ ...a, balance: Number(a.balance) }))}
+      accounts={accounts.map(a => ({
+        ...a,
+        balance: Number(a.balance),
+        createdAt: (a as any).createdAt?.toISOString?.() ?? null,
+        updatedAt: (a as any).updatedAt?.toISOString?.() ?? null,
+      }))}
       transactions={transactions.map(t => ({
         ...t,
         amount: Number(t.amount),
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt?.toISOString() ?? null,
+        emailConfirmedAt: t.emailConfirmedAt?.toISOString() ?? null,
         externalDetails: t.externalDetails as Record<string, string> | null,
       }))}
       userId={session.user.id}

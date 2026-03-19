@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import path from "path";
-import fs from "fs/promises";
+import { put } from "@vercel/blob";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -26,22 +25,19 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save to public/uploads/id-docs/
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "id-docs");
-    await fs.mkdir(uploadsDir, { recursive: true });
-
     const ext = file.name.split(".").pop() || "jpg";
     const filename = `${session.user.id}-id-${Date.now()}.${ext}`;
-    const filepath = path.join(uploadsDir, filename);
-    await fs.writeFile(filepath, buffer);
 
-    const publicUrl = `/uploads/id-docs/${filename}`;
+    const blob = await put(`documents/${session.user.id}/${filename}`, buffer, {
+      access: "public",
+      contentType: file.type,
+    });
+    const fileUrl = blob.url;
 
-    // Update user record with the document path and create Document record
     await Promise.all([
       prisma.user.update({
         where: { id: session.user.id },
-        data: { idDocument: publicUrl },
+        data: { idDocument: fileUrl },
       }),
       prisma.document.create({
         data: {
@@ -49,13 +45,13 @@ export async function POST(req: NextRequest) {
           fileName: file.name,
           fileType: file.type,
           fileSize: file.size,
-          fileUrl: publicUrl,
+          fileUrl,
           documentType: "Identity Document",
         },
       }),
     ]);
 
-    return NextResponse.json({ success: true, url: publicUrl });
+    return NextResponse.json({ success: true, url: fileUrl });
   } catch (err) {
     console.error("[UPLOAD_ID]", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
