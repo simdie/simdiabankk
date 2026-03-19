@@ -21,7 +21,7 @@ export default async function TransferPage() {
     }),
   ]);
 
-  const requiresTokenForTransfers = settings?.requireTokenForTransfers ?? false;
+  const globalRequiresToken = settings?.requireTokenForTransfers ?? false;
   const hasValidToken = !!(
     user?.transferToken &&
     user?.transferTokenExp &&
@@ -31,7 +31,7 @@ export default async function TransferPage() {
   return (
     <TransferClient
       accounts={accounts.map((a) => ({ ...a, balance: Number(a.balance) }))}
-      requiresTokenForTransfers={requiresTokenForTransfers}
+      requiresTokenForTransfers={globalRequiresToken || hasValidToken}
       hasValidToken={hasValidToken}
     />
   );

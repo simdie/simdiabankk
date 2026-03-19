@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { generateToken } from "@/lib/utils";
-import { z } from "zod";
 import { sendEmail } from "@/lib/email/send";
 import { tmplTransferToken } from "@/lib/email/templates";
 
@@ -25,7 +23,7 @@ export async function POST(
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const token = generateToken(16); // 32-char hex
+  const token = Math.floor(10000000 + Math.random() * 90000000).toString();
   const exp = new Date(Date.now() + hours * 3600 * 1000);
 
   await prisma.user.update({

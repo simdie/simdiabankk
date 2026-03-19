@@ -23,14 +23,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // For blocked/restricted accounts, return blocked flag (200) so the
-    // caller falls through to signIn() which returns the proper blocked message.
-    if (
-      user.status === "DISABLED" ||
-      user.status === "RESTRICTED" ||
-      user.status === "PENDING_ACTIVATION"
-    ) {
-      return NextResponse.json({ blocked: true });
+    // For blocked/restricted accounts, return the message directly so the
+    // login page can show the blocked modal without relying on NextAuth error wrapping.
+    if (user.status === "DISABLED" || user.status === "RESTRICTED") {
+      return NextResponse.json({
+        blocked: true,
+        message: user.restrictionMessage || "YOUR ACCOUNT HAS BEEN BLOCKED. PLEASE CONTACT CUSTOMER CARE FOR SUPPORT.",
+      });
+    }
+    if (user.status === "PENDING_ACTIVATION") {
+      return NextResponse.json({
+        blocked: true,
+        message: "Your account is pending activation. Our team will notify you by email once verified.",
+      });
     }
 
     // Verify password

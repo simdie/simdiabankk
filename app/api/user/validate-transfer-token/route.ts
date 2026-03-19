@@ -5,22 +5,37 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return Response.json({ valid: false });
+    }
+
+    const { token } = await req.json();
+
+    if (!token) {
+      return Response.json({ valid: false });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { transferToken: true, transferTokenExp: true },
+    });
+
+    const now = new Date();
+    const tokenMatches = user?.transferToken === token.trim();
+    const notExpired = !!(user?.transferTokenExp && new Date(user.transferTokenExp) > now);
+
+    console.log("[VALIDATE TOKEN]", {
+      provided: token,
+      stored: user?.transferToken,
+      matches: tokenMatches,
+      expired: !notExpired,
+    });
+
+    return Response.json({ valid: !!(tokenMatches && notExpired) });
+  } catch (error: any) {
+    console.error("Validate token error:", error);
     return Response.json({ valid: false });
   }
-
-  const { token } = await req.json();
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { transferToken: true, transferTokenExp: true },
-  });
-
-  const isValid =
-    user?.transferToken === token &&
-    user?.transferTokenExp &&
-    new Date(user.transferTokenExp) > new Date();
-
-  return Response.json({ valid: !!isValid });
 }

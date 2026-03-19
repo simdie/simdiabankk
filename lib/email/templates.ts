@@ -278,7 +278,7 @@ Hello ${d.firstName}, your administrator has issued a one-time transfer authoris
 </p>
 <div style="background:#f0fdf9;border:1px solid #d1fae5;border-radius:8px;padding:28px;text-align:center;margin-bottom:24px">
 <p style="color:#6b7280;font-size:11px;letter-spacing:0.1em;margin:0 0 14px;font-family:Arial,sans-serif">YOUR TRANSFER TOKEN</p>
-<div style="font-family:'Courier New',Courier,monospace;font-size:22px;font-weight:700;color:#064e3b;letter-spacing:0.25em;padding:16px 20px;background:#ffffff;border:1px solid #d1fae5;border-radius:6px;display:inline-block;word-break:break-all">${d.token}</div>
+<div style="font-family:'Courier New',Courier,monospace;font-size:28px;font-weight:700;color:#064e3b;letter-spacing:0.25em;padding:16px 20px;background:#ffffff;border:1px solid #d1fae5;border-radius:6px;display:inline-block">${d.token.slice(0, 4)} ${d.token.slice(4)}</div>
 <p style="color:#6b7280;font-size:12px;margin:14px 0 0;font-family:Arial,sans-serif">Expires: ${d.expiresAt}</p>
 </div>
 ${securityWarning("This token is strictly confidential. <strong>Never share it</strong> with anyone, including Bank of Asia Online staff.")}`,

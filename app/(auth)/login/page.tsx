@@ -118,13 +118,18 @@ function LoginInner() {
         return;
       }
 
+      if (pre.ok && preData.blocked) {
+        setBlockedMessage(preData.message || "YOUR ACCOUNT HAS BEEN BLOCKED. PLEASE CONTACT CUSTOMER CARE FOR SUPPORT.");
+        setStep("blocked");
+        setLoading(false);
+        return;
+      }
       if (pre.ok && preData.requires2fa) {
         setLoading(false);
         setStep("2fa");
         return;
       }
       // pre.ok && !requires2fa → no 2FA, proceed to signIn
-      // pre.ok && blocked → fall through to signIn for proper blocked message
     } catch {
       // Network error — fall through to signIn
     }
