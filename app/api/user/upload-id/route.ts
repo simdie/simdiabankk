@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const blobName = `documents/${session.user.id}/${safeName}-${timestamp}.${ext}`;
 
     const blob = await put(blobName, file, {
-      access: "public",
+      access: "private",
       contentType: file.type,
     });
 

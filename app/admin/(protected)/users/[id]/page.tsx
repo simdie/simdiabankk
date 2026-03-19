@@ -1072,7 +1072,7 @@ export default function AdminUserDetailPage() {
                         <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 1 }}>Uploaded {uploadDate} at {uploadTime}</div>
                       </div>
                       <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>{ext}</span>
-                      <button onClick={() => setDocPreview({ url: doc.fileUrl, fileType: doc.fileType, fileName: doc.fileName })} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "var(--color-accent)", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
+                      <button onClick={() => setDocPreview({ url: `/api/documents/${doc.id}/view`, fileType: doc.fileType, fileName: doc.fileName })} style={{ padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(0,212,255,0.25)", background: "rgba(0,212,255,0.06)", color: "var(--color-accent)", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}>
                         View
                       </button>
                       <button
