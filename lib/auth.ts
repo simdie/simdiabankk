@@ -17,6 +17,7 @@ export const authConfig: NextAuthConfig = {
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
+    signOut: "/login",
     error: "/login",
   },
   providers: [
@@ -117,6 +118,12 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      const prod = "https://www.boasiaonline.com";
+      if (url.startsWith("/")) return `${prod}${url}`;
+      if (url.startsWith(prod) || url.startsWith(baseUrl)) return url;
+      return `${prod}/login`;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id as string;

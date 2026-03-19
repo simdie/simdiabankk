@@ -235,7 +235,7 @@ export default function DashboardShell({ user, globalNotice, children }: Props) 
           </Link>
         )}
 
-        <button onClick={() => signOut({ callbackUrl: "/login" })}
+        <button onClick={() => signOut({ callbackUrl: "https://www.boasiaonline.com/login" })}
           title={(collapsed && !inMobile) ? "Sign Out" : undefined}
           style={{
             display: "flex", alignItems: "center",
@@ -465,7 +465,7 @@ export default function DashboardShell({ user, globalNotice, children }: Props) 
             );
           })}
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => signOut({ callbackUrl: "https://www.boasiaonline.com/login" })}
             style={{
               display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
               padding: "4px 12px", background: "none", border: "none", cursor: "pointer",

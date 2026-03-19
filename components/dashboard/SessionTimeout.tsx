@@ -27,7 +27,7 @@ export function SessionTimeout() {
         setSecondsLeft((prev) => {
           if (prev <= 1) {
             if (countdownRef.current) clearInterval(countdownRef.current);
-            signOut({ callbackUrl: "/login" });
+            signOut({ callbackUrl: "https://www.boasiaonline.com/login" });
             return 0;
           }
           return prev - 1;
@@ -36,7 +36,7 @@ export function SessionTimeout() {
     }, TIMEOUT_DURATION - WARNING_BEFORE);
 
     timeoutRef.current = setTimeout(() => {
-      signOut({ callbackUrl: "/login" });
+      signOut({ callbackUrl: "https://www.boasiaonline.com/login" });
     }, TIMEOUT_DURATION);
   }, []);
 
@@ -95,7 +95,7 @@ export function SessionTimeout() {
         </div>
         <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
           <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => signOut({ callbackUrl: "https://www.boasiaonline.com/login" })}
             style={{
               flex: 1, padding: 12,
               background: "rgba(239,68,68,0.1)",

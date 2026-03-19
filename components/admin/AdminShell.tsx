@@ -236,7 +236,7 @@ export default function AdminShell({
           {(!collapsed || inMobile) && "User Portal"}
         </Link>
 
-        <button onClick={() => signOut({ callbackUrl: "/login" })}
+        <button onClick={() => signOut({ callbackUrl: "https://www.boasiaonline.com/login" })}
           title={(collapsed && !inMobile) ? "Sign Out" : undefined}
           style={{
             display: "flex", alignItems: "center",
