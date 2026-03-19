@@ -127,6 +127,8 @@ export default function TransferClient({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [transferToken, setTransferToken] = useState("");
+  const [showToken, setShowToken] = useState(false);
+  const [tokenError, setTokenError] = useState("");
   const [success, setSuccess] = useState<{ reference: string; amount: number; currency: string; requiresEmailConfirm: boolean } | null>(null);
 
   // Internal
@@ -201,7 +203,27 @@ export default function TransferClient({
   }, [receiverAccountNumber, txType]);
 
   async function handleSubmit() {
-    setLoading(true); setError("");
+    setLoading(true); setError(""); setTokenError("");
+    if (requiresTokenForTransfers) {
+      if (!transferToken.trim()) {
+        setTokenError("Transfer token is required.");
+        setLoading(false); return;
+      }
+      try {
+        const validateRes = await fetch("/api/user/validate-transfer-token", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: transferToken.trim() }),
+        });
+        const validateData = await validateRes.json();
+        if (!validateData.valid) {
+          setTokenError("Invalid or expired token. Contact your admin.");
+          setLoading(false); return;
+        }
+      } catch {
+        setTokenError("Could not validate token. Please try again.");
+        setLoading(false); return;
+      }
+    }
     try {
       const body: Record<string, unknown> = {
         type: txType,
@@ -702,19 +724,40 @@ export default function TransferClient({
 
             {/* Token field */}
             {requiresTokenForTransfers && (
-              <div>
-                <label style={labelStyle}>Transfer Authorisation Token</label>
-                <input
-                  className="input-nexus"
-                  type="password"
-                  placeholder="Enter your transfer token"
-                  value={transferToken}
-                  onChange={(e) => setTransferToken(e.target.value)}
-                  style={{ fontFamily: "var(--font-jetbrains-mono)", letterSpacing: 2 }}
-                />
-                <div style={{ marginTop: 6, fontSize: 12, color: "var(--color-text-muted)" }}>
-                  Your account requires a one-time authorisation token to send funds.
+              <div style={{ background: "rgba(0,200,150,0.06)", border: "1px solid rgba(0,200,150,0.2)", borderRadius: 12, padding: 20 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 16 }}>
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>🔑</span>
+                  <p style={{ color: "#00C896", fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.6 }}>
+                    Transfer Token Code has been sent to your registered Email / Phone. Enter it below to authorise this transfer.
+                  </p>
                 </div>
+                <label style={{ display: "block", color: "#9CA3AF", fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>
+                  Transfer Token
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showToken ? "text" : "password"}
+                    value={transferToken}
+                    onChange={e => { setTransferToken(e.target.value); setTokenError(""); }}
+                    placeholder="Enter your transfer token"
+                    style={{
+                      width: "100%", background: "rgba(255,255,255,0.05)",
+                      border: tokenError ? "1px solid #EF4444" : "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 10, padding: "14px 48px 14px 16px",
+                      color: "#FFFFFF", fontSize: 15,
+                      fontFamily: "var(--font-jetbrains-mono)", letterSpacing: "0.08em",
+                      outline: "none", boxSizing: "border-box",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowToken(p => !p)}
+                    style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6B7280", cursor: "pointer", padding: 4, fontSize: 16 }}
+                  >
+                    {showToken ? "🙈" : "👁️"}
+                  </button>
+                </div>
+                {tokenError && <p style={{ color: "#EF4444", fontSize: 12, margin: "6px 0 0" }}>{tokenError}</p>}
               </div>
             )}
 

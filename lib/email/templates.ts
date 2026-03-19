@@ -422,6 +422,30 @@ export function transferTokenEmail(d: { firstName: string; token: string; expire
   return { subject: "Your Bank of Asia Transfer Security Token", html: tmplTransferToken(d) };
 }
 
+export function tmplAccountBlocked(d: { firstName: string; message: string }): string {
+  return wrap(
+    `<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:10px;padding:20px;text-align:center;margin-bottom:28px">
+  <div style="font-size:32px;margin-bottom:8px">🔒</div>
+  <p style="color:#991b1b;font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin:0">Account Access Restricted</p>
+</div>
+<h1 style="color:#111827;font-size:22px;font-weight:700;margin:0 0 16px;font-family:Arial,sans-serif">Account Notice</h1>
+<p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 24px;font-family:Arial,sans-serif">Hello ${d.firstName},</p>
+<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:20px;margin-bottom:24px">
+  <p style="color:#991b1b;font-size:15px;font-weight:600;line-height:1.7;margin:0;font-family:Arial,sans-serif">${d.message}</p>
+</div>
+<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin-bottom:24px">
+  <p style="color:#374151;font-size:14px;line-height:1.7;margin:0 0 8px;font-family:Arial,sans-serif">To resolve this, please contact our support team:</p>
+  <p style="color:#374151;font-size:14px;line-height:1.8;margin:0;font-family:Arial,sans-serif">
+    ✉️ <strong>support@boasiaonline.com</strong><br/>
+    📞 Singapore: <strong>+65 6532 1234</strong><br/>
+    📞 USA: <strong>+1 (212) 555-0147</strong>
+  </p>
+</div>
+<p style="color:#6b7280;font-size:13px;text-align:center;margin:0;font-family:Arial,sans-serif">Please do not attempt further logins until this matter is resolved.</p>`,
+    "Important notice regarding your Bank of Asia Online account."
+  );
+}
+
 export function accountRestrictedEmail(d: { firstName: string; restrictionMessage: string }) {
   return {
     subject: "Important: Your Bank of Asia Online Account Status",

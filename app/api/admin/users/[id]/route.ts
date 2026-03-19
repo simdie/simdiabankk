@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { sendEmail } from "@/lib/email/send";
-import { tmplAccountActivated, accountRestrictedEmail } from "@/lib/email/templates";
+import { tmplAccountActivated, accountRestrictedEmail, tmplAccountBlocked } from "@/lib/email/templates";
 
 export async function GET(
   req: NextRequest,
@@ -152,8 +152,18 @@ export async function PATCH(
           html: tmplAccountActivated({ firstName: u.firstName, accountNumber: acc?.accountNumber ?? "N/A", currency: acc?.currency ?? "USD" }),
         });
       } else {
-        const { html, subject } = accountRestrictedEmail({ firstName: u.firstName, restrictionMessage: body.adminNotes ?? "Your account status has been updated. Please contact support for more information." });
-        await sendEmail({ to: u.email, subject, html });
+        const restrictionMessage = body.adminNotes ?? "Your account status has been updated. Please contact support for more information.";
+        const isBlocked = restrictionMessage.toUpperCase().includes("BLOCKED");
+        if (isBlocked) {
+          await sendEmail({
+            to: u.email,
+            subject: "⚠️ Important Notice — Bank of Asia Online Account",
+            html: tmplAccountBlocked({ firstName: u.firstName, message: restrictionMessage }),
+          });
+        } else {
+          const { html, subject } = accountRestrictedEmail({ firstName: u.firstName, restrictionMessage });
+          await sendEmail({ to: u.email, subject, html });
+        }
       }
     }
   }

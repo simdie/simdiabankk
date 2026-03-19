@@ -402,19 +402,92 @@ function BlockedStep({ blockedMessage, setStep, setError, setBlockedMessage }: {
   setStep: (s: Step) => void; setError: (s: string) => void; setBlockedMessage: (s: string) => void;
 }) {
   return (
-    <div className="animate-fade-slide-up">
-      <div style={{ borderRadius: 16, padding: "32px 28px", background: "linear-gradient(135deg, rgba(255,59,92,0.08), rgba(13,26,48,0.9))", border: "1px solid rgba(255,59,92,0.3)", boxShadow: "0 0 40px rgba(255,59,92,0.1)", textAlign: "center" }}>
-        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(255,59,92,0.1)", border: "2px solid rgba(255,59,92,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, margin: "0 auto 20px", boxShadow: "0 0 30px rgba(255,59,92,0.2)" }}>🔒</div>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-danger)", marginBottom: 8 }}>Access Restricted</div>
-        <h2 style={{ fontFamily: "var(--font-dm-sans)", fontSize: 22, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 20 }}>Account Access Denied</h2>
-        <div style={{ padding: "16px", borderRadius: 10, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,59,92,0.15)", fontFamily: "var(--font-jetbrains-mono)", fontSize: 12.5, lineHeight: 1.7, color: "rgba(255,150,160,0.9)", textAlign: "left", marginBottom: 24 }}>
-          {blockedMessage}
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 9999,
+      background: "rgba(0,0,0,0.92)",
+      backdropFilter: "blur(12px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "24px",
+    }}>
+      <div style={{
+        background: "#0A0F1E",
+        border: "1px solid rgba(239,68,68,0.3)",
+        borderRadius: "20px",
+        padding: "48px 40px",
+        maxWidth: "480px", width: "100%",
+        textAlign: "center",
+        boxShadow: "0 0 80px rgba(239,68,68,0.15), 0 25px 50px rgba(0,0,0,0.8)",
+      }}>
+        {/* Lock icon */}
+        <div style={{
+          width: 80, height: 80, borderRadius: "50%",
+          background: "rgba(239,68,68,0.1)",
+          border: "2px solid rgba(239,68,68,0.3)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          margin: "0 auto 24px", fontSize: 36,
+          boxShadow: "0 0 30px rgba(239,68,68,0.2)",
+        }}>🔒</div>
+
+        {/* Warning badge */}
+        <div style={{
+          background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
+          borderRadius: "100px", padding: "6px 20px",
+          display: "inline-block", marginBottom: "20px",
+        }}>
+          <span style={{ color: "#EF4444", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            ⚠️ Access Restricted
+          </span>
         </div>
-        <a href="mailto:support@boasiaonline.com?subject=Account Access Issue" className="btn-danger" style={{ width: "100%", display: "flex", justifyContent: "center", textDecoration: "none", marginBottom: 14 }}>
-          Contact Support
+
+        {/* Heading */}
+        <h2 style={{ color: "#FFFFFF", fontSize: 22, fontWeight: 700, margin: "0 0 16px", lineHeight: 1.3 }}>
+          Account Access Blocked
+        </h2>
+
+        {/* Message */}
+        <div style={{
+          background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+          borderRadius: 10, padding: "16px 20px", marginBottom: 24,
+        }}>
+          <p style={{ color: "#FCA5A5", fontSize: 14, lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
+            {blockedMessage || "YOUR ACCOUNT HAS BEEN BLOCKED. PLEASE CONTACT CUSTOMER CARE FOR SUPPORT."}
+          </p>
+        </div>
+
+        {/* Contact info */}
+        <div style={{
+          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 10, padding: "16px 20px", marginBottom: 28, textAlign: "left",
+        }}>
+          <p style={{ color: "#9CA3AF", fontSize: 13, margin: "0 0 10px", fontWeight: 600 }}>
+            Contact Support to Resolve:
+          </p>
+          <p style={{ color: "#D1D5DB", fontSize: 13, lineHeight: 2, margin: 0 }}>
+            ✉️ support@boasiaonline.com<br/>
+            📞 +65 6532 1234 (Singapore)<br/>
+            📞 +1 (212) 555-0147 (USA)
+          </p>
+        </div>
+
+        {/* Contact button */}
+        <a href="mailto:support@boasiaonline.com" style={{
+          display: "block", background: "#EF4444", color: "#FFFFFF",
+          padding: "14px 32px", borderRadius: 10, fontSize: 15, fontWeight: 600,
+          textDecoration: "none", marginBottom: 12,
+        }}>
+          Contact Support →
         </a>
-        <button onClick={() => { setStep("credentials"); setError(""); setBlockedMessage(""); }} style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>
-          ← Back
+
+        {/* Back button */}
+        <button
+          onClick={() => { setStep("credentials"); setError(""); setBlockedMessage(""); }}
+          style={{
+            background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
+            color: "#6B7280", padding: "12px 32px", borderRadius: 10,
+            fontSize: 14, cursor: "pointer", width: "100%",
+          }}
+        >
+          ← Back to Login
         </button>
       </div>
     </div>

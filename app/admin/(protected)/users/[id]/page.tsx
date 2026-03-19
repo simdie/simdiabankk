@@ -12,6 +12,7 @@ import DatePicker from "@/components/ui/DatePicker";
 const G = "#F0B429";
 
 const SCARY_MESSAGES = [
+  { label: "Account Block", value: "YOUR ACCOUNT HAS BEEN BLOCKED. PLEASE CONTACT CUSTOMER CARE FOR SUPPORT.", red: true },
   { label: "Federal Mandate", value: "ERROR: ACCOUNT FROZEN BY FEDERAL MANDATE. CONTACT COMPLIANCE IMMEDIATELY." },
   { label: "Suspicious Activity", value: "ACCOUNT SUSPENDED — SUSPICIOUS ACTIVITY DETECTED. LEGAL HOLD APPLIED. DO NOT ATTEMPT FURTHER ACCESS." },
   { label: "Regulatory Review", value: "ACCESS DENIED: ACCOUNT UNDER REGULATORY REVIEW. ALL TRANSACTIONS FROZEN PENDING INVESTIGATION." },
@@ -379,7 +380,7 @@ export default function AdminUserDetailPage() {
                 <div className="flex flex-wrap gap-2 mb-3">
                   {SCARY_MESSAGES.map(m => (
                     <button key={m.label} onClick={() => setRestrictionMsg(m.value)}
-                      style={{ padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "rgba(255,59,92,0.08)", border: "1px solid rgba(255,59,92,0.2)", color: "var(--color-danger)" }}>
+                      style={m.red ? { padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", color: "#EF4444" } : { padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: "pointer", background: "rgba(255,59,92,0.08)", border: "1px solid rgba(255,59,92,0.2)", color: "var(--color-danger)" }}>
                       {m.label}
                     </button>
                   ))}
