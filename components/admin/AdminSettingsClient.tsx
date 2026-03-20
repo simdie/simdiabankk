@@ -264,16 +264,6 @@ export default function AdminSettingsClient() {
 
         {[
           {
-            field: "requireEmailConfirmForTransfers" as keyof Settings,
-            value: settings.requireEmailConfirmForTransfers,
-            label: "Transfer Email Confirmation",
-            desc: "Users must confirm transfers via email link before they execute. Adds friction but prevents unauthorized transfers.",
-            confirmTitle: settings.requireEmailConfirmForTransfers ? "Disable Email Confirmation" : "Enable Email Confirmation",
-            confirmMsg: settings.requireEmailConfirmForTransfers
-              ? "Transfers will execute immediately without email verification. Ensure other controls are in place."
-              : "All new transfers will require users to click a confirmation link in their email before processing.",
-          },
-          {
             field: "requireTokenForTransfers" as keyof Settings,
             value: settings.requireTokenForTransfers,
             label: "Transfer Token Requirement",

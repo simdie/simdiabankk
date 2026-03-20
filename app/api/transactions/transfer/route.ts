@@ -41,17 +41,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
 
-  // Check transfer token if required
-  const settings = await prisma.systemSettings.findUnique({ where: { id: "singleton" } });
-  if (settings?.requireTokenForTransfers) {
+  // Validate per-user transfer token when one is active
+  if (user.transferToken && user.transferTokenExp && new Date() < user.transferTokenExp) {
     const { transferToken } = body;
-    if (!user.transferToken || !user.transferTokenExp) {
-      return NextResponse.json({ error: "Transfer token required. Contact your administrator." }, { status: 403 });
-    }
-    if (new Date() > user.transferTokenExp) {
-      return NextResponse.json({ error: "Transfer token has expired." }, { status: 403 });
-    }
-    if (user.transferToken !== transferToken) {
+    if (!transferToken || user.transferToken !== transferToken) {
       return NextResponse.json({ error: "Invalid transfer token." }, { status: 403 });
     }
   }

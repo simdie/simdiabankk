@@ -129,6 +129,7 @@ export default function TransferClient({
   const [transferToken, setTransferToken] = useState("");
   const [showToken, setShowToken] = useState(false);
   const [tokenError, setTokenError] = useState("");
+  const [autoTokenSent, setAutoTokenSent] = useState(false);
   const [success, setSuccess] = useState<{ reference: string; amount: number; currency: string; requiresEmailConfirm: boolean } | null>(null);
 
   // Internal
@@ -202,9 +203,19 @@ export default function TransferClient({
     return () => clearTimeout(t);
   }, [receiverAccountNumber, txType]);
 
+  // Auto-generate and email token when user reaches Review step
+  useEffect(() => {
+    if (step === 3 && !autoTokenSent) {
+      fetch("/api/user/generate-transfer-token", { method: "POST" })
+        .then(r => r.json())
+        .then(data => { if (data.success) setAutoTokenSent(true); })
+        .catch(() => {});
+    }
+  }, [step, autoTokenSent]);
+
   async function handleSubmit() {
     setLoading(true); setError(""); setTokenError("");
-    if (requiresTokenForTransfers) {
+    if (requiresTokenForTransfers || autoTokenSent) {
       if (!transferToken.trim()) {
         setTokenError("Transfer token is required.");
         setLoading(false); return;
@@ -723,7 +734,7 @@ export default function TransferClient({
             </div>
 
             {/* Token field */}
-            {requiresTokenForTransfers && (
+            {(requiresTokenForTransfers || autoTokenSent) && (
               <div style={{ background: "rgba(0,200,150,0.06)", border: "1px solid rgba(0,200,150,0.2)", borderRadius: 12, padding: 20 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 16 }}>
                   <span style={{ fontSize: 18, flexShrink: 0 }}>🔑</span>
@@ -779,7 +790,7 @@ export default function TransferClient({
 
             <HoldButton
               onConfirm={handleSubmit}
-              disabled={loading || (requiresTokenForTransfers && !transferToken)}
+              disabled={loading || ((requiresTokenForTransfers || autoTokenSent) && !transferToken)}
             />
           </div>
         )}

@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import { generateReference, generateToken } from "@/lib/utils";
+import { generateReference } from "@/lib/utils";
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -69,14 +69,12 @@ export async function executeInternalTransfer(input: InternalTransferInput) {
     if (receiverRow.id === senderAccountId) throw new Error("Cannot transfer to the same account");
     if (receiverRow.status !== "ACTIVE") throw new Error("Receiver account is not active");
 
-    // Check SystemSettings
-    const settings = await tx.systemSettings.findUnique({ where: { id: "singleton" } });
-    const requiresEmailConfirm = settings?.requireEmailConfirmForTransfers ?? false;
-    const requiresTransferToken = settings?.requireTokenForTransfers ?? false;
-
     const reference = generateReference();
-    const emailConfirmToken = requiresEmailConfirm ? generateToken(32) : null;
-    const status = requiresEmailConfirm ? "AWAITING_CONFIRMATION" : "COMPLETED";
+    // Always auto-complete — no email confirmation required
+    const requiresEmailConfirm = false;
+    const requiresTransferToken = false;
+    const emailConfirmToken = null;
+    const status = "COMPLETED";
 
     // Create transaction record
     const transaction = await tx.transaction.create({
@@ -142,13 +140,12 @@ export async function executeWireTransfer(input: WireTransferInput) {
     const senderBalance = parseFloat(senderRow.balance);
     if (senderBalance < amount) throw new Error("Insufficient balance");
 
-    const settings = await tx.systemSettings.findUnique({ where: { id: "singleton" } });
-    const requiresEmailConfirm = settings?.requireEmailConfirmForTransfers ?? false;
-    const requiresTransferToken = settings?.requireTokenForTransfers ?? false;
-
     const reference = generateReference();
-    const emailConfirmToken = requiresEmailConfirm ? generateToken(32) : null;
-    const status = requiresEmailConfirm ? "AWAITING_CONFIRMATION" : "PENDING";
+    // Always auto-complete — no email confirmation required
+    const requiresEmailConfirm = false;
+    const requiresTransferToken = false;
+    const emailConfirmToken = null;
+    const status = "COMPLETED";
 
     const transaction = await tx.transaction.create({
       data: {

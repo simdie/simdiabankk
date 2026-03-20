@@ -691,46 +691,10 @@ export default function AdminUserDetailPage() {
             {/* Transfer Token card */}
             <Card>
               <CardTitle>Transfer Token</CardTitle>
-              {user.transferToken ? (
-                <div className="mb-4">
-                  <div style={{ fontSize: 13, color: "var(--color-text-muted)", marginBottom: 8 }}>
-                    Active — expires {new Date(user.transferTokenExp).toLocaleString()}
-                  </div>
-                  <div className="break-all" style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: "var(--color-accent)", padding: "8px 12px", borderRadius: 8, background: "rgba(0,212,255,0.05)", border: "1px solid rgba(0,212,255,0.15)" }}>
-                    {user.transferToken}
-                  </div>
-                </div>
-              ) : (
-                <div style={{ fontSize: 13, color: "var(--color-text-muted)", marginBottom: 14 }}>No active token</div>
-              )}
-              {newToken && (
-                <div className="mb-4" style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(0,229,160,0.06)", border: "1px solid rgba(0,229,160,0.2)" }}>
-                  <div style={{ fontSize: 11, color: "var(--color-success)", fontWeight: 700, marginBottom: 6 }}>NEW TOKEN (share with user):</div>
-                  <div className="break-all" style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: "var(--color-text-primary)" }}>{newToken}</div>
-                  <CopyButton text={newToken} label="Copy Token" />
-                </div>
-              )}
-              <div className="flex flex-col gap-3">
-                <Select
-                  options={[
-                    { value: "1h", label: "1 hour" },
-                    { value: "6h", label: "6 hours" },
-                    { value: "24h", label: "24 hours" },
-                    { value: "72h", label: "72 hours" },
-                  ]}
-                  value={tokenExpiry} onChange={setTokenExpiry}
-                />
-                <div className="flex gap-2">
-                  <button onClick={generateToken} className="btn-nexus flex-1" style={{ padding: "10px", fontSize: 13 }} disabled={tokenLoading}>
-                    {tokenLoading ? "Generating…" : "Generate Token"}
-                  </button>
-                  {user.transferToken && (
-                    <button onClick={revokeToken} className="flex-1"
-                      style={{ padding: "10px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(255,59,92,0.3)", background: "rgba(255,59,92,0.08)", color: "var(--color-danger)", fontWeight: 700, cursor: "pointer" }}>
-                      Revoke
-                    </button>
-                  )}
-                </div>
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: 20 }}>
+                <p style={{ color: "#6B7280", fontSize: 13, margin: 0, lineHeight: 1.6 }}>
+                  Transfer tokens are now automatically generated and sent to the user&apos;s email when they initiate a transfer. No manual generation required.
+                </p>
               </div>
             </Card>
 

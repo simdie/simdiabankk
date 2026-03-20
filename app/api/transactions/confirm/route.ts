@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { confirmEmailTransaction } from "@/lib/transactions";
 
 export async function GET(req: NextRequest) {
+  // Email confirmation is no longer required — all transfers auto-complete.
+  return Response.json({ message: "Email confirmation is no longer required." });
+
   const token = req.nextUrl.searchParams.get("token");
   if (!token) {
     return new NextResponse(errorPage("Missing confirmation token."), {
